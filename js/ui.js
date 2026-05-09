@@ -4,7 +4,6 @@
 
 const UIManager = {
     currentMainTab: 'calculatorPanel',
-    currentEnergyMode: 'pulse-to-energy',
     currentAccuracyMode: 'manual',
 
     switchMainTab(panelId) {
@@ -60,24 +59,11 @@ const UIManager = {
                 if (vtLiveRatio) vtLiveRatio.style.display = 'flex';
                 break;
         }
-        const resultsPanel = document.getElementById('calcResultsPanel');
-        if (resultsPanel) resultsPanel.style.display = 'none';
+        document.getElementById('calcResultsPanel').style.display = 'none';
         Calculator.updateLiveRatios();
         if (navigator.vibrate) navigator.vibrate(8);
     },
 
-    switchEnergyMode(mode) {
-        this.currentEnergyMode = mode;
-        Calculator.currentEnergyMode = mode;
-        document.getElementById('togglePulseToEnergy').classList.toggle('active', mode === 'pulse-to-energy');
-        document.getElementById('toggleEnergyToPulse').classList.toggle('active', mode === 'energy-to-pulse');
-        document.getElementById('energyPulseToEnergy').style.display = mode === 'pulse-to-energy' ? 'block' : 'none';
-        document.getElementById('energyEnergyToPulse').style.display = mode === 'energy-to-pulse' ? 'block' : 'none';
-        document.getElementById('energyResult').style.display = 'none';
-        if (navigator.vibrate) navigator.vibrate(8);
-    },
-
-    // NEW: Accuracy mode toggle
     switchAccuracyMode(mode) {
         this.currentAccuracyMode = mode;
         Calculator.currentAccuracyMode = mode;
@@ -106,9 +92,6 @@ const UIManager = {
         document.getElementById('energyPulseCount').value = '';
         document.getElementById('energyPulseConst').value = '';
         document.getElementById('energyMultiplier').value = '1';
-        document.getElementById('energyTarget').value = '';
-        document.getElementById('energyPulseConst2').value = '';
-        document.getElementById('energyMultiplier2').value = '1';
         document.getElementById('energyResult').style.display = 'none';
         document.getElementById('accReference').value = '';
         document.getElementById('accPulseCount').value = '';
@@ -170,15 +153,9 @@ const UIManager = {
 
     shareCalculatorResult() {
         const lastCalc = Calculator.history.find(h => h.type === 'calculator');
-        if (!lastCalc) {
-            this.showToast('Tiada keputusan untuk dikongsi', 'error');
-            return;
-        }
-        const text = `📊 MeterCalc Pro\n⚡ Mode: ${lastCalc.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n🔌 Primary Pulse = ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n📋 ${lastCalc.supply} | Cl.${lastCalc.meterClass}`;
-        if (navigator.share) {
-            navigator.share({ title: 'MeterCalc Pro Result', text }).catch(() => {});
-        } else {
-            navigator.clipboard.writeText(text).then(() => this.showToast('📋 Keputusan disalin!', 'success'));
-        }
+        if (!lastCalc) { this.showToast('Tiada keputusan', 'error'); return; }
+        const text = `📊 MeterCalc Pro\n⚡ ${lastCalc.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n📋 ${lastCalc.supply} | Cl.${lastCalc.meterClass}`;
+        if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {});
+        else navigator.clipboard.writeText(text).then(() => this.showToast('📋 Disalin!', 'success'));
     }
 };
