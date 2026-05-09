@@ -1,5 +1,4 @@
-const LANG = {
-    current: 'bm',
+const LANG_DATA = {
     bm: {
         calcDone: '✅ Pengiraan selesai!', energyDone: '✅ Tenaga dikira!', dialPass: '✅ LULUS!', dialFail: '❌ GAGAL!', mdDone: '✅ MD dikira!',
         errConstActive: '❌ Meter Constant Active mesti > 0', errCTPrimary: '❌ CT Primary mesti > 0', errCTSecondary: '❌ CT Secondary mesti > 0',
@@ -7,8 +6,8 @@ const LANG = {
         warnCTSwap: '⚠️ CT Secondary > Primary?', errPulseCount: '❌ Jumlah Pulse mesti ≥ 0', errPulseConst: '❌ Pulse Constant mesti > 0',
         errPulseCountWS: '❌ Pulse Count (Working Standard) mesti ≥ 0', errStart: '❌ Sila masukkan Bacaan Mula', errEnd: '❌ Sila masukkan Bacaan Akhir',
         errEndLess: '❌ Bacaan Akhir mesti > Bacaan Mula', errRealPulse: '❌ Real Pulse mesti ≥ 0',
-        resetDone: '🔄 Semua dikosongkan!', historyCleared: '🗑️ Sejarah dipadamkan!', copied: '📋 Disalin!',
-        historyEmpty: 'Tiada rekod'
+        resetDone: '🔄 Semua dikosongkan!', historyCleared: '🗑️ Sejarah dipadamkan!', copied: '📋 Disalin!', csvDone: '📥 CSV dimuat turun!',
+        noResult: 'Tiada keputusan', confirmClear: 'Padam semua sejarah?'
     },
     en: {
         calcDone: '✅ Calculation complete!', energyDone: '✅ Energy calculated!', dialPass: '✅ PASS!', dialFail: '❌ FAIL!', mdDone: '✅ MD calculated!',
@@ -17,14 +16,170 @@ const LANG = {
         warnCTSwap: '⚠️ CT Secondary > Primary?', errPulseCount: '❌ Pulse Count must be ≥ 0', errPulseConst: '❌ Pulse Constant must be > 0',
         errPulseCountWS: '❌ Pulse Count (Working Standard) must be ≥ 0', errStart: '❌ Please enter Start Reading', errEnd: '❌ Please enter End Reading',
         errEndLess: '❌ End Reading must be > Start Reading', errRealPulse: '❌ Real Pulse must be ≥ 0',
-        resetDone: '🔄 All cleared!', historyCleared: '🗑️ History deleted!', copied: '📋 Copied!',
-        historyEmpty: 'No records'
+        resetDone: '🔄 All cleared!', historyCleared: '🗑️ History deleted!', copied: '📋 Copied!', csvDone: '📥 CSV downloaded!',
+        noResult: 'No results', confirmClear: 'Delete all history?'
     }
 };
 
 const UIManager = {
     currentMainTab: 'calculatorPanel',
+    currentLang: 'bm',
 
+    // ============ LANGUAGE ============
+    toggleLanguage() {
+        this.currentLang = this.currentLang === 'bm' ? 'en' : 'bm';
+        document.getElementById('btnLang').textContent = this.currentLang === 'bm' ? '🇲🇾' : '🇬🇧';
+        this.updateAllLabels();
+    },
+
+    t(key) {
+        return LANG_DATA[this.currentLang][key] || key;
+    },
+
+    updateAllLabels() {
+        const lang = this.currentLang;
+        const t = LANG_DATA[lang];
+
+        // Main tab labels
+        const tabLabels = {
+            'calculatorPanel': lang === 'bm' ? 'Kalkulator' : 'Calculator',
+            'energyPanel': lang === 'bm' ? 'Tenaga' : 'Energy',
+            'dialTestPanel': lang === 'bm' ? 'Dial Test' : 'Dial Test',
+            'demandPanel': lang === 'bm' ? 'MD' : 'MD',
+            'historyPanel': lang === 'bm' ? 'Sejarah' : 'History',
+            'referencePanel': lang === 'bm' ? 'Rujukan' : 'Reference'
+        };
+
+        document.querySelectorAll('.main-tab').forEach(tab => {
+            const panelId = tab.dataset.panel;
+            const labelSpan = tab.querySelector('.main-tab-label');
+            if (labelSpan && tabLabels[panelId]) {
+                labelSpan.textContent = tabLabels[panelId];
+            }
+        });
+
+        // Panel titles
+        const titles = {
+            'calculatorPanel': { title: lang === 'bm' ? '📋 Parameter Input' : '📋 Parameter Input', results: lang === 'bm' ? '📊 Keputusan' : '📊 Results' },
+            'energyPanel': { title: lang === 'bm' ? '🔢 Pulse → Tenaga' : '🔢 Pulse → Energy', desc: lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.' },
+            'dialTestPanel': { title: lang === 'bm' ? '📊 Dial Test' : '📊 Dial Test' },
+            'demandPanel': { title: lang === 'bm' ? '🕐 Maximum Demand' : '🕐 Maximum Demand', desc: lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.' },
+            'historyPanel': { title: lang === 'bm' ? '📋 Sejarah' : '📋 History' },
+            'referencePanel': { title: lang === 'bm' ? '📚 Rujukan Pantas' : '📚 Quick Reference' }
+        };
+
+        Object.keys(titles).forEach(panelId => {
+            const panel = document.getElementById(panelId);
+            if (!panel) return;
+            const h2 = panel.querySelector('.panel-header h2');
+            if (h2 && titles[panelId].title) h2.textContent = titles[panelId].title;
+            const desc = panel.querySelector('.panel-desc');
+            if (desc && titles[panelId].desc) desc.textContent = titles[panelId].desc;
+        });
+
+        // Results title
+        const resultsPanel = document.getElementById('calcResultsPanel');
+        if (resultsPanel) {
+            const resultH2 = resultsPanel.querySelector('.panel-header h2');
+            if (resultH2) resultH2.textContent = titles['calculatorPanel'].results;
+        }
+
+        // Input labels
+        const inputLabels = {
+            'meterConstActive': lang === 'bm' ? 'Meter Constant Active' : 'Meter Constant Active',
+            'meterConstReactive': lang === 'bm' ? 'Meter Constant Reactive' : 'Meter Constant Reactive',
+            'supplyType': lang === 'bm' ? 'Jenis Supply' : 'Supply Type',
+            'meterClass': lang === 'bm' ? 'Class Meter' : 'Meter Class',
+            'ctPrimary': lang === 'bm' ? 'CT Primary' : 'CT Primary',
+            'ctSecondary': lang === 'bm' ? 'CT Secondary' : 'CT Secondary',
+            'ctRatio': lang === 'bm' ? 'CT Ratio' : 'CT Ratio',
+            'vtPrimary': lang === 'bm' ? 'VT Primary' : 'VT Primary',
+            'vtSecondary': lang === 'bm' ? 'VT Secondary' : 'VT Secondary',
+            'vtRatio': lang === 'bm' ? 'VT Ratio' : 'VT Ratio',
+            'energyUnit': lang === 'bm' ? 'Unit Tenaga' : 'Energy Unit',
+            'energyPulse': lang === 'bm' ? 'Jumlah Pulse' : 'Pulse Count',
+            'pulseConst': lang === 'bm' ? 'Pulse Constant' : 'Pulse Constant',
+            'multiplier': lang === 'bm' ? 'Multiplier (M)' : 'Multiplier (M)',
+            'dialUnit': lang === 'bm' ? 'Unit' : 'Unit',
+            'dialClass': lang === 'bm' ? 'Class' : 'Class',
+            'dialPulseConst': lang === 'bm' ? 'Pulse Constant' : 'Pulse Constant',
+            'dialMultiplier': lang === 'bm' ? 'Multiplier (M)' : 'Multiplier (M)',
+            'dialPulseCount': lang === 'bm' ? 'Pulse Count' : 'Pulse Count',
+            'dialStart': lang === 'bm' ? 'Bacaan Mula' : 'Start Reading',
+            'dialEnd': lang === 'bm' ? 'Bacaan Akhir' : 'End Reading',
+            'dialRealPulse': lang === 'bm' ? 'Real Pulse' : 'Real Pulse',
+            'mdPulse': lang === 'bm' ? 'Jumlah Pulse (30 minit)' : 'Pulse Count (30 min)',
+            'mdPulseConst': lang === 'bm' ? 'Pulse Constant' : 'Pulse Constant',
+            'mdMultiplier': lang === 'bm' ? 'Multiplier (M)' : 'Multiplier (M)',
+        };
+
+        document.querySelectorAll('.input-label span:first-child').forEach(span => {
+            // Find which label key matches
+            for (const [key, label] of Object.entries(inputLabels)) {
+                if (span.parentElement && span.parentElement.parentElement) {
+                    const parentId = span.closest('.input-block')?.querySelector('input, select')?.id;
+                    if (parentId === key || span.textContent.includes(inputLabels[key])) {
+                        span.textContent = label;
+                        break;
+                    }
+                }
+            }
+        });
+
+        // Button labels
+        const calcBtn = document.querySelector('#calculatorPanel .btn-calculate span');
+        if (calcBtn) calcBtn.textContent = lang === 'bm' ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE';
+
+        const energyBtn = document.querySelector('#energyPanel .btn-calculate span');
+        if (energyBtn) energyBtn.textContent = lang === 'bm' ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY';
+
+        const dialBtn = document.querySelector('#dialTestPanel .btn-calculate span');
+        if (dialBtn) dialBtn.textContent = lang === 'bm' ? '📊 KIRA' : '📊 CALCULATE';
+
+        const mdBtn = document.querySelector('#demandPanel .btn-calculate span');
+        if (mdBtn) mdBtn.textContent = lang === 'bm' ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
+
+        // History action buttons
+        const historyBtns = document.querySelectorAll('#historyPanel .btn-text');
+        if (historyBtns.length >= 3) {
+            historyBtns[0].textContent = lang === 'bm' ? '📋 Salin' : '📋 Copy';
+            historyBtns[1].textContent = lang === 'bm' ? '📥 CSV' : '📥 CSV';
+            historyBtns[2].textContent = lang === 'bm' ? 'Padam Semua' : 'Clear All';
+        }
+
+        // Reference titles
+        const refTitles = document.querySelectorAll('#referencePanel .ref-title');
+        if (refTitles.length >= 5) {
+            refTitles[0].textContent = lang === 'bm' ? 'Standard CT Ratios' : 'Standard CT Ratios';
+            refTitles[1].textContent = lang === 'bm' ? 'Standard VT Ratios' : 'Standard VT Ratios';
+            refTitles[2].textContent = lang === 'bm' ? 'Standard Meter Constants' : 'Standard Meter Constants';
+            refTitles[3].textContent = lang === 'bm' ? 'Class Limits' : 'Class Limits';
+            refTitles[4].textContent = lang === 'bm' ? '📏 Decimal Point Rules' : '📏 Decimal Point Rules';
+        }
+
+        // Energy calc result label
+        const energyResultLabel = document.querySelector('#energyResult .calc-result-label');
+        if (energyResultLabel) energyResultLabel.textContent = lang === 'bm' ? 'Tenaga' : 'Energy';
+
+        // Dial result label
+        const dialResultLabel = document.querySelector('#dialResult .calc-result-label');
+        if (dialResultLabel) dialResultLabel.textContent = lang === 'bm' ? 'Keputusan' : 'Results';
+
+        // MD result label
+        const mdResultLabel = document.querySelector('#demandResult .calc-result-label');
+        if (mdResultLabel) mdResultLabel.textContent = lang === 'bm' ? 'Maximum Demand' : 'Maximum Demand';
+
+        // Empty state
+        const emptyState = document.querySelector('#historyList .empty-state p');
+        if (emptyState) emptyState.textContent = lang === 'bm' ? 'Tiada rekod' : 'No records';
+
+        // Update history if visible
+        if (this.currentMainTab === 'historyPanel') {
+            Calculator.renderHistory();
+        }
+    },
+
+    // ============ MAIN TAB SWITCHING ============
     switchMainTab(panelId) {
         this.currentMainTab = panelId;
         document.querySelectorAll('.main-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.panel === panelId));
@@ -58,29 +213,35 @@ const UIManager = {
         if (navigator.vibrate) navigator.vibrate(8);
     },
 
-    toggleLanguage() {
-        LANG.current = LANG.current === 'bm' ? 'en' : 'bm';
-        document.getElementById('btnLang').textContent = LANG.current === 'bm' ? '🇲🇾' : '🇬🇧';
-    },
-
     resetAll() {
         Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel');
         document.getElementById('calcResultsPanel').style.display = 'none';
         document.getElementById('energyResult').style.display = 'none';
         document.getElementById('dialResult').style.display = 'none';
         document.getElementById('demandResult').style.display = 'none';
-        this.showToast(LANG[LANG.current].resetDone, 'success');
+        this.showToast(this.t('resetDone'), 'success');
         document.getElementById('calculatorPanel').scrollIntoView({ behavior: 'smooth' });
     },
 
-    clearHistory() { if (confirm('Padam semua?')) { Calculator.history = []; Calculator.saveHistory(); Calculator.renderHistory(); this.showToast(LANG[LANG.current].historyCleared, 'success'); } },
-    copyAllHistory() { navigator.clipboard.writeText(Calculator.exportHistoryCSV()).then(() => this.showToast(LANG[LANG.current].copied, 'success')); },
+    clearHistory() {
+        if (confirm(this.t('confirmClear'))) {
+            Calculator.history = [];
+            Calculator.saveHistory();
+            Calculator.renderHistory();
+            this.showToast(this.t('historyCleared'), 'success');
+        }
+    },
+
+    copyAllHistory() {
+        navigator.clipboard.writeText(Calculator.exportHistoryCSV()).then(() => this.showToast(this.t('copied'), 'success'));
+    },
+
     exportCSV() {
         const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' });
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click();
         URL.revokeObjectURL(url);
-        this.showToast('📥 CSV dimuat turun!', 'success');
+        this.showToast(this.t('csvDone'), 'success');
     },
 
     _toastTimeout: null,
@@ -97,17 +258,19 @@ const UIManager = {
         icon.innerHTML = isLight ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
         localStorage.setItem('metercalc_theme', isLight ? 'light' : 'dark');
     },
+
     loadTheme() {
         if (localStorage.getItem('metercalc_theme') === 'light') {
             document.body.classList.add('light-theme');
             document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
         }
     },
+
     shareCalculatorResult() {
         const last = Calculator.history.find(h => h.type === 'calculator');
-        if (!last) { this.showToast('Tiada keputusan', 'error'); return; }
+        if (!last) { this.showToast(this.t('noResult'), 'error'); return; }
         const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`;
         if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {});
-        else navigator.clipboard.writeText(text).then(() => this.showToast(LANG[LANG.current].copied, 'success'));
+        else navigator.clipboard.writeText(text).then(() => this.showToast(this.t('copied'), 'success'));
     }
 };
