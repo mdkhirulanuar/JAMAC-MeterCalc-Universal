@@ -7,7 +7,7 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MeterCalc">
-    <meta name="description" content="MeterCalc Pro - Universal Meter Calculator with Energy, Accuracy & Demand">
+    <meta name="description" content="MeterCalc Pro - Universal Meter Parameter Calculator">
     
     <link rel="manifest" href="manifest.json">
     <link rel="stylesheet" href="css/style.css">
@@ -20,7 +20,7 @@
         <div class="splash-content">
             <div class="splash-icon">⚡</div>
             <h1>MeterCalc Pro</h1>
-            <p>Universal Calculator</p>
+            <p data-lang="splash-subtitle">Universal Calculator</p>
             <div class="splash-loader"><div class="splash-bar"></div></div>
         </div>
     </div>
@@ -34,6 +34,9 @@
                 <span class="logo-text">⚡ MeterCalc Pro</span>
             </div>
             <div class="topbar-right">
+                <button class="topbar-btn lang-btn" onclick="UIManager.toggleLanguage()" title="Tukar Bahasa">
+                    <span id="langIcon">🇲🇾</span>
+                </button>
                 <button class="topbar-btn" onclick="UIManager.resetAll()" title="Reset">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="1 4 1 10 7 10"/><path d="M3.5 17.5A9 9 0 1 0 2 12"/></svg>
                 </button>
@@ -47,27 +50,27 @@
         <nav class="main-tabs" id="mainTabs">
             <button class="main-tab active" data-panel="calculatorPanel" onclick="UIManager.switchMainTab('calculatorPanel')">
                 <span class="main-tab-icon">🔌</span>
-                <span class="main-tab-label">Kalkulator</span>
+                <span class="main-tab-label" data-lang="tab-calculator">Kalkulator</span>
             </button>
             <button class="main-tab" data-panel="energyPanel" onclick="UIManager.switchMainTab('energyPanel')">
                 <span class="main-tab-icon">🔢</span>
-                <span class="main-tab-label">Tenaga</span>
+                <span class="main-tab-label" data-lang="tab-energy">Tenaga</span>
             </button>
             <button class="main-tab" data-panel="accuracyPanel" onclick="UIManager.switchMainTab('accuracyPanel')">
                 <span class="main-tab-icon">📊</span>
-                <span class="main-tab-label">Ketepatan</span>
+                <span class="main-tab-label" data-lang="tab-accuracy">Ketepatan</span>
             </button>
             <button class="main-tab" data-panel="demandPanel" onclick="UIManager.switchMainTab('demandPanel')">
                 <span class="main-tab-icon">🕐</span>
-                <span class="main-tab-label">MD</span>
+                <span class="main-tab-label" data-lang="tab-demand">MD</span>
             </button>
             <button class="main-tab" data-panel="historyPanel" onclick="UIManager.switchMainTab('historyPanel')">
                 <span class="main-tab-icon">📋</span>
-                <span class="main-tab-label">Sejarah</span>
+                <span class="main-tab-label" data-lang="tab-history">Sejarah</span>
             </button>
             <button class="main-tab" data-panel="referencePanel" onclick="UIManager.switchMainTab('referencePanel')">
                 <span class="main-tab-icon">📚</span>
-                <span class="main-tab-label">Rujukan</span>
+                <span class="main-tab-label" data-lang="tab-reference">Rujukan</span>
             </button>
         </nav>
 
@@ -77,10 +80,9 @@
             <!-- ============ CALCULATOR PANEL ============ -->
             <section class="panel" id="calculatorPanel">
                 <div class="panel-header">
-                    <h2>📋 Parameter Input</h2>
+                    <h2 data-lang="calc-title">📋 Parameter Input</h2>
                 </div>
 
-                <!-- Sub-tabs: Direct / CT / CT+VT -->
                 <nav class="mode-tabs" id="calcModeTabs">
                     <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchCalcMode('direct')">
                         <span class="mode-label">DIRECT</span>
@@ -94,10 +96,9 @@
                 </nav>
                 
                 <div class="panel-body">
-                    <!-- Meter Constant Active -->
                     <div class="input-block">
                         <label class="input-label">
-                            <span>Meter Constant Active</span>
+                            <span data-lang="input-const-active">Meter Constant Active</span>
                             <span class="label-unit">imp/kWh</span>
                         </label>
                         <div class="input-wrap">
@@ -106,10 +107,9 @@
                         </div>
                     </div>
 
-                    <!-- Meter Constant Reactive -->
                     <div class="input-block">
                         <label class="input-label">
-                            <span>Meter Constant Reactive</span>
+                            <span data-lang="input-const-reactive">Meter Constant Reactive</span>
                             <span class="label-unit">imp/kvarh</span>
                         </label>
                         <div class="input-wrap">
@@ -118,10 +118,9 @@
                         </div>
                     </div>
 
-                    <!-- Supply & Class -->
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label">Jenis Supply</label>
+                            <label class="input-label" data-lang="input-supply">Jenis Supply</label>
                             <select id="supplyType" class="input-field">
                                 <option value="1P2W">1 Fasa (1P2W)</option>
                                 <option value="3P3W">3 Fasa (3P3W)</option>
@@ -129,7 +128,7 @@
                             </select>
                         </div>
                         <div class="input-block">
-                            <label class="input-label">Class Meter</label>
+                            <label class="input-label" data-lang="input-class">Class Meter</label>
                             <select id="meterClass" class="input-field">
                                 <option value="0.2S">Class 0.2S</option>
                                 <option value="0.5S">Class 0.5S</option>
@@ -140,7 +139,6 @@
                         </div>
                     </div>
 
-                    <!-- CT Section -->
                     <div class="section-divider" id="ctSectionDivider" style="display:none;">
                         <div class="divider-line"></div>
                         <span class="divider-text">CURRENT TRANSFORMER</span>
@@ -148,11 +146,15 @@
                     </div>
                     <div class="input-row-2" id="ctInputSection" style="display:none;">
                         <div class="input-block">
-                            <label class="input-label">CT Primary (A)</label>
+                            <label class="input-label">
+                                <span data-lang="input-ct-primary">CT Primary (A)</span>
+                            </label>
                             <input type="number" id="ctPrimary" class="input-field" placeholder="800" inputmode="decimal">
                         </div>
                         <div class="input-block">
-                            <label class="input-label">CT Secondary (A)</label>
+                            <label class="input-label">
+                                <span data-lang="input-ct-secondary">CT Secondary (A)</span>
+                            </label>
                             <input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" value="5">
                         </div>
                     </div>
@@ -161,7 +163,6 @@
                         <strong id="ctLiveRatioValue">-</strong>
                     </div>
 
-                    <!-- VT Section -->
                     <div class="section-divider" id="vtSectionDivider" style="display:none;">
                         <div class="divider-line"></div>
                         <span class="divider-text">VOLTAGE TRANSFORMER</span>
@@ -169,11 +170,15 @@
                     </div>
                     <div class="input-row-2" id="vtInputSection" style="display:none;">
                         <div class="input-block">
-                            <label class="input-label">VT Primary (V)</label>
+                            <label class="input-label">
+                                <span data-lang="input-vt-primary">VT Primary (V)</span>
+                            </label>
                             <input type="number" id="vtPrimary" class="input-field" placeholder="11000" inputmode="decimal">
                         </div>
                         <div class="input-block">
-                            <label class="input-label">VT Secondary (V)</label>
+                            <label class="input-label">
+                                <span data-lang="input-vt-secondary">VT Secondary (V)</span>
+                            </label>
                             <input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" value="110">
                         </div>
                     </div>
@@ -182,9 +187,8 @@
                         <strong id="vtLiveRatioValue">-</strong>
                     </div>
 
-                    <!-- Calculate Button -->
                     <button class="btn-calculate" onclick="Calculator.calculate()">
-                        <span>🔢 KIRA PARAMETER</span>
+                        <span data-lang="btn-calculate">🔢 KIRA PARAMETER</span>
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
                     </button>
                 </div>
@@ -193,40 +197,42 @@
             <!-- Calculator Results -->
             <section class="panel" id="calcResultsPanel" style="display:none;">
                 <div class="panel-header results-header">
-                    <h2>📊 Keputusan Pengiraan</h2>
+                    <h2 data-lang="result-title">📊 Keputusan Pengiraan</h2>
+                    <button class="btn-copy-header" onclick="UIManager.copyCalculatorResults()" title="Copy semua">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                    </button>
                 </div>
                 <div class="panel-body" id="calcResultsBody">
-                    <!-- Dynamic content -->
                 </div>
             </section>
 
             <!-- ============ ENERGY PANEL ============ -->
             <section class="panel" id="energyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>🔢 Energy Registration Calculator</h2>
+                    <h2 data-lang="energy-title">🔢 Energy Registration Calculator</h2>
                 </div>
                 <div class="panel-body">
                     <div class="calc-type-toggle">
                         <button class="toggle-btn active" onclick="UIManager.switchEnergyMode('pulse-to-energy')" id="togglePulseToEnergy">
-                            Pulse → Tenaga
+                            <span data-lang="energy-pulse-to-energy">Pulse → Tenaga</span>
                         </button>
                         <button class="toggle-btn" onclick="UIManager.switchEnergyMode('energy-to-pulse')" id="toggleEnergyToPulse">
-                            Tenaga → Pulse
+                            <span data-lang="energy-energy-to-pulse">Tenaga → Pulse</span>
                         </button>
                     </div>
 
                     <div id="energyPulseToEnergy">
                         <div class="input-block">
-                            <label class="input-label">Jumlah Pulse Diterima</label>
+                            <label class="input-label" data-lang="energy-pulse-count">Jumlah Pulse Diterima</label>
                             <input type="number" id="energyPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal">
                         </div>
                         <div class="input-row-2">
                             <div class="input-block">
-                                <label class="input-label">Pulse Constant (imp/kWh)</label>
+                                <label class="input-label" data-lang="energy-pulse-const">Pulse Constant (imp/kWh)</label>
                                 <input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal">
                             </div>
                             <div class="input-block">
-                                <label class="input-label">Multiplier (M)</label>
+                                <label class="input-label" data-lang="energy-multiplier">Multiplier (M)</label>
                                 <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1">
                             </div>
                         </div>
@@ -234,28 +240,31 @@
 
                     <div id="energyEnergyToPulse" style="display:none;">
                         <div class="input-block">
-                            <label class="input-label">Tenaga Dikehendaki (kWh)</label>
+                            <label class="input-label" data-lang="energy-target">Tenaga Dikehendaki (kWh)</label>
                             <input type="number" id="energyTarget" class="input-field" placeholder="Cth: 50" inputmode="decimal" step="any">
                         </div>
                         <div class="input-row-2">
                             <div class="input-block">
-                                <label class="input-label">Pulse Constant (imp/kWh)</label>
+                                <label class="input-label" data-lang="energy-pulse-const">Pulse Constant (imp/kWh)</label>
                                 <input type="number" id="energyPulseConst2" class="input-field" placeholder="1000" inputmode="decimal">
                             </div>
                             <div class="input-block">
-                                <label class="input-label">Multiplier (M)</label>
+                                <label class="input-label" data-lang="energy-multiplier">Multiplier (M)</label>
                                 <input type="number" id="energyMultiplier2" class="input-field" placeholder="1" inputmode="decimal" value="1">
                             </div>
                         </div>
                     </div>
 
                     <button class="btn-calculate" onclick="Calculator.calculateEnergy()">
-                        <span>🔢 KIRA TENAGA</span>
+                        <span data-lang="btn-energy-calc">🔢 KIRA TENAGA</span>
                     </button>
 
                     <div class="calc-result" id="energyResult" style="display:none;">
-                        <div class="calc-result-label">Hasil</div>
+                        <div class="calc-result-label" data-lang="result-hasil">Hasil</div>
                         <div class="calc-result-value" id="energyResultValue">-</div>
+                        <button class="btn-copy-result" onclick="UIManager.copySingleValue('energyResultValue')">
+                            📋 <span data-lang="btn-copy">Salin</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -263,19 +272,19 @@
             <!-- ============ ACCURACY PANEL ============ -->
             <section class="panel" id="accuracyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>📊 Meter Accuracy Calculator</h2>
+                    <h2 data-lang="accuracy-title">📊 Meter Accuracy Calculator</h2>
                 </div>
                 <div class="panel-body">
                     <div class="input-block">
-                        <label class="input-label">Tenaga Rujukan (Standard)</label>
+                        <label class="input-label" data-lang="accuracy-reference">Tenaga Rujukan (Standard)</label>
                         <input type="number" id="accReference" class="input-field" placeholder="Cth: 100" inputmode="decimal" step="any">
                     </div>
                     <div class="input-block">
-                        <label class="input-label">Tenaga Meter Under Test</label>
+                        <label class="input-label" data-lang="accuracy-meter">Tenaga Meter Under Test</label>
                         <input type="number" id="accMeterReading" class="input-field" placeholder="Cth: 101.5" inputmode="decimal" step="any">
                     </div>
                     <div class="input-block">
-                        <label class="input-label">Class Meter</label>
+                        <label class="input-label" data-lang="input-class">Class Meter</label>
                         <select id="accMeterClass" class="input-field">
                             <option value="0.2S">Class 0.2S (±0.2%)</option>
                             <option value="0.5S">Class 0.5S (±0.5%)</option>
@@ -286,13 +295,16 @@
                     </div>
 
                     <button class="btn-calculate" onclick="Calculator.calculateAccuracy()">
-                        <span>📊 KIRA KETEPATAN</span>
+                        <span data-lang="btn-accuracy-calc">📊 KIRA KETEPATAN</span>
                     </button>
 
                     <div class="calc-result" id="accuracyResult" style="display:none;">
-                        <div class="calc-result-label">% Error</div>
+                        <div class="calc-result-label" data-lang="accuracy-error">% Error</div>
                         <div class="calc-result-value" id="accuracyResultValue">-</div>
                         <div class="calc-result-status" id="accuracyStatus"></div>
+                        <button class="btn-copy-result" onclick="UIManager.copyAccuracyResults()">
+                            📋 <span data-lang="btn-copy">Salin</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -300,32 +312,35 @@
             <!-- ============ DEMAND PANEL ============ -->
             <section class="panel" id="demandPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>🕐 Maximum Demand Calculator</h2>
+                    <h2 data-lang="demand-title">🕐 Maximum Demand Calculator</h2>
                 </div>
                 <div class="panel-body">
-                    <p class="panel-desc">Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.</p>
+                    <p class="panel-desc" data-lang="demand-desc">Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.</p>
                     <div class="input-block">
-                        <label class="input-label">Jumlah Pulse (dalam 30 minit)</label>
+                        <label class="input-label" data-lang="demand-pulse">Jumlah Pulse (dalam 30 minit)</label>
                         <input type="number" id="demandPulseCount" class="input-field" placeholder="Cth: 150" inputmode="decimal">
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label">Pulse Constant (imp/kWh)</label>
+                            <label class="input-label" data-lang="energy-pulse-const">Pulse Constant (imp/kWh)</label>
                             <input type="number" id="demandPulseConst" class="input-field" placeholder="1000" inputmode="decimal">
                         </div>
                         <div class="input-block">
-                            <label class="input-label">Multiplier (M)</label>
+                            <label class="input-label" data-lang="energy-multiplier">Multiplier (M)</label>
                             <input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1">
                         </div>
                     </div>
 
                     <button class="btn-calculate" onclick="Calculator.calculateDemand()">
-                        <span>🕐 KIRA MD</span>
+                        <span data-lang="btn-demand-calc">🕐 KIRA MD</span>
                     </button>
 
                     <div class="calc-result" id="demandResult" style="display:none;">
                         <div class="calc-result-label">Maximum Demand</div>
                         <div class="calc-result-value" id="demandResultValue">-</div>
+                        <button class="btn-copy-result" onclick="UIManager.copySingleValue('demandResultValue')">
+                            📋 <span data-lang="btn-copy">Salin</span>
+                        </button>
                     </div>
                 </div>
             </section>
@@ -333,14 +348,14 @@
             <!-- ============ HISTORY PANEL ============ -->
             <section class="panel" id="historyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>📋 Sejarah Pengiraan</h2>
-                    <button class="btn-text" onclick="UIManager.clearHistory()" id="btnClearHistory" style="display:none;">Padam Semua</button>
+                    <h2 data-lang="history-title">📋 Sejarah Pengiraan</h2>
+                    <button class="btn-text" onclick="UIManager.clearHistory()" id="btnClearHistory" style="display:none;" data-lang="history-clear">Padam Semua</button>
                 </div>
                 <div class="panel-body">
                     <div id="historyList">
                         <div class="empty-state">
                             <span class="empty-icon">📭</span>
-                            <p>Tiada rekod pengiraan</p>
+                            <p data-lang="history-empty">Tiada rekod pengiraan</p>
                         </div>
                     </div>
                 </div>
@@ -349,61 +364,50 @@
             <!-- ============ REFERENCE PANEL ============ -->
             <section class="panel" id="referencePanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>📚 Rujukan Pantas</h2>
+                    <h2 data-lang="ref-title">📚 Rujukan Pantas</h2>
                 </div>
                 <div class="panel-body">
                     <div class="ref-section">
-                        <h3 class="ref-title">Standard CT Ratios</h3>
+                        <h3 class="ref-title" data-lang="ref-ct">Standard CT Ratios</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">100/5A</span>
-                            <span class="ref-chip">200/5A</span>
-                            <span class="ref-chip">400/5A</span>
-                            <span class="ref-chip">600/5A</span>
-                            <span class="ref-chip">800/5A</span>
-                            <span class="ref-chip">1000/5A</span>
-                            <span class="ref-chip">1200/5A</span>
-                            <span class="ref-chip">1600/5A</span>
-                            <span class="ref-chip">2000/5A</span>
+                            <span class="ref-chip">100/5A</span><span class="ref-chip">200/5A</span><span class="ref-chip">400/5A</span>
+                            <span class="ref-chip">600/5A</span><span class="ref-chip">800/5A</span><span class="ref-chip">1000/5A</span>
+                            <span class="ref-chip">1200/5A</span><span class="ref-chip">1600/5A</span><span class="ref-chip">2000/5A</span>
                         </div>
                     </div>
                     <div class="ref-section">
-                        <h3 class="ref-title">Standard VT Ratios</h3>
+                        <h3 class="ref-title" data-lang="ref-vt">Standard VT Ratios</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">11kV/110V</span>
-                            <span class="ref-chip">22kV/110V</span>
-                            <span class="ref-chip">33kV/110V</span>
-                            <span class="ref-chip">66kV/110V</span>
+                            <span class="ref-chip">11kV/110V</span><span class="ref-chip">22kV/110V</span>
+                            <span class="ref-chip">33kV/110V</span><span class="ref-chip">66kV/110V</span>
                         </div>
                     </div>
                     <div class="ref-section">
-                        <h3 class="ref-title">Standard Meter Constants</h3>
+                        <h3 class="ref-title" data-lang="ref-constants">Standard Meter Constants</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">1 imp/kWh</span>
-                            <span class="ref-chip">250 imp/kWh</span>
-                            <span class="ref-chip">500 imp/kWh</span>
-                            <span class="ref-chip">1000 imp/kWh</span>
-                            <span class="ref-chip">2000 imp/kWh</span>
-                            <span class="ref-chip">5000 imp/kWh</span>
+                            <span class="ref-chip">1 imp/kWh</span><span class="ref-chip">250 imp/kWh</span>
+                            <span class="ref-chip">500 imp/kWh</span><span class="ref-chip">1000 imp/kWh</span>
+                            <span class="ref-chip">2000 imp/kWh</span><span class="ref-chip">5000 imp/kWh</span>
                         </div>
                     </div>
                     <div class="ref-section">
-                        <h3 class="ref-title">Class Accuracy Limits</h3>
+                        <h3 class="ref-title" data-lang="ref-class">Class Accuracy Limits</h3>
                         <table class="ref-table">
-                            <tr><th>Class</th><th>Had Ralat</th><th>Kegunaan</th></tr>
-                            <tr><td>0.2S</td><td>±0.2%</td><td>Precision metering</td></tr>
-                            <tr><td>0.5S</td><td>±0.5%</td><td>Large industrial</td></tr>
-                            <tr><td>0.5</td><td>±0.5%</td><td>Industrial</td></tr>
-                            <tr><td>1</td><td>±1%</td><td>General / Commercial</td></tr>
-                            <tr><td>2</td><td>±2%</td><td>Domestic</td></tr>
+                            <tr><th>Class</th><th data-lang="ref-error-limit">Had Ralat</th><th data-lang="ref-usage">Kegunaan</th></tr>
+                            <tr><td>0.2S</td><td>±0.2%</td><td data-lang="ref-precision">Precision metering</td></tr>
+                            <tr><td>0.5S</td><td>±0.5%</td><td data-lang="ref-industrial-large">Large industrial</td></tr>
+                            <tr><td>0.5</td><td>±0.5%</td><td data-lang="ref-industrial">Industrial</td></tr>
+                            <tr><td>1</td><td>±1%</td><td data-lang="ref-commercial">General / Commercial</td></tr>
+                            <tr><td>2</td><td>±2%</td><td data-lang="ref-domestic">Domestic</td></tr>
                         </table>
                     </div>
                     <div class="ref-section">
-                        <h3 class="ref-title">Wiring Configuration</h3>
+                        <h3 class="ref-title" data-lang="ref-wiring">Wiring Configuration</h3>
                         <table class="ref-table">
-                            <tr><th>Jenis</th><th>Kegunaan</th></tr>
-                            <tr><td>1P2W</td><td>Domestik 1 fasa</td></tr>
-                            <tr><td>3P3W</td><td>Industri 3 fasa (delta)</td></tr>
-                            <tr><td>3P4W</td><td>Komersial/Industri (wye)</td></tr>
+                            <tr><th data-lang="ref-type">Jenis</th><th data-lang="ref-usage">Kegunaan</th></tr>
+                            <tr><td>1P2W</td><td data-lang="ref-1p2w">Domestik 1 fasa</td></tr>
+                            <tr><td>3P3W</td><td data-lang="ref-3p3w">Industri 3 fasa (delta)</td></tr>
+                            <tr><td>3P4W</td><td data-lang="ref-3p4w">Komersial/Industri (wye)</td></tr>
                         </table>
                     </div>
                 </div>
