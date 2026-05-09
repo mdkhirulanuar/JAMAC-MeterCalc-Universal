@@ -886,3 +886,66 @@ select.input-field {
     .calc-result-value { font-size: 2rem; }
     .input-row-2 { grid-template-columns: 1fr; }
 }
+
+/* ============ LANGUAGE TOGGLE ============ */
+.lang-btn {
+    font-size: 1rem;
+    position: relative;
+}
+
+.lang-btn #langIcon {
+    line-height: 1;
+}
+
+/* ============ COPY BUTTONS ============ */
+.btn-copy-header {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    color: #fff;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: var(--transition);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    font-size: 0.75rem;
+}
+
+.btn-copy-header:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.btn-copy-result {
+    margin-top: 12px;
+    padding: 10px 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border);
+    color: var(--text);
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-weight: 600;
+    font-family: var(--font);
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-copy-result:active {
+    transform: scale(0.95);
+    background: rgba(77, 166, 255, 0.15);
+    border-color: var(--accent);
+}
+
+.calc-result {
+    position: relative;
+}
+
+/* Toast copy animation */
+.toast.copied {
+    border-color: var(--accent);
+    background: #1a2838;
+}
