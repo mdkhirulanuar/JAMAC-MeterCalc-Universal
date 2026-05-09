@@ -1,3 +1,27 @@
+const LANG = {
+    current: 'bm',
+    bm: {
+        calcDone: '✅ Pengiraan selesai!', energyDone: '✅ Tenaga dikira!', dialPass: '✅ LULUS!', dialFail: '❌ GAGAL!', mdDone: '✅ MD dikira!',
+        errConstActive: '❌ Meter Constant Active mesti > 0', errCTPrimary: '❌ CT Primary mesti > 0', errCTSecondary: '❌ CT Secondary mesti > 0',
+        errVTPrimary: '❌ VT Primary mesti > 0', errVTSecondary: '❌ VT Secondary mesti > 0',
+        warnCTSwap: '⚠️ CT Secondary > Primary?', errPulseCount: '❌ Jumlah Pulse mesti ≥ 0', errPulseConst: '❌ Pulse Constant mesti > 0',
+        errPulseCountWS: '❌ Pulse Count (Working Standard) mesti ≥ 0', errStart: '❌ Sila masukkan Bacaan Mula', errEnd: '❌ Sila masukkan Bacaan Akhir',
+        errEndLess: '❌ Bacaan Akhir mesti > Bacaan Mula', errRealPulse: '❌ Real Pulse mesti ≥ 0',
+        resetDone: '🔄 Semua dikosongkan!', historyCleared: '🗑️ Sejarah dipadamkan!', copied: '📋 Disalin!',
+        historyEmpty: 'Tiada rekod'
+    },
+    en: {
+        calcDone: '✅ Calculation complete!', energyDone: '✅ Energy calculated!', dialPass: '✅ PASS!', dialFail: '❌ FAIL!', mdDone: '✅ MD calculated!',
+        errConstActive: '❌ Meter Constant Active must be > 0', errCTPrimary: '❌ CT Primary must be > 0', errCTSecondary: '❌ CT Secondary must be > 0',
+        errVTPrimary: '❌ VT Primary must be > 0', errVTSecondary: '❌ VT Secondary must be > 0',
+        warnCTSwap: '⚠️ CT Secondary > Primary?', errPulseCount: '❌ Pulse Count must be ≥ 0', errPulseConst: '❌ Pulse Constant must be > 0',
+        errPulseCountWS: '❌ Pulse Count (Working Standard) must be ≥ 0', errStart: '❌ Please enter Start Reading', errEnd: '❌ Please enter End Reading',
+        errEndLess: '❌ End Reading must be > Start Reading', errRealPulse: '❌ Real Pulse must be ≥ 0',
+        resetDone: '🔄 All cleared!', historyCleared: '🗑️ History deleted!', copied: '📋 Copied!',
+        historyEmpty: 'No records'
+    }
+};
+
 const UIManager = {
     currentMainTab: 'calculatorPanel',
 
@@ -31,33 +55,32 @@ const UIManager = {
             document.getElementById('vtLiveRatio').style.display = 'flex';
         }
         document.getElementById('calcResultsPanel').style.display = 'none';
-        Calculator.updateLiveRatios();
         if (navigator.vibrate) navigator.vibrate(8);
     },
 
-    resetAll() {
-        Calculator.currentMode = 'direct';
-        this.switchCalcMode('direct');
-        this.switchMainTab('calculatorPanel');
-        document.getElementById('meterConstActive').value = '1000';
-        document.getElementById('meterConstReactive').value = '1000';
-        document.getElementById('ctPrimary').value = ''; document.getElementById('ctSecondary').value = '5';
-        document.getElementById('vtPrimary').value = ''; document.getElementById('vtSecondary').value = '110';
-        document.getElementById('energyPulseCount').value = ''; document.getElementById('energyPulseConst').value = ''; document.getElementById('energyMultiplier').value = '1';
-        document.getElementById('energyResult').style.display = 'none';
-        document.getElementById('dialPulseConst').value = ''; document.getElementById('dialMultiplier').value = '1';
-        document.getElementById('dialPulseCount').value = ''; document.getElementById('dialStart').value = ''; document.getElementById('dialEnd').value = ''; document.getElementById('dialRealPulse').value = '';
-        document.getElementById('dialResult').style.display = 'none';
-        document.getElementById('demandPulseCount').value = ''; document.getElementById('demandPulseConst').value = ''; document.getElementById('demandMultiplier').value = '1';
-        document.getElementById('demandResult').style.display = 'none';
-        document.getElementById('calcResultsPanel').style.display = 'none';
-        Calculator.updateLiveRatios();
-        document.getElementById('calculatorPanel').scrollIntoView({ behavior: 'smooth' });
-        this.showToast('🔄 Semua dikosongkan!', 'success');
+    toggleLanguage() {
+        LANG.current = LANG.current === 'bm' ? 'en' : 'bm';
+        document.getElementById('btnLang').textContent = LANG.current === 'bm' ? '🇲🇾' : '🇬🇧';
     },
 
-    clearHistory() {
-        if (confirm('Padam semua sejarah?')) { Calculator.history = []; Calculator.saveHistory(); Calculator.renderHistory(); this.showToast('🗑️ Sejarah dipadamkan!', 'success'); }
+    resetAll() {
+        Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel');
+        document.getElementById('calcResultsPanel').style.display = 'none';
+        document.getElementById('energyResult').style.display = 'none';
+        document.getElementById('dialResult').style.display = 'none';
+        document.getElementById('demandResult').style.display = 'none';
+        this.showToast(LANG[LANG.current].resetDone, 'success');
+        document.getElementById('calculatorPanel').scrollIntoView({ behavior: 'smooth' });
+    },
+
+    clearHistory() { if (confirm('Padam semua?')) { Calculator.history = []; Calculator.saveHistory(); Calculator.renderHistory(); this.showToast(LANG[LANG.current].historyCleared, 'success'); } },
+    copyAllHistory() { navigator.clipboard.writeText(Calculator.exportHistoryCSV()).then(() => this.showToast(LANG[LANG.current].copied, 'success')); },
+    exportCSV() {
+        const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click();
+        URL.revokeObjectURL(url);
+        this.showToast('📥 CSV dimuat turun!', 'success');
     },
 
     _toastTimeout: null,
@@ -68,8 +91,8 @@ const UIManager = {
     },
 
     toggleTheme() {
-        const body = document.body; body.classList.toggle('light-theme');
-        const isLight = body.classList.contains('light-theme');
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
         const icon = document.getElementById('themeIcon');
         icon.innerHTML = isLight ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
         localStorage.setItem('metercalc_theme', isLight ? 'light' : 'dark');
@@ -77,16 +100,14 @@ const UIManager = {
     loadTheme() {
         if (localStorage.getItem('metercalc_theme') === 'light') {
             document.body.classList.add('light-theme');
-            const icon = document.getElementById('themeIcon');
-            if (icon) icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+            document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
         }
     },
-
     shareCalculatorResult() {
         const last = Calculator.history.find(h => h.type === 'calculator');
         if (!last) { this.showToast('Tiada keputusan', 'error'); return; }
         const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`;
         if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {});
-        else navigator.clipboard.writeText(text).then(() => this.showToast('📋 Disalin!', 'success'));
+        else navigator.clipboard.writeText(text).then(() => this.showToast(LANG[LANG.current].copied, 'success'));
     }
 };
