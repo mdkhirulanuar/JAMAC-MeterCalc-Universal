@@ -1,6 +1,7 @@
 /**
  * MeterCalc Pro - UI Manager
  * Multi-language support (BM/EN), Copy to clipboard
+ * V3 - Direct innerHTML rewrite for guaranteed language switch
  */
 
 const UIManager = {
@@ -228,15 +229,15 @@ const UIManager = {
         document.body.removeChild(textarea);
     },
 
-    // ============ LANGUAGE SWITCH (ULTIMATE FIX) ============
+    // ============ LANGUAGE SWITCH (REWRITE APPROACH) ============
     toggleLanguage() {
         // Flip language
         const newLang = this.currentLang === 'ms' ? 'en' : 'ms';
         
-        // Save to localStorage FIRST
+        // Save to localStorage
         localStorage.setItem('metercalc_lang', newLang);
         
-        // Reload page to apply all changes cleanly
+        // Reload to apply all changes
         window.location.reload();
     },
 
@@ -251,101 +252,238 @@ const UIManager = {
             langIcon.textContent = saved === 'ms' ? '🇲🇾' : '🇬🇧';
         }
         
-        // Apply all translations AFTER DOM is ready
-        this.applyAllTranslations();
+        // CRITICAL: Rewrite ALL UI text directly
+        this.rewriteAllText();
     },
 
-    applyAllTranslations() {
-        // Update all elements with data-lang attribute
-        document.querySelectorAll('[data-lang]').forEach(el => {
-            const key = el.dataset.lang;
-            const text = Lang.get(key);
-            if (text && text !== key) {
-                el.textContent = text;
-            }
-        });
+    rewriteAllText() {
+        const lang = this.currentLang;
+        const isMs = lang === 'ms';
 
-        // Update specific elements by ID that don't use data-lang
-        this.updateSpecificElements();
-        
-        // Update placeholders
-        this.updatePlaceholders();
-    },
-
-    updateSpecificElements() {
-        const isMs = this.currentLang === 'ms';
-        
-        // Panel titles
-        const titles = {
-            'calc-title': isMs ? '📋 Parameter Input' : '📋 Parameter Input',
-            'result-title': isMs ? '📊 Keputusan Pengiraan' : '📊 Calculation Results',
-            'energy-title': isMs ? '🔢 Energy Registration Calculator' : '🔢 Energy Registration Calculator',
-            'accuracy-title': isMs ? '📊 Meter Accuracy Calculator' : '📊 Meter Accuracy Calculator',
-            'demand-title': isMs ? '🕐 Maximum Demand Calculator' : '🕐 Maximum Demand Calculator',
-            'history-title': isMs ? '📋 Sejarah Pengiraan' : '📋 Calculation History',
-            'ref-title': isMs ? '📚 Rujukan Pantas' : '📚 Quick Reference',
-            'tab-calculator': isMs ? 'Kalkulator' : 'Calculator',
-            'tab-energy': isMs ? 'Tenaga' : 'Energy',
-            'tab-accuracy': isMs ? 'Ketepatan' : 'Accuracy',
-            'tab-demand': 'MD',
-            'tab-history': isMs ? 'Sejarah' : 'History',
-            'tab-reference': isMs ? 'Rujukan' : 'Reference',
-            'input-const-active': isMs ? 'Meter Constant Active' : 'Meter Constant Active',
-            'input-const-reactive': isMs ? 'Meter Constant Reactive' : 'Meter Constant Reactive',
-            'input-supply': isMs ? 'Jenis Supply' : 'Supply Type',
-            'input-class': isMs ? 'Class Meter' : 'Meter Class',
-            'input-ct-primary': isMs ? 'CT Primary (A)' : 'CT Primary (A)',
-            'input-ct-secondary': isMs ? 'CT Secondary (A)' : 'CT Secondary (A)',
-            'input-vt-primary': isMs ? 'VT Primary (V)' : 'VT Primary (V)',
-            'input-vt-secondary': isMs ? 'VT Secondary (V)' : 'VT Secondary (V)',
-            'btn-calculate': isMs ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE',
-            'btn-energy-calc': isMs ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY',
-            'btn-accuracy-calc': isMs ? '📊 KIRA KETEPATAN' : '📊 CHECK ACCURACY',
-            'btn-demand-calc': isMs ? '🕐 KIRA MD' : '🕐 CALCULATE MD',
-            'btn-copy': isMs ? 'Salin' : 'Copy',
-            'history-clear': isMs ? 'Padam Semua' : 'Clear All',
-            'energy-pulse-count': isMs ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
-            'energy-pulse-const': isMs ? 'Pulse Constant (imp/kWh)' : 'Pulse Constant (imp/kWh)',
-            'energy-multiplier': isMs ? 'Multiplier (M)' : 'Multiplier (M)',
-            'energy-target': isMs ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
-            'accuracy-reference': isMs ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
-            'accuracy-meter': isMs ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy',
-            'demand-pulse': isMs ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
-            'demand-desc': isMs ? 'Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.' : 'Calculate Maximum Demand (MD) based on pulse readings over 30 minutes.',
-            'energy-pulse-to-energy': isMs ? 'Pulse → Tenaga' : 'Pulse → Energy',
-            'energy-energy-to-pulse': isMs ? 'Tenaga → Pulse' : 'Energy → Pulse',
-            'result-hasil': isMs ? 'Hasil' : 'Result',
-            'accuracy-error': isMs ? '% Error' : '% Error',
-            'ref-ct': 'Standard CT Ratios',
-            'ref-vt': 'Standard VT Ratios',
-            'ref-constants': 'Standard Meter Constants',
-            'ref-class': 'Class Accuracy Limits',
-            'ref-error-limit': isMs ? 'Had Ralat' : 'Error Limit',
-            'ref-usage': isMs ? 'Kegunaan' : 'Usage',
-            'ref-wiring': isMs ? 'Wiring Configuration' : 'Wiring Configuration',
-            'ref-type': isMs ? 'Jenis' : 'Type',
-            'ref-precision': isMs ? 'Precision metering' : 'Precision metering',
-            'ref-industrial-large': isMs ? 'Large industrial' : 'Large industrial',
-            'ref-industrial': isMs ? 'Industrial' : 'Industrial',
-            'ref-commercial': isMs ? 'General / Commercial' : 'General / Commercial',
-            'ref-domestic': isMs ? 'Domestic' : 'Domestic',
-            'ref-1p2w': isMs ? 'Domestik 1 fasa' : 'Domestic 1 phase',
-            'ref-3p3w': isMs ? 'Industri 3 fasa (delta)' : 'Industrial 3 phase (delta)',
-            'ref-3p4w': isMs ? 'Komersial/Industri (wye)' : 'Commercial/Industrial (wye)',
-            'history-empty': isMs ? 'Tiada rekod pengiraan' : 'No calculation records',
-            'splash-subtitle': isMs ? 'Universal Calculator' : 'Universal Calculator'
+        // ===== MAIN TAB LABELS (DIRECT SPAN REWRITE) =====
+        const tabLabels = {
+            'Kalkulator': isMs ? 'Kalkulator' : 'Calculator',
+            'Tenaga': isMs ? 'Tenaga' : 'Energy',
+            'Ketepatan': isMs ? 'Ketepatan' : 'Accuracy',
+            'MD': 'MD',
+            'Sejarah': isMs ? 'Sejarah' : 'History',
+            'Rujukan': isMs ? 'Rujukan' : 'Reference'
         };
 
-        Object.entries(titles).forEach(([key, value]) => {
-            const el = document.querySelector(`[data-lang="${key}"]`);
-            if (el) {
-                el.textContent = value;
+        document.querySelectorAll('.main-tab-label').forEach(span => {
+            const currentText = span.textContent.trim();
+            if (tabLabels[currentText] !== undefined) {
+                span.textContent = tabLabels[currentText];
             }
         });
+
+        // ===== PANEL HEADERS =====
+        const panelHeaders = document.querySelectorAll('.panel-header h2');
+        panelHeaders.forEach(h2 => {
+            const text = h2.innerHTML;
+            if (text.includes('Parameter Input')) {
+                h2.innerHTML = isMs ? '📋 Parameter Input' : '📋 Parameter Input';
+            } else if (text.includes('Keputusan Pengiraan') || text.includes('Calculation Results')) {
+                h2.innerHTML = isMs ? '📊 Keputusan Pengiraan' : '📊 Calculation Results';
+            } else if (text.includes('Energy Registration')) {
+                h2.innerHTML = isMs ? '🔢 Energy Registration Calculator' : '🔢 Energy Registration Calculator';
+            } else if (text.includes('Meter Accuracy')) {
+                h2.innerHTML = isMs ? '📊 Meter Accuracy Calculator' : '📊 Meter Accuracy Calculator';
+            } else if (text.includes('Maximum Demand')) {
+                h2.innerHTML = isMs ? '🕐 Maximum Demand Calculator' : '🕐 Maximum Demand Calculator';
+            } else if (text.includes('Sejarah') || text.includes('Calculation History')) {
+                h2.innerHTML = isMs ? '📋 Sejarah Pengiraan' : '📋 Calculation History';
+            } else if (text.includes('Rujukan') || text.includes('Quick Reference')) {
+                h2.innerHTML = isMs ? '📚 Rujukan Pantas' : '📚 Quick Reference';
+            }
+        });
+
+        // ===== INPUT LABELS =====
+        document.querySelectorAll('.input-label span:first-child').forEach(span => {
+            const text = span.textContent.trim();
+            const labelMap = {
+                'Meter Constant Active': 'Meter Constant Active',
+                'Meter Constant Reactive': 'Meter Constant Reactive',
+                'Jenis Supply': isMs ? 'Jenis Supply' : 'Supply Type',
+                'Supply Type': isMs ? 'Jenis Supply' : 'Supply Type',
+                'Class Meter': isMs ? 'Class Meter' : 'Meter Class',
+                'Meter Class': isMs ? 'Class Meter' : 'Meter Class',
+                'CT Primary (A)': 'CT Primary (A)',
+                'CT Secondary (A)': 'CT Secondary (A)',
+                'VT Primary (V)': 'VT Primary (V)',
+                'VT Secondary (V)': 'VT Secondary (V)',
+                'Jumlah Pulse Diterima': isMs ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
+                'Pulse Count Received': isMs ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
+                'Jumlah Pulse (dalam 30 minit)': isMs ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
+                'Pulse Count (in 30 minutes)': isMs ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
+                'Pulse Constant (imp/kWh)': 'Pulse Constant (imp/kWh)',
+                'Multiplier (M)': 'Multiplier (M)',
+                'Tenaga Dikehendaki (kWh)': isMs ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
+                'Energy Required (kWh)': isMs ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
+                'Tenaga Rujukan (Standard)': isMs ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
+                'Reference Energy (Standard)': isMs ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
+                'Tenaga Meter Under Test': isMs ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy',
+                'Meter Under Test Energy': isMs ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy'
+            };
+            if (labelMap[text] !== undefined) {
+                span.textContent = labelMap[text];
+            }
+        });
+
+        // ===== BUTTONS =====
+        document.querySelectorAll('.btn-calculate span[data-lang]').forEach(span => {
+            const key = span.dataset.lang;
+            if (key === 'btn-calculate') {
+                span.textContent = isMs ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE';
+            } else if (key === 'btn-energy-calc') {
+                span.textContent = isMs ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY';
+            } else if (key === 'btn-accuracy-calc') {
+                span.textContent = isMs ? '📊 KIRA KETEPATAN' : '📊 CHECK ACCURACY';
+            } else if (key === 'btn-demand-calc') {
+                span.textContent = isMs ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
+            }
+        });
+
+        // ===== TOGGLE BUTTONS =====
+        const togglePulse = document.getElementById('togglePulseToEnergy');
+        const toggleEnergy = document.getElementById('toggleEnergyToPulse');
+        if (togglePulse) {
+            const span = togglePulse.querySelector('span[data-lang]');
+            if (span) span.textContent = isMs ? 'Pulse → Tenaga' : 'Pulse → Energy';
+        }
+        if (toggleEnergy) {
+            const span = toggleEnergy.querySelector('span[data-lang]');
+            if (span) span.textContent = isMs ? 'Tenaga → Pulse' : 'Energy → Pulse';
+        }
+
+        // ===== COPY BUTTONS =====
+        document.querySelectorAll('.btn-copy-result span[data-lang]').forEach(span => {
+            span.textContent = isMs ? 'Salin' : 'Copy';
+        });
+
+        // ===== HISTORY CLEAR BUTTON =====
+        const btnClear = document.getElementById('btnClearHistory');
+        if (btnClear) {
+            btnClear.textContent = isMs ? 'Padam Semua' : 'Clear All';
+        }
+
+        // ===== HISTORY EMPTY STATE =====
+        const emptyState = document.querySelector('#historyList .empty-state p');
+        if (emptyState && emptyState.dataset.lang === 'history-empty') {
+            emptyState.textContent = isMs ? 'Tiada rekod pengiraan' : 'No calculation records';
+        }
+
+        // ===== PANEL DESC =====
+        const panelDesc = document.querySelector('.panel-desc[data-lang="demand-desc"]');
+        if (panelDesc) {
+            panelDesc.textContent = isMs 
+                ? 'Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.'
+                : 'Calculate Maximum Demand (MD) based on pulse readings over 30 minutes.';
+        }
+
+        // ===== REFERENCE TABLE =====
+        document.querySelectorAll('.ref-title').forEach(title => {
+            const text = title.textContent.trim();
+            const refMap = {
+                'Standard CT Ratios': 'Standard CT Ratios',
+                'Standard VT Ratios': 'Standard VT Ratios',
+                'Standard Meter Constants': 'Standard Meter Constants',
+                'Class Accuracy Limits': 'Class Accuracy Limits',
+                'Had Ralat': isMs ? 'Had Ralat' : 'Error Limit',
+                'Error Limit': isMs ? 'Had Ralat' : 'Error Limit',
+                'Kegunaan': isMs ? 'Kegunaan' : 'Usage',
+                'Usage': isMs ? 'Kegunaan' : 'Usage',
+                'Wiring Configuration': 'Wiring Configuration',
+                'Jenis': isMs ? 'Jenis' : 'Type',
+                'Type': isMs ? 'Jenis' : 'Type',
+                'Precision metering': 'Precision metering',
+                'Large industrial': 'Large industrial',
+                'Industrial': 'Industrial',
+                'General / Commercial': 'General / Commercial',
+                'Domestic': 'Domestic',
+                'Domestik 1 fasa': isMs ? 'Domestik 1 fasa' : 'Domestic 1 phase',
+                'Domestic 1 phase': isMs ? 'Domestik 1 fasa' : 'Domestic 1 phase',
+                'Industri 3 fasa (delta)': isMs ? 'Industri 3 fasa (delta)' : 'Industrial 3 phase (delta)',
+                'Industrial 3 phase (delta)': isMs ? 'Industri 3 fasa (delta)' : 'Industrial 3 phase (delta)',
+                'Komersial/Industri (wye)': isMs ? 'Komersial/Industri (wye)' : 'Commercial/Industrial (wye)',
+                'Commercial/Industrial (wye)': isMs ? 'Komersial/Industri (wye)' : 'Commercial/Industrial (wye)'
+            };
+            if (refMap[text] !== undefined) {
+                title.textContent = refMap[text];
+            }
+        });
+
+        // ===== SPLASH SUBTITLE =====
+        const splashSub = document.querySelector('[data-lang="splash-subtitle"]');
+        if (splashSub) {
+            splashSub.textContent = isMs ? 'Universal Calculator' : 'Universal Calculator';
+        }
+
+        // ===== RESULT LABELS (DYNAMIC - update if results are visible) =====
+        this.updateResultLabels();
     },
 
-    updatePlaceholders() {
-        // No need to update placeholders as they are the same in both languages
+    updateResultLabels() {
+        const lang = this.currentLang;
+        const isMs = lang === 'ms';
+
+        // Hero result label
+        const heroLabel = document.querySelector('.hero-label');
+        if (heroLabel) {
+            heroLabel.textContent = 'TOTAL MULTIPLIER';
+        }
+
+        // Result card labels
+        document.querySelectorAll('.result-card-label').forEach(label => {
+            const text = label.textContent.trim();
+            const labelMap = {
+                'CT Ratio': 'CT Ratio',
+                'VT Ratio': 'VT Ratio',
+                'Primary Active': 'Primary Active',
+                'Secondary Active': 'Secondary Active',
+                'Primary Reactive': 'Primary Reactive',
+                'Secondary Reactive': 'Secondary Reactive',
+                '% Error': '% Error',
+                'Hasil': isMs ? 'Hasil' : 'Result',
+                'Result': isMs ? 'Hasil' : 'Result',
+                'Maximum Demand': 'Maximum Demand'
+            };
+            if (labelMap[text] !== undefined) {
+                label.textContent = labelMap[text];
+            }
+        });
+
+        // Formula title
+        const formulaTitle = document.querySelector('.formula-title');
+        if (formulaTitle) {
+            formulaTitle.textContent = isMs ? '📐 Formula Digunakan' : '📐 Formula Used';
+        }
+
+        // Section dividers
+        document.querySelectorAll('.divider-text').forEach(div => {
+            if (div.textContent.trim() === 'PULSE CONSTANTS') {
+                div.textContent = 'PULSE CONSTANTS';
+            }
+        });
+
+        // Mode info in hero
+        const heroSub = document.querySelector('.hero-sub');
+        if (heroSub) {
+            const text = heroSub.textContent;
+            if (text.includes('Tiada CT/VT')) {
+                heroSub.textContent = text.replace('Tiada CT/VT', isMs ? 'Tiada CT/VT' : 'No CT/VT');
+            } else if (text.includes('No CT/VT')) {
+                heroSub.textContent = text.replace('No CT/VT', isMs ? 'Tiada CT/VT' : 'No CT/VT');
+            }
+            if (text.includes('CT Sahaja')) {
+                heroSub.textContent = text.replace('CT Sahaja', isMs ? 'CT Sahaja' : 'CT Only');
+            } else if (text.includes('CT Only')) {
+                heroSub.textContent = text.replace('CT Only', isMs ? 'CT Sahaja' : 'CT Only');
+            }
+            if (text.includes('High Voltage')) {
+                // Keep as is
+            }
+        });
     },
 
     // ============ TOAST ============
@@ -450,15 +588,7 @@ const Lang = {
             'live-enter-value': 'Masukkan nilai',
             'history-empty': 'Tiada rekod pengiraan',
             'result-hasil': 'Hasil',
-            'accuracy-error': '% Error',
-            'energy-pulse-count': 'Jumlah Pulse Diterima',
-            'energy-pulse-const': 'Pulse Constant (imp/kWh)',
-            'energy-multiplier': 'Multiplier (M)',
-            'energy-target': 'Tenaga Dikehendaki (kWh)',
-            'accuracy-reference': 'Tenaga Rujukan (Standard)',
-            'accuracy-meter': 'Tenaga Meter Under Test',
-            'demand-pulse': 'Jumlah Pulse (dalam 30 minit)',
-            'demand-desc': 'Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.'
+            'accuracy-error': '% Error'
         },
         en: {
             'toast-enter-constant': 'Please enter Meter Constant Active!',
@@ -495,15 +625,7 @@ const Lang = {
             'live-enter-value': 'Enter value',
             'history-empty': 'No calculation records',
             'result-hasil': 'Result',
-            'accuracy-error': '% Error',
-            'energy-pulse-count': 'Pulse Count Received',
-            'energy-pulse-const': 'Pulse Constant (imp/kWh)',
-            'energy-multiplier': 'Multiplier (M)',
-            'energy-target': 'Energy Required (kWh)',
-            'accuracy-reference': 'Reference Energy (Standard)',
-            'accuracy-meter': 'Meter Under Test Energy',
-            'demand-pulse': 'Pulse Count (in 30 minutes)',
-            'demand-desc': 'Calculate Maximum Demand (MD) based on pulse readings over 30 minutes.'
+            'accuracy-error': '% Error'
         }
     },
 
