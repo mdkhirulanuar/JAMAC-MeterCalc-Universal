@@ -11,32 +11,27 @@ const UIManager = {
     switchMainTab(panelId) {
         this.currentMainTab = panelId;
 
-        // Update main tabs
         document.querySelectorAll('.main-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.panel === panelId);
         });
 
-        // Hide all panels
         const panels = ['calculatorPanel', 'calcResultsPanel', 'energyPanel', 'accuracyPanel', 'demandPanel', 'historyPanel', 'referencePanel'];
         panels.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
 
-        // Show selected panel
         const targetPanel = document.getElementById(panelId);
         if (targetPanel) {
             targetPanel.style.display = 'block';
             targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        // Special: Show calculator results if on calculator tab
         if (panelId === 'calculatorPanel') {
             const calcPanel = document.getElementById('calculatorPanel');
             if (calcPanel) calcPanel.style.display = 'block';
         }
 
-        // Refresh history if switching to history tab
         if (panelId === 'historyPanel') {
             Calculator.renderHistory();
         }
@@ -48,29 +43,23 @@ const UIManager = {
     switchCalcMode(mode) {
         Calculator.currentMode = mode;
 
-        // Update sub-tabs
         document.querySelectorAll('.mode-tab').forEach(tab => {
             tab.classList.toggle('active', tab.dataset.mode === mode);
         });
 
-        // Show/hide sections
         const ctDivider = document.getElementById('ctSectionDivider');
         const ctInputs = document.getElementById('ctInputSection');
         const ctLiveRatio = document.getElementById('ctLiveRatio');
         const vtDivider = document.getElementById('vtSectionDivider');
         const vtInputs = document.getElementById('vtInputSection');
         const vtLiveRatio = document.getElementById('vtLiveRatio');
-        const reverseInputs = document.getElementById('reverseInputSection');
 
-        // Reset all to hidden first
-        [ctDivider, ctInputs, ctLiveRatio, vtDivider, vtInputs, vtLiveRatio, reverseInputs].forEach(el => {
+        [ctDivider, ctInputs, ctLiveRatio, vtDivider, vtInputs, vtLiveRatio].forEach(el => {
             if (el) el.style.display = 'none';
         });
 
-        // Show based on mode
         switch (mode) {
             case 'direct':
-                // Nothing extra
                 break;
             case 'ct':
                 if (ctDivider) ctDivider.style.display = 'flex';
@@ -85,18 +74,8 @@ const UIManager = {
                 if (vtInputs) vtInputs.style.display = 'grid';
                 if (vtLiveRatio) vtLiveRatio.style.display = 'flex';
                 break;
-            case 'reverse':
-                if (reverseInputs) reverseInputs.style.display = 'block';
-                if (ctDivider) ctDivider.style.display = 'flex';
-                if (ctInputs) ctInputs.style.display = 'grid';
-                if (ctLiveRatio) ctLiveRatio.style.display = 'flex';
-                if (vtDivider) vtDivider.style.display = 'flex';
-                if (vtInputs) vtInputs.style.display = 'grid';
-                if (vtLiveRatio) vtLiveRatio.style.display = 'flex';
-                break;
         }
 
-        // Hide results panel when switching mode
         const resultsPanel = document.getElementById('calcResultsPanel');
         if (resultsPanel) resultsPanel.style.display = 'none';
 
@@ -110,15 +89,12 @@ const UIManager = {
         this.currentEnergyMode = mode;
         Calculator.currentEnergyMode = mode;
 
-        // Update toggle buttons
         document.getElementById('togglePulseToEnergy').classList.toggle('active', mode === 'pulse-to-energy');
         document.getElementById('toggleEnergyToPulse').classList.toggle('active', mode === 'energy-to-pulse');
 
-        // Show/hide sections
         document.getElementById('energyPulseToEnergy').style.display = mode === 'pulse-to-energy' ? 'block' : 'none';
         document.getElementById('energyEnergyToPulse').style.display = mode === 'energy-to-pulse' ? 'block' : 'none';
 
-        // Hide result
         document.getElementById('energyResult').style.display = 'none';
 
         if (navigator.vibrate) navigator.vibrate(8);
@@ -138,9 +114,7 @@ const UIManager = {
         document.getElementById('ctSecondary').value = '5';
         document.getElementById('vtPrimary').value = '';
         document.getElementById('vtSecondary').value = '110';
-        document.getElementById('targetPrimaryPulse').value = '';
 
-        // Reset energy fields
         document.getElementById('energyPulseCount').value = '';
         document.getElementById('energyPulseConst').value = '';
         document.getElementById('energyMultiplier').value = '1';
@@ -149,19 +123,16 @@ const UIManager = {
         document.getElementById('energyMultiplier2').value = '1';
         document.getElementById('energyResult').style.display = 'none';
 
-        // Reset accuracy fields
         document.getElementById('accReference').value = '';
         document.getElementById('accMeterReading').value = '';
         document.getElementById('accMeterClass').value = '1';
         document.getElementById('accuracyResult').style.display = 'none';
 
-        // Reset demand fields
         document.getElementById('demandPulseCount').value = '';
         document.getElementById('demandPulseConst').value = '';
         document.getElementById('demandMultiplier').value = '1';
         document.getElementById('demandResult').style.display = 'none';
 
-        // Hide results
         document.getElementById('calcResultsPanel').style.display = 'none';
 
         Calculator.updateLiveRatios();
@@ -231,18 +202,13 @@ const UIManager = {
 
     // ============ SHARE ============
     shareCalculatorResult() {
-        const lastCalc = Calculator.history.find(h => h.type === 'calculator' || h.type === 'reverse');
+        const lastCalc = Calculator.history.find(h => h.type === 'calculator');
         if (!lastCalc) {
             this.showToast('Tiada keputusan untuk dikongsi', 'error');
             return;
         }
 
-        let text = '';
-        if (lastCalc.type === 'calculator') {
-            text = `📊 MeterCalc Pro\n⚡ Mode: ${lastCalc.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n🔌 Primary Pulse = ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n📋 ${lastCalc.supply} | Cl.${lastCalc.meterClass}`;
-        } else {
-            text = `📊 MeterCalc Pro (Reverse)\n🔄 Required Km = ${Calculator.formatNumber(lastCalc.requiredMeterConstant)} imp/kWh\n🎯 Target Pulse = ${Calculator.formatNumber(lastCalc.targetPrimaryPulse)} imp/kWh\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}`;
-        }
+        const text = `📊 MeterCalc Pro\n⚡ Mode: ${lastCalc.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n🔌 Primary Pulse = ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n📋 ${lastCalc.supply} | Cl.${lastCalc.meterClass}`;
 
         if (navigator.share) {
             navigator.share({ title: 'MeterCalc Pro Result', text }).catch(() => {});
