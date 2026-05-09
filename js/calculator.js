@@ -1,6 +1,7 @@
 /**
  * MeterCalc Pro - Core Calculation Engine
  * Features: Direct, CT, CT+VT, Energy, Accuracy, Demand
+ * Multi-language support via Lang.get()
  */
 
 const Calculator = {
@@ -14,7 +15,6 @@ const Calculator = {
         this.attachLiveListeners();
     },
 
-    // ============ GET INPUT VALUES ============
     getInputValues() {
         return {
             mode: this.currentMode,
@@ -29,24 +29,21 @@ const Calculator = {
         };
     },
 
-    // ============ MAIN CALCULATOR ============
     calculate() {
         const inputs = this.getInputValues();
 
-        // Validate meter constant
         if (!inputs.meterConstActive || inputs.meterConstActive <= 0) {
-            UIManager.showToast('Sila masukkan Meter Constant Active!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-constant'), 'error');
             document.getElementById('meterConstActive').focus();
             return;
         }
 
-        // Calculate ratios
         let ctRatio = 1;
         let vtRatio = 1;
 
         if (this.currentMode === 'ct' || this.currentMode === 'ctvt') {
             if (!inputs.ctPrimary || !inputs.ctSecondary || inputs.ctSecondary <= 0) {
-                UIManager.showToast('Sila masukkan nilai CT!', 'error');
+                UIManager.showToast(Lang.get('toast-enter-ct'), 'error');
                 return;
             }
             ctRatio = inputs.ctPrimary / inputs.ctSecondary;
@@ -54,7 +51,7 @@ const Calculator = {
 
         if (this.currentMode === 'ctvt') {
             if (!inputs.vtPrimary || !inputs.vtSecondary || inputs.vtSecondary <= 0) {
-                UIManager.showToast('Sila masukkan nilai VT!', 'error');
+                UIManager.showToast(Lang.get('toast-enter-vt'), 'error');
                 return;
             }
             vtRatio = inputs.vtPrimary / inputs.vtSecondary;
@@ -88,11 +85,10 @@ const Calculator = {
         this.addToHistory(result);
 
         document.getElementById('calcResultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        UIManager.showToast('✅ Pengiraan selesai!', 'success');
+        UIManager.showToast(Lang.get('toast-calc-done'), 'success');
         if (navigator.vibrate) navigator.vibrate([10, 20, 10]);
     },
 
-    // ============ DISPLAY CALCULATOR RESULTS ============
     displayCalcResults(result) {
         const panel = document.getElementById('calcResultsPanel');
         const body = document.getElementById('calcResultsBody');
@@ -101,20 +97,23 @@ const Calculator = {
         panel.offsetHeight;
         panel.style.animation = 'fadeInUp 0.3s ease-out';
 
-        const modeLabels = { direct: 'DIRECT • Tiada CT/VT', ct: 'CT Sahaja', ctvt: 'CT + VT (High Voltage)' };
+        const modeLabels = {
+            direct: Lang.get('result-direct-mode'),
+            ct: Lang.get('result-ct-mode'),
+            ctvt: Lang.get('result-ctvt-mode')
+        };
 
         let html = `
             <div class="hero-result">
-                <div class="hero-label">TOTAL MULTIPLIER</div>
+                <div class="hero-label">${Lang.get('result-total-multiplier')}</div>
                 <div class="hero-value">${this.formatNumber(result.totalMultiplier)}</div>
                 <div class="hero-sub">${modeLabels[result.mode]} • ${result.supply} • Cl.${result.meterClass}</div>
             </div>
-
             <div class="result-grid-2" id="ratioGrid">`;
 
         if (result.mode === 'ct' || result.mode === 'ctvt') {
             html += `
-                <div class="result-card">
+                <div class="result-card copyable" data-value="CT Ratio: ${this.formatNumber(result.ctRatio)} : 1" onclick="UIManager.copyFromCard(this)">
                     <div class="result-card-label">CT Ratio</div>
                     <div class="result-card-value">${this.formatNumber(result.ctRatio)} : 1</div>
                 </div>`;
@@ -122,28 +121,26 @@ const Calculator = {
 
         if (result.mode === 'ctvt') {
             html += `
-                <div class="result-card">
+                <div class="result-card copyable" data-value="VT Ratio: ${this.formatNumber(result.vtRatio)} : 1" onclick="UIManager.copyFromCard(this)">
                     <div class="result-card-label">VT Ratio</div>
                     <div class="result-card-value">${this.formatNumber(result.vtRatio)} : 1</div>
                 </div>`;
         }
 
         html += `</div>
-
             <div class="section-divider">
                 <div class="divider-line"></div>
-                <span class="divider-text">PULSE CONSTANTS</span>
+                <span class="divider-text">${Lang.get('result-pulse-constants')}</span>
                 <div class="divider-line"></div>
             </div>
-
             <div class="result-grid-2">
-                <div class="result-card pulse-card">
-                    <div class="result-card-label">Primary Active</div>
+                <div class="result-card pulse-card copyable" data-value="Primary Active: ${this.formatNumber(result.primaryActive)} imp/kWh" onclick="UIManager.copyFromCard(this)">
+                    <div class="result-card-label">${Lang.get('result-primary-active')}</div>
                     <div class="result-card-value">${result.primaryActive < 0.001 ? result.primaryActive.toExponential(4) : this.formatNumber(result.primaryActive)}</div>
                     <div class="result-card-unit">imp/kWh</div>
                 </div>
-                <div class="result-card pulse-card">
-                    <div class="result-card-label">Secondary Active</div>
+                <div class="result-card pulse-card copyable" data-value="Secondary Active: ${this.formatNumber(result.secondaryActive)} imp/kWh" onclick="UIManager.copyFromCard(this)">
+                    <div class="result-card-label">${Lang.get('result-secondary-active')}</div>
                     <div class="result-card-value">${this.formatNumber(result.secondaryActive)}</div>
                     <div class="result-card-unit">imp/kWh</div>
                 </div>
@@ -152,13 +149,13 @@ const Calculator = {
         if (result.primaryReactive > 0) {
             html += `
             <div class="result-grid-2">
-                <div class="result-card pulse-card">
-                    <div class="result-card-label">Primary Reactive</div>
+                <div class="result-card pulse-card copyable" data-value="Primary Reactive: ${this.formatNumber(result.primaryReactive)} imp/kvarh" onclick="UIManager.copyFromCard(this)">
+                    <div class="result-card-label">${Lang.get('result-primary-reactive')}</div>
                     <div class="result-card-value">${result.primaryReactive < 0.001 ? result.primaryReactive.toExponential(4) : this.formatNumber(result.primaryReactive)}</div>
                     <div class="result-card-unit">imp/kvarh</div>
                 </div>
-                <div class="result-card pulse-card">
-                    <div class="result-card-label">Secondary Reactive</div>
+                <div class="result-card pulse-card copyable" data-value="Secondary Reactive: ${this.formatNumber(result.secondaryReactive)} imp/kvarh" onclick="UIManager.copyFromCard(this)">
+                    <div class="result-card-label">${Lang.get('result-secondary-reactive')}</div>
                     <div class="result-card-value">${this.formatNumber(result.secondaryReactive)}</div>
                     <div class="result-card-unit">imp/kvarh</div>
                 </div>
@@ -167,12 +164,8 @@ const Calculator = {
 
         html += `
             <div class="formula-box">
-                <div class="formula-title">📐 Formula Digunakan</div>
+                <div class="formula-title">📐 ${Lang.get('result-formula')}</div>
                 <div class="formula-content">${this.getFormulaText(result)}</div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-action btn-share" onclick="UIManager.shareCalculatorResult()">📤 Kongsi</button>
             </div>`;
 
         body.innerHTML = html;
@@ -188,7 +181,6 @@ const Calculator = {
         }
     },
 
-    // ============ ENERGY REGISTRATION CALCULATOR ============
     calculateEnergy() {
         if (this.currentEnergyMode === 'pulse-to-energy') {
             this.calculatePulseToEnergy();
@@ -203,11 +195,11 @@ const Calculator = {
         const multiplier = parseFloat(document.getElementById('energyMultiplier').value) || 1;
 
         if (!pulseCount || pulseCount <= 0) {
-            UIManager.showToast('Sila masukkan jumlah pulse!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-pulse'), 'error');
             return;
         }
         if (!pulseConst || pulseConst <= 0) {
-            UIManager.showToast('Sila masukkan pulse constant!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-constant'), 'error');
             return;
         }
 
@@ -226,7 +218,7 @@ const Calculator = {
             timestamp: new Date().toISOString()
         });
 
-        UIManager.showToast('✅ Tenaga dikira!', 'success');
+        UIManager.showToast(Lang.get('toast-energy-done'), 'success');
     },
 
     calculateEnergyToPulse() {
@@ -235,11 +227,11 @@ const Calculator = {
         const multiplier = parseFloat(document.getElementById('energyMultiplier2').value) || 1;
 
         if (!energy || energy <= 0) {
-            UIManager.showToast('Sila masukkan tenaga!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-energy'), 'error');
             return;
         }
         if (!pulseConst || pulseConst <= 0) {
-            UIManager.showToast('Sila masukkan pulse constant!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-constant'), 'error');
             return;
         }
 
@@ -258,47 +250,39 @@ const Calculator = {
             timestamp: new Date().toISOString()
         });
 
-        UIManager.showToast('✅ Pulse dikira!', 'success');
+        UIManager.showToast(Lang.get('toast-pulse-done'), 'success');
     },
 
-    // ============ ACCURACY CALCULATOR ============
     calculateAccuracy() {
         const reference = parseFloat(document.getElementById('accReference').value);
         const meterReading = parseFloat(document.getElementById('accMeterReading').value);
         const meterClass = document.getElementById('accMeterClass').value;
 
         if (!reference || reference <= 0) {
-            UIManager.showToast('Sila masukkan tenaga rujukan!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-reference'), 'error');
             return;
         }
         if (!meterReading || meterReading <= 0) {
-            UIManager.showToast('Sila masukkan tenaga meter!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-meter-reading'), 'error');
             return;
         }
 
         const errorPercent = ((meterReading - reference) / reference) * 100;
         const absError = Math.abs(errorPercent);
 
-        const limits = {
-            '0.2S': 0.2,
-            '0.5S': 0.5,
-            '0.5': 0.5,
-            '1': 1,
-            '2': 2
-        };
-
+        const limits = { '0.2S': 0.2, '0.5S': 0.5, '0.5': 0.5, '1': 1, '2': 2 };
         const limit = limits[meterClass] || 1;
         const passed = absError <= limit;
 
         document.getElementById('accuracyResult').style.display = 'block';
         document.getElementById('accuracyResultValue').textContent = errorPercent.toFixed(4) + ' %';
-        
+
         const statusEl = document.getElementById('accuracyStatus');
         if (passed) {
-            statusEl.textContent = '✅ LULUS - Dalam had Class ' + meterClass + ' (±' + limit + '%)';
+            statusEl.textContent = Lang.get('accuracy-pass') + ' Class ' + meterClass + ' (±' + limit + '%)';
             statusEl.className = 'calc-result-status pass';
         } else {
-            statusEl.textContent = '❌ GAGAL - Melebihi had Class ' + meterClass + ' (±' + limit + '%)';
+            statusEl.textContent = Lang.get('accuracy-fail') + ' Class ' + meterClass + ' (±' + limit + '%)';
             statusEl.className = 'calc-result-status fail';
         }
 
@@ -312,25 +296,23 @@ const Calculator = {
             timestamp: new Date().toISOString()
         });
 
-        UIManager.showToast(passed ? '✅ Meter LULUS!' : '❌ Meter GAGAL!', passed ? 'success' : 'error');
+        UIManager.showToast(passed ? Lang.get('toast-accuracy-pass') : Lang.get('toast-accuracy-fail'), passed ? 'success' : 'error');
     },
 
-    // ============ DEMAND CALCULATOR ============
     calculateDemand() {
         const pulseCount = parseFloat(document.getElementById('demandPulseCount').value);
         const pulseConst = parseFloat(document.getElementById('demandPulseConst').value);
         const multiplier = parseFloat(document.getElementById('demandMultiplier').value) || 1;
 
         if (!pulseCount || pulseCount <= 0) {
-            UIManager.showToast('Sila masukkan jumlah pulse!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-pulse'), 'error');
             return;
         }
         if (!pulseConst || pulseConst <= 0) {
-            UIManager.showToast('Sila masukkan pulse constant!', 'error');
+            UIManager.showToast(Lang.get('toast-enter-constant'), 'error');
             return;
         }
 
-        // MD = (Pulse × M × 3600) / (Constant × 1800)
         const md = (pulseCount * multiplier * 3600) / (pulseConst * 1800);
 
         document.getElementById('demandResult').style.display = 'block';
@@ -345,10 +327,9 @@ const Calculator = {
             timestamp: new Date().toISOString()
         });
 
-        UIManager.showToast('✅ Maximum Demand dikira!', 'success');
+        UIManager.showToast(Lang.get('toast-demand-done'), 'success');
     },
 
-    // ============ LIVE RATIO UPDATES ============
     attachLiveListeners() {
         const updateRatios = () => this.updateLiveRatios();
         ['ctPrimary', 'ctSecondary', 'vtPrimary', 'vtSecondary'].forEach(id => {
@@ -369,7 +350,7 @@ const Calculator = {
                 ctValue.textContent = (ctPrimary / ctSecondary).toFixed(2) + ' : 1';
                 ctValue.style.color = 'var(--accent)';
             } else {
-                ctValue.textContent = 'Masukkan nilai';
+                ctValue.textContent = Lang.get('live-enter-value');
                 ctValue.style.color = 'var(--text3)';
             }
         } else {
@@ -387,7 +368,7 @@ const Calculator = {
                 vtValue.textContent = (vtPrimary / vtSecondary).toFixed(2) + ' : 1';
                 vtValue.style.color = 'var(--accent)';
             } else {
-                vtValue.textContent = 'Masukkan nilai';
+                vtValue.textContent = Lang.get('live-enter-value');
                 vtValue.style.color = 'var(--text3)';
             }
         } else {
@@ -395,30 +376,22 @@ const Calculator = {
         }
     },
 
-    // ============ HISTORY MANAGEMENT ============
     addToHistory(entry) {
-        this.history.unshift({
-            id: Date.now(),
-            ...entry
-        });
+        this.history.unshift({ id: Date.now(), ...entry });
         if (this.history.length > 50) this.history.pop();
         this.saveHistory();
         this.renderHistory();
     },
 
     saveHistory() {
-        try {
-            localStorage.setItem('metercalc_pro_history', JSON.stringify(this.history));
-        } catch (e) {}
+        try { localStorage.setItem('metercalc_pro_history', JSON.stringify(this.history)); } catch (e) {}
     },
 
     loadHistory() {
         try {
             const saved = localStorage.getItem('metercalc_pro_history');
             if (saved) this.history = JSON.parse(saved);
-        } catch (e) {
-            this.history = [];
-        }
+        } catch (e) { this.history = []; }
     },
 
     renderHistory() {
@@ -429,7 +402,7 @@ const Calculator = {
             container.innerHTML = `
                 <div class="empty-state">
                     <span class="empty-icon">📭</span>
-                    <p>Tiada rekod pengiraan</p>
+                    <p>${Lang.get('history-empty')}</p>
                 </div>`;
             btnClear.style.display = 'none';
             return;
@@ -452,12 +425,10 @@ const Calculator = {
             } else if (h.type === 'energy') {
                 typeLabel = h.mode === 'pulse-to-energy' ? '🔢 Pulse→Tenaga' : '🔢 Tenaga→Pulse';
                 dotClass = 'energy';
-                detail = h.mode === 'pulse-to-energy' 
+                detail = h.mode === 'pulse-to-energy'
                     ? `${this.formatNumber(h.pulseCount)} pulse ÷ ${this.formatNumber(h.pulseConst)} × ${this.formatNumber(h.multiplier)}`
                     : `${this.formatNumber(h.energy)} kWh × ${this.formatNumber(h.pulseConst)} ÷ ${this.formatNumber(h.multiplier)}`;
-                value = h.mode === 'pulse-to-energy' 
-                    ? this.formatNumber(h.result) + ' kWh'
-                    : this.formatNumber(h.result) + ' pulses';
+                value = h.mode === 'pulse-to-energy' ? this.formatNumber(h.result) + ' kWh' : this.formatNumber(h.result) + ' pulses';
             } else if (h.type === 'accuracy') {
                 typeLabel = '📊 ACCURACY';
                 dotClass = 'accuracy';
@@ -488,7 +459,6 @@ const Calculator = {
         }).join('');
     },
 
-    // ============ UTILS ============
     formatNumber(num) {
         if (num === undefined || num === null) return '-';
         if (Number.isInteger(num)) return num.toLocaleString('ms-MY');
