@@ -261,41 +261,51 @@
             </section>
 
             <!-- ============ ACCURACY PANEL ============ -->
-            <section class="panel" id="accuracyPanel" style="display:none;">
-                <div class="panel-header">
-                    <h2>📊 Meter Accuracy Calculator</h2>
-                </div>
-                <div class="panel-body">
-                    <div class="input-block">
-                        <label class="input-label">Tenaga Rujukan (Standard)</label>
-                        <input type="number" id="accReference" class="input-field" placeholder="Cth: 100" inputmode="decimal" step="any">
-                    </div>
-                    <div class="input-block">
-                        <label class="input-label">Tenaga Meter Under Test</label>
-                        <input type="number" id="accMeterReading" class="input-field" placeholder="Cth: 101.5" inputmode="decimal" step="any">
-                    </div>
-                    <div class="input-block">
-                        <label class="input-label">Class Meter</label>
-                        <select id="accMeterClass" class="input-field">
-                            <option value="0.2S">Class 0.2S (±0.2%)</option>
-                            <option value="0.5S">Class 0.5S (±0.5%)</option>
-                            <option value="0.5">Class 0.5 (±0.5%)</option>
-                            <option value="1" selected>Class 1 (±1%)</option>
-                            <option value="2">Class 2 (±2%)</option>
-                        </select>
-                    </div>
+<section class="panel" id="accuracyPanel" style="display:none;">
+    <div class="panel-header">
+        <h2>📊 Meter Accuracy Calculator</h2>
+    </div>
+    <div class="panel-body">
+        <!-- NEW: Supply Type Selection -->
+        <div class="input-block">
+            <label class="input-label">Jenis Supply (untuk formula)</label>
+            <select id="accSupplyType" class="input-field">
+                <option value="1P2W" selected>1 Fasa (1P2W)</option>
+                <option value="3P4W">3 Fasa (3P4W)</option>
+            </select>
+        </div>
 
-                    <button class="btn-calculate" onclick="Calculator.calculateAccuracy()">
-                        <span>📊 KIRA KETEPATAN</span>
-                    </button>
+        <div class="input-block">
+            <label class="input-label">Tenaga Rujukan (Standard)</label>
+            <input type="number" id="accReference" class="input-field" placeholder="Cth: 100" inputmode="decimal" step="any" min="0.000001">
+        </div>
+        <div class="input-block">
+            <label class="input-label">Tenaga Meter Under Test</label>
+            <input type="number" id="accMeterReading" class="input-field" placeholder="Cth: 101.5" inputmode="decimal" step="any" min="0.000001">
+        </div>
+        <div class="input-block">
+            <label class="input-label">Class Meter</label>
+            <select id="accMeterClass" class="input-field">
+                <option value="0.2S">Class 0.2S (±0.2%)</option>
+                <option value="0.5S">Class 0.5S (±0.5%)</option>
+                <option value="0.5">Class 0.5 (±0.5%)</option>
+                <option value="1" selected>Class 1 (±1%)</option>
+                <option value="2">Class 2 (±2%)</option>
+            </select>
+        </div>
 
-                    <div class="calc-result" id="accuracyResult" style="display:none;">
-                        <div class="calc-result-label">% Error</div>
-                        <div class="calc-result-value" id="accuracyResultValue">-</div>
-                        <div class="calc-result-status" id="accuracyStatus"></div>
-                    </div>
-                </div>
-            </section>
+        <button class="btn-calculate" onclick="Calculator.calculateAccuracy()">
+            <span>📊 KIRA KETEPATAN</span>
+        </button>
+
+        <div class="calc-result" id="accuracyResult" style="display:none;">
+            <div class="calc-result-label">% Error</div>
+            <div class="calc-result-value" id="accuracyResultValue">-</div>
+            <div class="calc-result-status" id="accuracyStatus"></div>
+            <div id="accuracyNote" style="margin-top: 10px;"></div>
+        </div>
+    </div>
+</section>
 
             <!-- ============ DEMAND PANEL ============ -->
             <section class="panel" id="demandPanel" style="display:none;">
