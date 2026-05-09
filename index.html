@@ -41,22 +41,22 @@
 
         <nav class="main-tabs" id="mainTabs">
             <button class="main-tab active" data-panel="calculatorPanel" onclick="UIManager.switchMainTab('calculatorPanel')">
-                <span class="main-tab-icon">🔌</span><span class="main-tab-label" data-lang="tabCalc"></span>
+                <span class="main-tab-icon">🔌</span><span class="main-tab-label" data-lang="tabCalc">Kalkulator</span>
             </button>
             <button class="main-tab" data-panel="energyPanel" onclick="UIManager.switchMainTab('energyPanel')">
-                <span class="main-tab-icon">🔢</span><span class="main-tab-label" data-lang="tabEnergy"></span>
+                <span class="main-tab-icon">🔢</span><span class="main-tab-label" data-lang="tabEnergy">Tenaga</span>
             </button>
             <button class="main-tab" data-panel="dialTestPanel" onclick="UIManager.switchMainTab('dialTestPanel')">
-                <span class="main-tab-icon">📊</span><span class="main-tab-label" data-lang="tabDial"></span>
+                <span class="main-tab-icon">📊</span><span class="main-tab-label" data-lang="tabDial">Dial Test</span>
             </button>
             <button class="main-tab" data-panel="demandPanel" onclick="UIManager.switchMainTab('demandPanel')">
-                <span class="main-tab-icon">🕐</span><span class="main-tab-label" data-lang="tabMD"></span>
+                <span class="main-tab-icon">🕐</span><span class="main-tab-label" data-lang="tabMD">MD</span>
             </button>
             <button class="main-tab" data-panel="historyPanel" onclick="UIManager.switchMainTab('historyPanel')">
-                <span class="main-tab-icon">📋</span><span class="main-tab-label" data-lang="tabHistory"></span>
+                <span class="main-tab-icon">📋</span><span class="main-tab-label" data-lang="tabHistory">Sejarah</span>
             </button>
             <button class="main-tab" data-panel="referencePanel" onclick="UIManager.switchMainTab('referencePanel')">
-                <span class="main-tab-icon">📚</span><span class="main-tab-label" data-lang="tabRef"></span>
+                <span class="main-tab-icon">📚</span><span class="main-tab-label" data-lang="tabRef">Rujukan</span>
             </button>
         </nav>
 
@@ -64,7 +64,7 @@
             
             <!-- ============ KALKULATOR ============ -->
             <section class="panel" id="calculatorPanel">
-                <div class="panel-header"><h2 data-lang="calcTitle"></h2></div>
+                <div class="panel-header"><h2 data-lang="calcTitle">📋 Parameter Input</h2></div>
                 <nav class="mode-tabs" id="calcModeTabs">
                     <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchCalcMode('direct')"><span class="mode-label">DIRECT</span></button>
                     <button class="mode-tab" data-mode="ct" onclick="UIManager.switchCalcMode('ct')"><span class="mode-label">CT</span></button>
@@ -72,162 +72,162 @@
                 </nav>
                 <div class="panel-body">
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="meterConstActive"></span><span class="label-src">Nameplate</span></label>
+                        <label class="input-label"><span data-lang="meterConstActive">Meter Constant Active</span><span class="label-src">Nameplate</span></label>
                         <div class="input-wrap"><input type="number" id="meterConstActive" class="input-field" placeholder="Cth: 1000" inputmode="decimal" value="1000" min="0.000001"><span class="input-suffix">imp/kWh</span></div>
                     </div>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="meterConstReactive"></span><span class="label-src">Nameplate</span></label>
+                        <label class="input-label"><span data-lang="meterConstReactive">Meter Constant Reactive</span><span class="label-src">Nameplate</span></label>
                         <div class="input-wrap"><input type="number" id="meterConstReactive" class="input-field" placeholder="Cth: 1000" inputmode="decimal" value="1000" min="0"><span class="input-suffix">imp/kvarh</span></div>
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="supplyType"></span></label>
+                            <label class="input-label"><span data-lang="supplyType">Jenis Supply</span></label>
                             <select id="supplyType" class="input-field"><option value="1P2W">1 Fasa (1P2W)</option><option value="3P3W">3 Fasa (3P3W)</option><option value="3P4W" selected>3 Fasa (3P4W)</option></select>
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="meterClass"></span></label>
+                            <label class="input-label"><span data-lang="meterClass">Class Meter</span></label>
                             <select id="meterClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select>
                         </div>
                     </div>
                     <div class="section-divider" id="ctSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">CURRENT TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="ctInputSection" style="display:none;">
-                        <div class="input-block"><label class="input-label"><span data-lang="ctPrimary"></span><span class="label-src">Nameplate</span></label><input type="number" id="ctPrimary" class="input-field" placeholder="800" inputmode="decimal" min="0"></div>
-                        <div class="input-block"><label class="input-label"><span data-lang="ctSecondary"></span><span class="label-src">Nameplate</span></label><input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" value="5" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span data-lang="ctPrimary">CT Primary</span><span class="label-src">Nameplate</span></label><input type="number" id="ctPrimary" class="input-field" placeholder="800" inputmode="decimal" min="0"></div>
+                        <div class="input-block"><label class="input-label"><span data-lang="ctSecondary">CT Secondary</span><span class="label-src">Nameplate</span></label><input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" value="5" min="0.000001"></div>
                     </div>
-                    <div class="live-ratio" id="ctLiveRatio" style="display:none;"><span data-lang="ctRatio"></span><strong id="ctLiveRatioValue">-</strong></div>
+                    <div class="live-ratio" id="ctLiveRatio" style="display:none;"><span data-lang="ctRatio">CT Ratio</span><strong id="ctLiveRatioValue">-</strong></div>
                     <div class="section-divider" id="vtSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">VOLTAGE TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="vtInputSection" style="display:none;">
-                        <div class="input-block"><label class="input-label"><span data-lang="vtPrimary"></span><span class="label-src">Nameplate</span></label><input type="number" id="vtPrimary" class="input-field" placeholder="11000" inputmode="decimal" min="0"></div>
-                        <div class="input-block"><label class="input-label"><span data-lang="vtSecondary"></span><span class="label-src">Nameplate</span></label><input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" value="110" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span data-lang="vtPrimary">VT Primary</span><span class="label-src">Nameplate</span></label><input type="number" id="vtPrimary" class="input-field" placeholder="11000" inputmode="decimal" min="0"></div>
+                        <div class="input-block"><label class="input-label"><span data-lang="vtSecondary">VT Secondary</span><span class="label-src">Nameplate</span></label><input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" value="110" min="0.000001"></div>
                     </div>
-                    <div class="live-ratio" id="vtLiveRatio" style="display:none;"><span data-lang="vtRatio"></span><strong id="vtLiveRatioValue">-</strong></div>
-                    <button class="btn-calculate" onclick="Calculator.calculate()"><span data-lang="btnCalc"></span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
+                    <div class="live-ratio" id="vtLiveRatio" style="display:none;"><span data-lang="vtRatio">VT Ratio</span><strong id="vtLiveRatioValue">-</strong></div>
+                    <button class="btn-calculate" onclick="Calculator.calculate()"><span data-lang="btnCalc">🔢 KIRA PARAMETER</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
                 </div>
             </section>
-            <section class="panel" id="calcResultsPanel" style="display:none;"><div class="panel-header results-header"><h2 data-lang="resultsTitle"></h2></div><div class="panel-body" id="calcResultsBody"></div></section>
+            <section class="panel" id="calcResultsPanel" style="display:none;"><div class="panel-header results-header"><h2 data-lang="resultsTitle">📊 Keputusan</h2></div><div class="panel-body" id="calcResultsBody"></div></section>
 
             <!-- ============ TENAGA ============ -->
             <section class="panel" id="energyPanel" style="display:none;">
-                <div class="panel-header"><h2 data-lang="energyTitle"></h2></div>
+                <div class="panel-header"><h2 data-lang="energyTitle">🔢 Pulse → Tenaga</h2></div>
                 <div class="panel-body">
-                    <p class="panel-desc" data-lang="energyDesc"></p>
+                    <p class="panel-desc" data-lang="energyDesc">Kira tenaga berdasarkan jumlah pulse diterima.</p>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="energyUnit"></span></label>
+                        <label class="input-label"><span data-lang="energyUnit">Unit Tenaga</span></label>
                         <select id="energyUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option><option value="MWh">MWh</option></select>
                     </div>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="energyPulse"></span><span class="label-src">MUT</span></label>
+                        <label class="input-label"><span data-lang="energyPulse">Jumlah Pulse</span><span class="label-src">MUT</span></label>
                         <input type="number" id="energyPulseCount" class="input-field" placeholder="5000" inputmode="decimal" value="5000" min="0">
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="pulseConst"></span><span class="label-src">Nameplate</span></label>
+                            <label class="input-label"><span data-lang="pulseConst">Pulse Constant</span><span class="label-src">Nameplate</span></label>
                             <input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001">
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="multiplier"></span></label>
+                            <label class="input-label"><span data-lang="multiplier">Multiplier (M)</span></label>
                             <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
-                    <button class="btn-calculate" onclick="Calculator.calculateEnergy()"><span data-lang="btnEnergy"></span></button>
-                    <div class="calc-result" id="energyResult" style="display:none;"><div class="calc-result-label" data-lang="energyResult"></div><div class="calc-result-value" id="energyResultValue">-</div></div>
+                    <button class="btn-calculate" onclick="Calculator.calculateEnergy()"><span data-lang="btnEnergy">🔢 KIRA TENAGA</span></button>
+                    <div class="calc-result" id="energyResult" style="display:none;"><div class="calc-result-label" data-lang="energyResult">Tenaga</div><div class="calc-result-value" id="energyResultValue">-</div></div>
                 </div>
             </section>
 
             <!-- ============ DIAL TEST ============ -->
             <section class="panel" id="dialTestPanel" style="display:none;">
-                <div class="panel-header"><h2 data-lang="dialTitle"></h2></div>
+                <div class="panel-header"><h2 data-lang="dialTitle">📊 Dial Test</h2></div>
                 <div class="panel-body">
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialUnit"></span></label>
+                            <label class="input-label"><span data-lang="dialUnit">Unit</span></label>
                             <select id="dialUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option></select>
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialClass"></span></label>
+                            <label class="input-label"><span data-lang="dialClass">Class</span></label>
                             <select id="dialClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select>
                         </div>
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialPulseConst"></span><span class="label-src">Nameplate</span></label>
+                            <label class="input-label"><span data-lang="dialPulseConst">Pulse Constant</span><span class="label-src">Nameplate</span></label>
                             <input type="number" id="dialPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001">
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialMultiplier"></span></label>
+                            <label class="input-label"><span data-lang="dialMultiplier">Multiplier (M)</span></label>
                             <input type="number" id="dialMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
                     <div class="section-divider"><div class="divider-line"></div><span class="divider-text">INPUT</span><div class="divider-line"></div></div>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="dialPulseCount"></span><span class="label-src">Working Standard</span></label>
+                        <label class="input-label"><span data-lang="dialPulseCount">Pulse Count</span><span class="label-src">Working Standard</span></label>
                         <input type="number" id="dialPulseCount" class="input-field" placeholder="1740" inputmode="decimal" value="1740" min="0">
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialStart"></span><span class="label-src">Skrin MUT</span></label>
+                            <label class="input-label"><span data-lang="dialStart">Bacaan Mula</span><span class="label-src">Skrin MUT</span></label>
                             <input type="number" id="dialStart" class="input-field" placeholder="100.0000" inputmode="decimal" step="any" value="100.0000" min="0">
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="dialEnd"></span><span class="label-src">Skrin MUT</span></label>
+                            <label class="input-label"><span data-lang="dialEnd">Bacaan Akhir</span><span class="label-src">Skrin MUT</span></label>
                             <input type="number" id="dialEnd" class="input-field" placeholder="101.7400" inputmode="decimal" step="any" value="101.7400" min="0">
                         </div>
                     </div>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="dialRealPulse"></span><span class="label-src">MUT</span></label>
+                        <label class="input-label"><span data-lang="dialRealPulse">Real Pulse</span><span class="label-src">MUT</span></label>
                         <input type="number" id="dialRealPulse" class="input-field" placeholder="1745" inputmode="decimal" value="1745" min="0">
                     </div>
-                    <button class="btn-calculate" onclick="Calculator.calculateDialTest()"><span data-lang="btnDial"></span></button>
-                    <div class="calc-result" id="dialResult" style="display:none;"><div class="calc-result-label" data-lang="dialResult"></div><div id="dialResultContent"></div></div>
+                    <button class="btn-calculate" onclick="Calculator.calculateDialTest()"><span data-lang="btnDial">📊 KIRA</span></button>
+                    <div class="calc-result" id="dialResult" style="display:none;"><div class="calc-result-label" data-lang="dialResult">Keputusan</div><div id="dialResultContent"></div></div>
                 </div>
             </section>
 
             <!-- ============ MD ============ -->
             <section class="panel" id="demandPanel" style="display:none;">
-                <div class="panel-header"><h2 data-lang="mdTitle"></h2></div>
+                <div class="panel-header"><h2 data-lang="mdTitle">🕐 Maximum Demand</h2></div>
                 <div class="panel-body">
-                    <p class="panel-desc" data-lang="mdDesc"></p>
+                    <p class="panel-desc" data-lang="mdDesc">Kira MD berdasarkan bacaan pulse dalam 30 minit.</p>
                     <div class="input-block">
-                        <label class="input-label"><span data-lang="mdPulse"></span><span class="label-src">MUT</span></label>
+                        <label class="input-label"><span data-lang="mdPulse">Jumlah Pulse (30 minit)</span><span class="label-src">MUT</span></label>
                         <input type="number" id="demandPulseCount" class="input-field" placeholder="150" inputmode="decimal" value="150" min="0">
                     </div>
                     <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="mdPulseConst"></span><span class="label-src">Nameplate</span></label>
+                            <label class="input-label"><span data-lang="mdPulseConst">Pulse Constant</span><span class="label-src">Nameplate</span></label>
                             <input type="number" id="demandPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001">
                         </div>
                         <div class="input-block">
-                            <label class="input-label"><span data-lang="mdMultiplier"></span></label>
+                            <label class="input-label"><span data-lang="mdMultiplier">Multiplier (M)</span></label>
                             <input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
-                    <button class="btn-calculate" onclick="Calculator.calculateDemand()"><span data-lang="btnMD"></span></button>
-                    <div class="calc-result" id="demandResult" style="display:none;"><div class="calc-result-label" data-lang="mdResult"></div><div class="calc-result-value" id="demandResultValue">-</div></div>
+                    <button class="btn-calculate" onclick="Calculator.calculateDemand()"><span data-lang="btnMD">🕐 KIRA MD</span></button>
+                    <div class="calc-result" id="demandResult" style="display:none;"><div class="calc-result-label" data-lang="mdResult">Maximum Demand</div><div class="calc-result-value" id="demandResultValue">-</div></div>
                 </div>
             </section>
 
             <!-- ============ SEJARAH ============ -->
             <section class="panel" id="historyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2 data-lang="historyTitle"></h2>
+                    <h2 data-lang="historyTitle">📋 Sejarah</h2>
                     <div class="history-actions">
-                        <button class="btn-text" onclick="UIManager.copyAllHistory()" data-lang="historyCopy"></button>
-                        <button class="btn-text" onclick="UIManager.exportCSV()" data-lang="historyExport"></button>
-                        <button class="btn-text" onclick="UIManager.clearHistory()" id="btnClearHistory" style="display:none;" data-lang="historyClear"></button>
+                        <button class="btn-text" onclick="UIManager.copyAllHistory()" data-lang="historyCopy">📋 Salin</button>
+                        <button class="btn-text" onclick="UIManager.exportCSV()" data-lang="historyExport">📥 CSV</button>
+                        <button class="btn-text" onclick="UIManager.clearHistory()" id="btnClearHistory" style="display:none;" data-lang="historyClear">Padam Semua</button>
                     </div>
                 </div>
-                <div class="panel-body"><div id="historyList"><div class="empty-state"><span class="empty-icon">📭</span><p data-lang="historyEmpty"></p></div></div></div>
+                <div class="panel-body"><div id="historyList"><div class="empty-state"><span class="empty-icon">📭</span><p data-lang="historyEmpty">Tiada rekod</p></div></div></div>
             </section>
 
             <!-- ============ RUJUKAN ============ -->
             <section class="panel" id="referencePanel" style="display:none;">
-                <div class="panel-header"><h2 data-lang="refTitle"></h2></div>
+                <div class="panel-header"><h2 data-lang="refTitle">📚 Rujukan Pantas</h2></div>
                 <div class="panel-body">
-                    <div class="ref-section"><h3 class="ref-title" data-lang="refCT"></h3><div class="ref-chips"><span class="ref-chip">100/5A</span><span class="ref-chip">200/5A</span><span class="ref-chip">400/5A</span><span class="ref-chip">600/5A</span><span class="ref-chip">800/5A</span><span class="ref-chip">1000/5A</span><span class="ref-chip">1200/5A</span><span class="ref-chip">1600/5A</span><span class="ref-chip">2000/5A</span></div></div>
-                    <div class="ref-section"><h3 class="ref-title" data-lang="refVT"></h3><div class="ref-chips"><span class="ref-chip">11kV/110V</span><span class="ref-chip">22kV/110V</span><span class="ref-chip">33kV/110V</span><span class="ref-chip">66kV/110V</span></div></div>
-                    <div class="ref-section"><h3 class="ref-title" data-lang="refConst"></h3><div class="ref-chips"><span class="ref-chip">1</span><span class="ref-chip">250</span><span class="ref-chip">500</span><span class="ref-chip">1000</span><span class="ref-chip">2000</span><span class="ref-chip">5000</span><span class="ref-chip">100000</span></div></div>
-                    <div class="ref-section"><h3 class="ref-title" data-lang="refClass"></h3><table class="ref-table"><tr><th>Class</th><th>Had</th></tr><tr><td>0.2S</td><td>±0.2%</td></tr><tr><td>0.5S</td><td>±0.5%</td></tr><tr><td>0.5</td><td>±0.5%</td></tr><tr><td>1</td><td>±1%</td></tr><tr><td>2</td><td>±2%</td></tr></table></div>
-                    <div class="ref-section"><h3 class="ref-title" data-lang="refDecimal"></h3><table class="ref-table"><tr><th>Julat</th><th>DP</th></tr><tr><td>≥1</td><td>2</td></tr><tr><td>0.1-0.999</td><td>3</td></tr><tr><td>0.01-0.099</td><td>4</td></tr><tr><td>0.001-0.0099</td><td>5</td></tr><tr><td>&lt;0.001</td><td>6</td></tr></table></div>
+                    <div class="ref-section"><h3 class="ref-title" data-lang="refCT">Standard CT Ratios</h3><div class="ref-chips"><span class="ref-chip">100/5A</span><span class="ref-chip">200/5A</span><span class="ref-chip">400/5A</span><span class="ref-chip">600/5A</span><span class="ref-chip">800/5A</span><span class="ref-chip">1000/5A</span><span class="ref-chip">1200/5A</span><span class="ref-chip">1600/5A</span><span class="ref-chip">2000/5A</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title" data-lang="refVT">Standard VT Ratios</h3><div class="ref-chips"><span class="ref-chip">11kV/110V</span><span class="ref-chip">22kV/110V</span><span class="ref-chip">33kV/110V</span><span class="ref-chip">66kV/110V</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title" data-lang="refConst">Standard Meter Constants</h3><div class="ref-chips"><span class="ref-chip">1</span><span class="ref-chip">250</span><span class="ref-chip">500</span><span class="ref-chip">1000</span><span class="ref-chip">2000</span><span class="ref-chip">5000</span><span class="ref-chip">100000</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title" data-lang="refClass">Class Limits</h3><table class="ref-table"><tr><th>Class</th><th>Had</th></tr><tr><td>0.2S</td><td>±0.2%</td></tr><tr><td>0.5S</td><td>±0.5%</td></tr><tr><td>0.5</td><td>±0.5%</td></tr><tr><td>1</td><td>±1%</td></tr><tr><td>2</td><td>±2%</td></tr></table></div>
+                    <div class="ref-section"><h3 class="ref-title" data-lang="refDecimal">📏 Decimal Point Rules</h3><table class="ref-table"><tr><th>Julat</th><th>DP</th></tr><tr><td>≥1</td><td>2</td></tr><tr><td>0.1-0.999</td><td>3</td></tr><tr><td>0.01-0.099</td><td>4</td></tr><tr><td>0.001-0.0099</td><td>5</td></tr><tr><td>&lt;0.001</td><td>6</td></tr></table></div>
                 </div>
             </section>
 
