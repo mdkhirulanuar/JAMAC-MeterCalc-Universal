@@ -191,48 +191,26 @@
                 <div class="panel-body" id="calcResultsBody"></div>
             </section>
 
-            <!-- ============ ENERGY PANEL ============ -->
+            <!-- ============ ENERGY PANEL (SIMPLIFIED) ============ -->
             <section class="panel" id="energyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>🔢 Energy Registration Calculator</h2>
+                    <h2>🔢 Pulse → Tenaga</h2>
                 </div>
                 <div class="panel-body">
-                    <div class="calc-type-toggle">
-                        <button class="toggle-btn active" onclick="UIManager.switchEnergyMode('pulse-to-energy')" id="togglePulseToEnergy">Pulse → Tenaga</button>
-                        <button class="toggle-btn" onclick="UIManager.switchEnergyMode('energy-to-pulse')" id="toggleEnergyToPulse">Tenaga → Pulse</button>
-                    </div>
+                    <p class="panel-desc">Kira tenaga (kWh) berdasarkan jumlah pulse yang diterima dari meter.</p>
 
-                    <div id="energyPulseToEnergy">
-                        <div class="input-block">
-                            <label class="input-label">Jumlah Pulse Diterima</label>
-                            <input type="number" id="energyPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal" min="0">
-                        </div>
-                        <div class="input-row-2">
-                            <div class="input-block">
-                                <label class="input-label">Pulse Constant (imp/kWh)</label>
-                                <input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001">
-                            </div>
-                            <div class="input-block">
-                                <label class="input-label">Multiplier (M)</label>
-                                <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
-                            </div>
-                        </div>
+                    <div class="input-block">
+                        <label class="input-label">Jumlah Pulse Diterima</label>
+                        <input type="number" id="energyPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal" min="0">
                     </div>
-
-                    <div id="energyEnergyToPulse" style="display:none;">
+                    <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label">Tenaga Dikehendaki (kWh)</label>
-                            <input type="number" id="energyTarget" class="input-field" placeholder="Cth: 50" inputmode="decimal" step="any" min="0">
+                            <label class="input-label">Pulse Constant (imp/kWh)</label>
+                            <input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001">
                         </div>
-                        <div class="input-row-2">
-                            <div class="input-block">
-                                <label class="input-label">Pulse Constant (imp/kWh)</label>
-                                <input type="number" id="energyPulseConst2" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001">
-                            </div>
-                            <div class="input-block">
-                                <label class="input-label">Multiplier (M)</label>
-                                <input type="number" id="energyMultiplier2" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
-                            </div>
+                        <div class="input-block">
+                            <label class="input-label">Multiplier (M)</label>
+                            <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
 
@@ -241,19 +219,18 @@
                     </button>
 
                     <div class="calc-result" id="energyResult" style="display:none;">
-                        <div class="calc-result-label">Hasil</div>
+                        <div class="calc-result-label">Tenaga</div>
                         <div class="calc-result-value" id="energyResultValue">-</div>
                     </div>
                 </div>
             </section>
 
-            <!-- ============ ACCURACY PANEL (UPDATED) ============ -->
+            <!-- ============ ACCURACY PANEL ============ -->
             <section class="panel" id="accuracyPanel" style="display:none;">
                 <div class="panel-header">
                     <h2>📊 Meter Accuracy Calculator</h2>
                 </div>
                 <div class="panel-body">
-                    <!-- Supply Type -->
                     <div class="input-block">
                         <label class="input-label">Jenis Supply</label>
                         <select id="accSupplyType" class="input-field">
@@ -262,13 +239,11 @@
                         </select>
                     </div>
 
-                    <!-- Toggle: Manual vs Pulse -->
                     <div class="calc-type-toggle">
                         <button class="toggle-btn active" onclick="UIManager.switchAccuracyMode('manual')" id="toggleAccManual">Manual</button>
                         <button class="toggle-btn" onclick="UIManager.switchAccuracyMode('pulse')" id="toggleAccPulse">Kira dari Pulse</button>
                     </div>
 
-                    <!-- Manual Input Section -->
                     <div id="accManualSection">
                         <div class="input-block">
                             <label class="input-label">Tenaga Rujukan (Standard) - kWh</label>
@@ -276,7 +251,6 @@
                         </div>
                     </div>
 
-                    <!-- Pulse Input Section -->
                     <div id="accPulseSection" style="display:none;">
                         <div class="input-block">
                             <label class="input-label">Pulse Count dari Standard Meter</label>
@@ -299,20 +273,17 @@
                                 <option value="Wh">Wh (Watt-hour)</option>
                             </select>
                         </div>
-                        <!-- Live preview -->
                         <div class="live-ratio" id="accLiveEnergy" style="display:none;">
                             <span>📐 Tenaga Rujukan</span>
                             <strong id="accLiveEnergyValue">-</strong>
                         </div>
                     </div>
 
-                    <!-- Tenaga MUT (common) -->
                     <div class="input-block">
                         <label class="input-label">Tenaga Meter Under Test - kWh</label>
                         <input type="number" id="accMeterReading" class="input-field" placeholder="Cth: 0.051" inputmode="decimal" step="any" min="0.000001">
                     </div>
 
-                    <!-- Class -->
                     <div class="input-block">
                         <label class="input-label">Class Meter</label>
                         <select id="accMeterClass" class="input-field">
@@ -386,7 +357,7 @@
                 </div>
             </section>
 
-            <!-- ============ REFERENCE PANEL (UPDATED) ============ -->
+            <!-- ============ REFERENCE PANEL ============ -->
             <section class="panel" id="referencePanel" style="display:none;">
                 <div class="panel-header">
                     <h2>📚 Rujukan Pantas</h2>
@@ -447,7 +418,6 @@
                             <tr><td>3P4W</td><td>Komersial/Industri (wye)</td></tr>
                         </table>
                     </div>
-                    <!-- NEW: Decimal Point Rules -->
                     <div class="ref-section">
                         <h3 class="ref-title">📏 Decimal Point Rules (Tenaga)</h3>
                         <table class="ref-table">
