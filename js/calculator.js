@@ -1,6 +1,6 @@
 /**
  * MeterCalc Pro - Core Calculation Engine
- * Features: Direct, CT, CT+VT, Reverse, Energy, Accuracy, Demand
+ * Features: Direct, CT, CT+VT, Energy, Accuracy, Demand
  */
 
 const Calculator = {
@@ -25,19 +25,13 @@ const Calculator = {
             ctPrimary: parseFloat(document.getElementById('ctPrimary').value) || null,
             ctSecondary: parseFloat(document.getElementById('ctSecondary').value) || null,
             vtPrimary: parseFloat(document.getElementById('vtPrimary').value) || null,
-            vtSecondary: parseFloat(document.getElementById('vtSecondary').value) || null,
-            targetPrimaryPulse: parseFloat(document.getElementById('targetPrimaryPulse').value) || null
+            vtSecondary: parseFloat(document.getElementById('vtSecondary').value) || null
         };
     },
 
     // ============ MAIN CALCULATOR ============
     calculate() {
         const inputs = this.getInputValues();
-
-        // Reverse mode: cari meter constant based on target primary pulse
-        if (this.currentMode === 'reverse') {
-            return this.calculateReverse(inputs);
-        }
 
         // Validate meter constant
         if (!inputs.meterConstActive || inputs.meterConstActive <= 0) {
@@ -95,47 +89,6 @@ const Calculator = {
 
         document.getElementById('calcResultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
         UIManager.showToast('✅ Pengiraan selesai!', 'success');
-        if (navigator.vibrate) navigator.vibrate([10, 20, 10]);
-    },
-
-    // ============ REVERSE CALCULATOR ============
-    calculateReverse(inputs) {
-        if (!inputs.targetPrimaryPulse || inputs.targetPrimaryPulse <= 0) {
-            UIManager.showToast('Sila masukkan Target Primary Pulse!', 'error');
-            document.getElementById('targetPrimaryPulse').focus();
-            return;
-        }
-
-        let ctRatio = 1;
-        let vtRatio = 1;
-
-        if (inputs.ctPrimary && inputs.ctSecondary && inputs.ctSecondary > 0) {
-            ctRatio = inputs.ctPrimary / inputs.ctSecondary;
-        }
-
-        if (inputs.vtPrimary && inputs.vtSecondary && inputs.vtSecondary > 0) {
-            vtRatio = inputs.vtPrimary / inputs.vtSecondary;
-        }
-
-        const totalMultiplier = ctRatio * vtRatio;
-        const requiredMeterConstant = inputs.targetPrimaryPulse * totalMultiplier;
-
-        const result = {
-            type: 'reverse',
-            ...inputs,
-            ctRatio,
-            vtRatio,
-            totalMultiplier,
-            requiredMeterConstant,
-            targetPrimaryPulse: inputs.targetPrimaryPulse,
-            timestamp: new Date().toISOString()
-        };
-
-        this.displayReverseResults(result);
-        this.addToHistory(result);
-
-        document.getElementById('calcResultsPanel').scrollIntoView({ behavior: 'smooth', block: 'start' });
-        UIManager.showToast('✅ Reverse calculation selesai!', 'success');
         if (navigator.vibrate) navigator.vibrate([10, 20, 10]);
     },
 
@@ -223,46 +176,6 @@ const Calculator = {
             </div>`;
 
         body.innerHTML = html;
-    },
-
-    // ============ DISPLAY REVERSE RESULTS ============
-    displayReverseResults(result) {
-        const panel = document.getElementById('calcResultsPanel');
-        const body = document.getElementById('calcResultsBody');
-        panel.style.display = 'block';
-        panel.style.animation = 'none';
-        panel.offsetHeight;
-        panel.style.animation = 'fadeInUp 0.3s ease-out';
-
-        body.innerHTML = `
-            <div class="hero-result">
-                <div class="hero-label">METER CONSTANT DIPERLUKAN</div>
-                <div class="hero-value">${this.formatNumber(result.requiredMeterConstant)}</div>
-                <div class="hero-sub">imp/kWh untuk mencapai Primary Pulse ${this.formatNumber(result.targetPrimaryPulse)} imp/kWh</div>
-            </div>
-
-            <div class="result-grid-2">
-                <div class="result-card">
-                    <div class="result-card-label">CT Ratio</div>
-                    <div class="result-card-value">${this.formatNumber(result.ctRatio)} : 1</div>
-                </div>
-                <div class="result-card">
-                    <div class="result-card-label">VT Ratio</div>
-                    <div class="result-card-value">${this.formatNumber(result.vtRatio)} : 1</div>
-                </div>
-            </div>
-
-            <div class="formula-box">
-                <div class="formula-title">📐 Formula</div>
-                <div class="formula-content">
-                    <code>M = ${this.formatNumber(result.ctRatio)} × ${this.formatNumber(result.vtRatio)} = <strong>${this.formatNumber(result.totalMultiplier)}</strong></code><br>
-                    <code>K<sub>m</sub> = Target Pulse × M = ${this.formatNumber(result.targetPrimaryPulse)} × ${this.formatNumber(result.totalMultiplier)} = <strong>${this.formatNumber(result.requiredMeterConstant)} imp/kWh</strong></code>
-                </div>
-            </div>
-
-            <div class="action-buttons">
-                <button class="btn-action btn-share" onclick="UIManager.shareCalculatorResult()">📤 Kongsi</button>
-            </div>`;
     },
 
     getFormulaText(result) {
@@ -450,7 +363,7 @@ const Calculator = {
         const ctDisplay = document.getElementById('ctLiveRatio');
         const ctValue = document.getElementById('ctLiveRatioValue');
 
-        if (this.currentMode === 'ct' || this.currentMode === 'ctvt' || this.currentMode === 'reverse') {
+        if (this.currentMode === 'ct' || this.currentMode === 'ctvt') {
             ctDisplay.style.display = 'flex';
             if (ctPrimary && ctSecondary && ctSecondary > 0) {
                 ctValue.textContent = (ctPrimary / ctSecondary).toFixed(2) + ' : 1';
@@ -468,7 +381,7 @@ const Calculator = {
         const vtDisplay = document.getElementById('vtLiveRatio');
         const vtValue = document.getElementById('vtLiveRatioValue');
 
-        if (this.currentMode === 'ctvt' || this.currentMode === 'reverse') {
+        if (this.currentMode === 'ctvt') {
             vtDisplay.style.display = 'flex';
             if (vtPrimary && vtSecondary && vtSecondary > 0) {
                 vtValue.textContent = (vtPrimary / vtSecondary).toFixed(2) + ' : 1';
@@ -531,16 +444,11 @@ const Calculator = {
             let typeLabel, dotClass, detail, value;
 
             if (h.type === 'calculator') {
-                const modeLabels = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT', reverse: 'REVERSE' };
+                const modeLabels = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT' };
                 typeLabel = '🔌 ' + (modeLabels[h.mode] || h.mode);
                 dotClass = h.mode || 'direct';
                 detail = `M = ${this.formatNumber(h.totalMultiplier)} | ${h.supply} Cl.${h.meterClass}`;
                 value = this.formatNumber(h.primaryActive) + ' imp/kWh';
-            } else if (h.type === 'reverse') {
-                typeLabel = '🔄 REVERSE';
-                dotClass = 'ctvt';
-                detail = `Km = ${this.formatNumber(h.requiredMeterConstant)} imp/kWh`;
-                value = 'Target: ' + this.formatNumber(h.targetPrimaryPulse);
             } else if (h.type === 'energy') {
                 typeLabel = h.mode === 'pulse-to-energy' ? '🔢 Pulse→Tenaga' : '🔢 Tenaga→Pulse';
                 dotClass = 'energy';
