@@ -7,20 +7,19 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="MeterCalc">
-    <meta name="description" content="Universal Meter Parameter Calculator - Direct, CT, CT+VT">
+    <meta name="description" content="MeterCalc Pro - Universal Meter Calculator with Energy, Accuracy, Demand & Reverse">
     
     <link rel="manifest" href="manifest.json">
-    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
     <link rel="stylesheet" href="css/style.css">
     
-    <title>MeterCalc Universal</title>
+    <title>MeterCalc Pro</title>
 </head>
 <body>
     <!-- Splash Screen -->
     <div id="splash" class="splash">
         <div class="splash-content">
             <div class="splash-icon">⚡</div>
-            <h1>MeterCalc</h1>
+            <h1>MeterCalc Pro</h1>
             <p>Universal Calculator</p>
             <div class="splash-loader"><div class="splash-bar"></div></div>
         </div>
@@ -32,7 +31,7 @@
         <!-- Top Bar -->
         <header class="topbar">
             <div class="topbar-left">
-                <span class="logo-text">⚡ MeterCalc</span>
+                <span class="logo-text">⚡ MeterCalc Pro</span>
             </div>
             <div class="topbar-right">
                 <button class="topbar-btn" onclick="UIManager.resetAll()" title="Reset">
@@ -44,33 +43,58 @@
             </div>
         </header>
 
-        <!-- Mode Selection Tabs -->
-        <nav class="mode-tabs" id="modeTabs">
-            <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchMode('direct')">
-                <span class="mode-icon">🔌</span>
-                <span class="mode-label">DIRECT</span>
-                <span class="mode-desc">Tanpa CT/VT</span>
+        <!-- Main Tabs -->
+        <nav class="main-tabs" id="mainTabs">
+            <button class="main-tab active" data-panel="calculatorPanel" onclick="UIManager.switchMainTab('calculatorPanel')">
+                <span class="main-tab-icon">🔌</span>
+                <span class="main-tab-label">Kalkulator</span>
             </button>
-            <button class="mode-tab" data-mode="ct" onclick="UIManager.switchMode('ct')">
-                <span class="mode-icon">🔧</span>
-                <span class="mode-label">CT</span>
-                <span class="mode-desc">Ada CT Sahaja</span>
+            <button class="main-tab" data-panel="energyPanel" onclick="UIManager.switchMainTab('energyPanel')">
+                <span class="main-tab-icon">🔢</span>
+                <span class="main-tab-label">Tenaga</span>
             </button>
-            <button class="mode-tab" data-mode="ctvt" onclick="UIManager.switchMode('ctvt')">
-                <span class="mode-icon">⚡</span>
-                <span class="mode-label">CT+VT</span>
-                <span class="mode-desc">High Voltage</span>
+            <button class="main-tab" data-panel="accuracyPanel" onclick="UIManager.switchMainTab('accuracyPanel')">
+                <span class="main-tab-icon">📊</span>
+                <span class="main-tab-label">Ketepatan</span>
+            </button>
+            <button class="main-tab" data-panel="demandPanel" onclick="UIManager.switchMainTab('demandPanel')">
+                <span class="main-tab-icon">🕐</span>
+                <span class="main-tab-label">MD</span>
+            </button>
+            <button class="main-tab" data-panel="historyPanel" onclick="UIManager.switchMainTab('historyPanel')">
+                <span class="main-tab-icon">📋</span>
+                <span class="main-tab-label">Sejarah</span>
+            </button>
+            <button class="main-tab" data-panel="referencePanel" onclick="UIManager.switchMainTab('referencePanel')">
+                <span class="main-tab-icon">📚</span>
+                <span class="main-tab-label">Rujukan</span>
             </button>
         </nav>
 
         <!-- Scrollable Content -->
         <main class="main-scroll" id="mainScroll">
             
-            <!-- Input Panel -->
-            <section class="panel" id="inputPanel">
+            <!-- ============ CALCULATOR PANEL ============ -->
+            <section class="panel" id="calculatorPanel">
                 <div class="panel-header">
                     <h2>📋 Parameter Input</h2>
                 </div>
+
+                <!-- Sub-tabs: Direct / CT / CT+VT / Reverse -->
+                <nav class="mode-tabs" id="calcModeTabs">
+                    <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchCalcMode('direct')">
+                        <span class="mode-label">DIRECT</span>
+                    </button>
+                    <button class="mode-tab" data-mode="ct" onclick="UIManager.switchCalcMode('ct')">
+                        <span class="mode-label">CT</span>
+                    </button>
+                    <button class="mode-tab" data-mode="ctvt" onclick="UIManager.switchCalcMode('ctvt')">
+                        <span class="mode-label">CT+VT</span>
+                    </button>
+                    <button class="mode-tab" data-mode="reverse" onclick="UIManager.switchCalcMode('reverse')">
+                        <span class="mode-label">🔄 Reverse</span>
+                    </button>
+                </nav>
                 
                 <div class="panel-body">
                     <!-- Meter Constant -->
@@ -119,13 +143,12 @@
                     </div>
 
                     <!-- CT Section -->
-                    <div class="section-divider" id="ctSection" style="display:none;">
+                    <div class="section-divider" id="ctSectionDivider" style="display:none;">
                         <div class="divider-line"></div>
                         <span class="divider-text">CURRENT TRANSFORMER</span>
                         <div class="divider-line"></div>
                     </div>
-
-                    <div class="input-row-2" id="ctInputs" style="display:none;">
+                    <div class="input-row-2" id="ctInputSection" style="display:none;">
                         <div class="input-block">
                             <label class="input-label">CT Primary (A)</label>
                             <input type="number" id="ctPrimary" class="input-field" placeholder="800" inputmode="decimal">
@@ -135,21 +158,18 @@
                             <input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" value="5">
                         </div>
                     </div>
-
-                    <!-- CT Ratio Live Display -->
-                    <div class="live-ratio" id="ctRatioDisplay" style="display:none;">
+                    <div class="live-ratio" id="ctLiveRatio" style="display:none;">
                         <span>CT Ratio</span>
-                        <strong id="ctRatioValue">-</strong>
+                        <strong id="ctLiveRatioValue">-</strong>
                     </div>
 
                     <!-- VT Section -->
-                    <div class="section-divider" id="vtSection" style="display:none;">
+                    <div class="section-divider" id="vtSectionDivider" style="display:none;">
                         <div class="divider-line"></div>
                         <span class="divider-text">VOLTAGE TRANSFORMER</span>
                         <div class="divider-line"></div>
                     </div>
-
-                    <div class="input-row-2" id="vtInputs" style="display:none;">
+                    <div class="input-row-2" id="vtInputSection" style="display:none;">
                         <div class="input-block">
                             <label class="input-label">VT Primary (V)</label>
                             <input type="number" id="vtPrimary" class="input-field" placeholder="11000" inputmode="decimal">
@@ -159,11 +179,39 @@
                             <input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" value="110">
                         </div>
                     </div>
-
-                    <!-- VT Ratio Live Display -->
-                    <div class="live-ratio" id="vtRatioDisplay" style="display:none;">
+                    <div class="live-ratio" id="vtLiveRatio" style="display:none;">
                         <span>VT Ratio</span>
-                        <strong id="vtRatioValue">-</strong>
+                        <strong id="vtLiveRatioValue">-</strong>
+                    </div>
+
+                    <!-- Reverse Mode: Target Primary Pulse -->
+                    <div id="reverseInputSection" style="display:none;">
+                        <div class="section-divider">
+                            <div class="divider-line"></div>
+                            <span class="divider-text">TARGET PRIMARY PULSE</span>
+                            <div class="divider-line"></div>
+                        </div>
+                        <div class="input-block">
+                            <label class="input-label">Primary Pulse Diingini (imp/kWh)</label>
+                            <input type="number" id="targetPrimaryPulse" class="input-field" placeholder="Cth: 0.01" inputmode="decimal" step="any">
+                        </div>
+                    </div>
+
+                    <!-- Site Info (MANDATORY) -->
+                    <div class="section-divider">
+                        <div class="divider-line"></div>
+                        <span class="divider-text">MAKLUMAT SITE (WAJIB)</span>
+                        <div class="divider-line"></div>
+                    </div>
+                    <div class="input-row-2">
+                        <div class="input-block">
+                            <label class="input-label">Nama Site / Lokasi *</label>
+                            <input type="text" id="siteName" class="input-field" placeholder="Cth: Pencawang Taman Desa">
+                        </div>
+                        <div class="input-block">
+                            <label class="input-label">Serial No. Meter *</label>
+                            <input type="text" id="meterSerial" class="input-field" placeholder="Cth: HOL3060180800850">
+                        </div>
                     </div>
 
                     <!-- Calculate Button -->
@@ -174,90 +222,150 @@
                 </div>
             </section>
 
-            <!-- Results Panel -->
-            <section class="panel" id="resultsPanel" style="display:none;">
+            <!-- Calculator Results -->
+            <section class="panel" id="calcResultsPanel" style="display:none;">
                 <div class="panel-header results-header">
-                    <h2>📊 Keputusan</h2>
+                    <h2>📊 Keputusan Pengiraan</h2>
                 </div>
-                
+                <div class="panel-body" id="calcResultsBody">
+                    <!-- Dynamic content -->
+                </div>
+            </section>
+
+            <!-- ============ ENERGY PANEL ============ -->
+            <section class="panel" id="energyPanel" style="display:none;">
+                <div class="panel-header">
+                    <h2>🔢 Energy Registration Calculator</h2>
+                </div>
                 <div class="panel-body">
-                    <!-- Total Multiplier - Hero -->
-                    <div class="hero-result" id="heroMultiplier">
-                        <div class="hero-label">TOTAL MULTIPLIER</div>
-                        <div class="hero-value" id="totalMultiplierValue">-</div>
-                        <div class="hero-sub" id="modeInfo">-</div>
-                    </div>
-
-                    <!-- Individual Ratios -->
-                    <div class="result-grid-2" id="ratioGrid">
-                        <div class="result-card" id="ctResultCard" style="display:none;">
-                            <div class="result-card-label">CT Ratio</div>
-                            <div class="result-card-value" id="ctResultValue">-</div>
-                        </div>
-                        <div class="result-card" id="vtResultCard" style="display:none;">
-                            <div class="result-card-label">VT Ratio</div>
-                            <div class="result-card-value" id="vtResultValue">-</div>
-                        </div>
-                    </div>
-
-                    <!-- Pulse Constants -->
-                    <div class="section-divider">
-                        <div class="divider-line"></div>
-                        <span class="divider-text">PULSE CONSTANTS</span>
-                        <div class="divider-line"></div>
-                    </div>
-
-                    <div class="result-grid-2">
-                        <div class="result-card pulse-card">
-                            <div class="result-card-label">Primary Active</div>
-                            <div class="result-card-value" id="primaryActiveValue">-</div>
-                            <div class="result-card-unit">imp/kWh</div>
-                        </div>
-                        <div class="result-card pulse-card">
-                            <div class="result-card-label">Secondary Active</div>
-                            <div class="result-card-value" id="secondaryActiveValue">-</div>
-                            <div class="result-card-unit">imp/kWh</div>
-                        </div>
-                    </div>
-
-                    <div class="result-grid-2" id="reactiveGrid">
-                        <div class="result-card pulse-card">
-                            <div class="result-card-label">Primary Reactive</div>
-                            <div class="result-card-value" id="primaryReactiveValue">-</div>
-                            <div class="result-card-unit">imp/kvarh</div>
-                        </div>
-                        <div class="result-card pulse-card">
-                            <div class="result-card-label">Secondary Reactive</div>
-                            <div class="result-card-value" id="secondaryReactiveValue">-</div>
-                            <div class="result-card-unit">imp/kvarh</div>
-                        </div>
-                    </div>
-
-                    <!-- Formula Box -->
-                    <div class="formula-box">
-                        <div class="formula-title">📐 Formula Digunakan</div>
-                        <div class="formula-content" id="formulaContent">
-                            <code>M = CT × VT</code><br>
-                            <code>P<sub>primary</sub> = K<sub>m</sub> ÷ M</code>
-                        </div>
-                    </div>
-
-                    <!-- Action Buttons -->
-                    <div class="action-buttons">
-                        <button class="btn-action btn-share" onclick="UIManager.shareResults()">
-                            📤 Kongsi
+                    <div class="calc-type-toggle">
+                        <button class="toggle-btn active" onclick="UIManager.switchEnergyMode('pulse-to-energy')" id="togglePulseToEnergy">
+                            Pulse → Tenaga
                         </button>
-                        <button class="btn-action btn-save" onclick="UIManager.saveToHistory()">
-                            💾 Simpan
+                        <button class="toggle-btn" onclick="UIManager.switchEnergyMode('energy-to-pulse')" id="toggleEnergyToPulse">
+                            Tenaga → Pulse
                         </button>
+                    </div>
+
+                    <div id="energyPulseToEnergy">
+                        <div class="input-block">
+                            <label class="input-label">Jumlah Pulse Diterima</label>
+                            <input type="number" id="energyPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal">
+                        </div>
+                        <div class="input-row-2">
+                            <div class="input-block">
+                                <label class="input-label">Pulse Constant (imp/kWh)</label>
+                                <input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal">
+                            </div>
+                            <div class="input-block">
+                                <label class="input-label">Multiplier (M)</label>
+                                <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="energyEnergyToPulse" style="display:none;">
+                        <div class="input-block">
+                            <label class="input-label">Tenaga Dikehendaki (kWh)</label>
+                            <input type="number" id="energyTarget" class="input-field" placeholder="Cth: 50" inputmode="decimal" step="any">
+                        </div>
+                        <div class="input-row-2">
+                            <div class="input-block">
+                                <label class="input-label">Pulse Constant (imp/kWh)</label>
+                                <input type="number" id="energyPulseConst2" class="input-field" placeholder="1000" inputmode="decimal">
+                            </div>
+                            <div class="input-block">
+                                <label class="input-label">Multiplier (M)</label>
+                                <input type="number" id="energyMultiplier2" class="input-field" placeholder="1" inputmode="decimal" value="1">
+                            </div>
+                        </div>
+                    </div>
+
+                    <button class="btn-calculate" onclick="Calculator.calculateEnergy()">
+                        <span>🔢 KIRA TENAGA</span>
+                    </button>
+
+                    <div class="calc-result" id="energyResult" style="display:none;">
+                        <div class="calc-result-label">Hasil</div>
+                        <div class="calc-result-value" id="energyResultValue">-</div>
                     </div>
                 </div>
             </section>
 
-            <!-- History -->
-            <section class="panel" id="historyPanel">
+            <!-- ============ ACCURACY PANEL ============ -->
+            <section class="panel" id="accuracyPanel" style="display:none;">
                 <div class="panel-header">
-                    <h2>🕐 Sejarah Pengiraan</h2>
+                    <h2>📊 Meter Accuracy Calculator</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="input-block">
+                        <label class="input-label">Tenaga Rujukan (Standard)</label>
+                        <input type="number" id="accReference" class="input-field" placeholder="Cth: 100" inputmode="decimal" step="any">
+                    </div>
+                    <div class="input-block">
+                        <label class="input-label">Tenaga Meter Under Test</label>
+                        <input type="number" id="accMeterReading" class="input-field" placeholder="Cth: 101.5" inputmode="decimal" step="any">
+                    </div>
+                    <div class="input-block">
+                        <label class="input-label">Class Meter</label>
+                        <select id="accMeterClass" class="input-field">
+                            <option value="0.2S">Class 0.2S (±0.2%)</option>
+                            <option value="0.5S">Class 0.5S (±0.5%)</option>
+                            <option value="0.5">Class 0.5 (±0.5%)</option>
+                            <option value="1" selected>Class 1 (±1%)</option>
+                            <option value="2">Class 2 (±2%)</option>
+                        </select>
+                    </div>
+
+                    <button class="btn-calculate" onclick="Calculator.calculateAccuracy()">
+                        <span>📊 KIRA KETEPATAN</span>
+                    </button>
+
+                    <div class="calc-result" id="accuracyResult" style="display:none;">
+                        <div class="calc-result-label">% Error</div>
+                        <div class="calc-result-value" id="accuracyResultValue">-</div>
+                        <div class="calc-result-status" id="accuracyStatus"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ DEMAND PANEL ============ -->
+            <section class="panel" id="demandPanel" style="display:none;">
+                <div class="panel-header">
+                    <h2>🕐 Maximum Demand Calculator</h2>
+                </div>
+                <div class="panel-body">
+                    <p class="panel-desc">Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.</p>
+                    <div class="input-block">
+                        <label class="input-label">Jumlah Pulse (dalam 30 minit)</label>
+                        <input type="number" id="demandPulseCount" class="input-field" placeholder="Cth: 150" inputmode="decimal">
+                    </div>
+                    <div class="input-row-2">
+                        <div class="input-block">
+                            <label class="input-label">Pulse Constant (imp/kWh)</label>
+                            <input type="number" id="demandPulseConst" class="input-field" placeholder="1000" inputmode="decimal">
+                        </div>
+                        <div class="input-block">
+                            <label class="input-label">Multiplier (M)</label>
+                            <input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1">
+                        </div>
+                    </div>
+
+                    <button class="btn-calculate" onclick="Calculator.calculateDemand()">
+                        <span>🕐 KIRA MD</span>
+                    </button>
+
+                    <div class="calc-result" id="demandResult" style="display:none;">
+                        <div class="calc-result-label">Maximum Demand</div>
+                        <div class="calc-result-value" id="demandResultValue">-</div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- ============ HISTORY PANEL ============ -->
+            <section class="panel" id="historyPanel" style="display:none;">
+                <div class="panel-header">
+                    <h2>📋 Sejarah Pengiraan</h2>
                     <button class="btn-text" onclick="UIManager.clearHistory()" id="btnClearHistory" style="display:none;">Padam Semua</button>
                 </div>
                 <div class="panel-body">
@@ -270,18 +378,79 @@
                 </div>
             </section>
 
+            <!-- ============ REFERENCE PANEL ============ -->
+            <section class="panel" id="referencePanel" style="display:none;">
+                <div class="panel-header">
+                    <h2>📚 Rujukan Pantas</h2>
+                </div>
+                <div class="panel-body">
+                    <div class="ref-section">
+                        <h3 class="ref-title">Standard CT Ratios</h3>
+                        <div class="ref-chips">
+                            <span class="ref-chip">100/5A</span>
+                            <span class="ref-chip">200/5A</span>
+                            <span class="ref-chip">400/5A</span>
+                            <span class="ref-chip">600/5A</span>
+                            <span class="ref-chip">800/5A</span>
+                            <span class="ref-chip">1000/5A</span>
+                            <span class="ref-chip">1200/5A</span>
+                            <span class="ref-chip">1600/5A</span>
+                            <span class="ref-chip">2000/5A</span>
+                        </div>
+                    </div>
+                    <div class="ref-section">
+                        <h3 class="ref-title">Standard VT Ratios</h3>
+                        <div class="ref-chips">
+                            <span class="ref-chip">11kV/110V</span>
+                            <span class="ref-chip">22kV/110V</span>
+                            <span class="ref-chip">33kV/110V</span>
+                            <span class="ref-chip">66kV/110V</span>
+                        </div>
+                    </div>
+                    <div class="ref-section">
+                        <h3 class="ref-title">Standard Meter Constants</h3>
+                        <div class="ref-chips">
+                            <span class="ref-chip">1 imp/kWh</span>
+                            <span class="ref-chip">250 imp/kWh</span>
+                            <span class="ref-chip">500 imp/kWh</span>
+                            <span class="ref-chip">1000 imp/kWh</span>
+                            <span class="ref-chip">2000 imp/kWh</span>
+                            <span class="ref-chip">5000 imp/kWh</span>
+                        </div>
+                    </div>
+                    <div class="ref-section">
+                        <h3 class="ref-title">Class Accuracy Limits</h3>
+                        <table class="ref-table">
+                            <tr><th>Class</th><th>Had Ralat</th><th>Kegunaan</th></tr>
+                            <tr><td>0.2S</td><td>±0.2%</td><td>Precision metering</td></tr>
+                            <tr><td>0.5S</td><td>±0.5%</td><td>Large industrial</td></tr>
+                            <tr><td>0.5</td><td>±0.5%</td><td>Industrial</td></tr>
+                            <tr><td>1</td><td>±1%</td><td>General / Commercial</td></tr>
+                            <tr><td>2</td><td>±2%</td><td>Domestic</td></tr>
+                        </table>
+                    </div>
+                    <div class="ref-section">
+                        <h3 class="ref-title">Wiring Configuration</h3>
+                        <table class="ref-table">
+                            <tr><th>Jenis</th><th>Kegunaan</th></tr>
+                            <tr><td>1P2W</td><td>Domestik 1 fasa</td></tr>
+                            <tr><td>3P3W</td><td>Industri 3 fasa (delta)</td></tr>
+                            <tr><td>3P4W</td><td>Komersial/Industri (wye)</td></tr>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
         </main>
 
         <!-- Toast -->
         <div id="toast" class="toast"></div>
     </div>
 
-    <!-- Scripts -->
     <script src="js/calculator.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
 
-    <!-- Service Worker -->
     <script>
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
