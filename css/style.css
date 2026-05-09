@@ -949,3 +949,23 @@ select.input-field {
     border-color: var(--accent);
     background: #1a2838;
 }
+
+/* ============ DIAL TEST ============ */
+.dial-results { display: flex; flex-direction: column; gap: 8px; }
+.dial-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); }
+.dial-row span { font-size: 0.8rem; color: var(--text2); }
+.dial-row strong { font-size: 0.9rem; color: #fff; }
+
+/* ============ LABEL SOURCE ============ */
+.label-src {
+    display: inline-block;
+    padding: 2px 8px;
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+}
