@@ -191,14 +191,13 @@
                 <div class="panel-body" id="calcResultsBody"></div>
             </section>
 
-            <!-- ============ ENERGY PANEL (SIMPLIFIED) ============ -->
+            <!-- ============ ENERGY PANEL ============ -->
             <section class="panel" id="energyPanel" style="display:none;">
                 <div class="panel-header">
                     <h2>🔢 Pulse → Tenaga</h2>
                 </div>
                 <div class="panel-body">
                     <p class="panel-desc">Kira tenaga (kWh) berdasarkan jumlah pulse yang diterima dari meter.</p>
-
                     <div class="input-block">
                         <label class="input-label">Jumlah Pulse Diterima</label>
                         <input type="number" id="energyPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal" min="0">
@@ -213,11 +212,9 @@
                             <input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
-
                     <button class="btn-calculate" onclick="Calculator.calculateEnergy()">
                         <span>🔢 KIRA TENAGA</span>
                     </button>
-
                     <div class="calc-result" id="energyResult" style="display:none;">
                         <div class="calc-result-label">Tenaga</div>
                         <div class="calc-result-value" id="energyResultValue">-</div>
@@ -225,7 +222,7 @@
                 </div>
             </section>
 
-            <!-- ============ ACCURACY PANEL ============ -->
+            <!-- ============ ACCURACY PANEL (PULSE SAHAJA) ============ -->
             <section class="panel" id="accuracyPanel" style="display:none;">
                 <div class="panel-header">
                     <h2>📊 Meter Accuracy Calculator</h2>
@@ -239,44 +236,32 @@
                         </select>
                     </div>
 
-                    <div class="calc-type-toggle">
-                        <button class="toggle-btn active" onclick="UIManager.switchAccuracyMode('manual')" id="toggleAccManual">Manual</button>
-                        <button class="toggle-btn" onclick="UIManager.switchAccuracyMode('pulse')" id="toggleAccPulse">Kira dari Pulse</button>
-                    </div>
+                    <p class="panel-desc">Kira tenaga rujukan dari pulse standard meter, kemudian bandingkan dengan bacaan Meter Under Test.</p>
 
-                    <div id="accManualSection">
+                    <div class="input-block">
+                        <label class="input-label">Pulse Count dari Standard Meter</label>
+                        <input type="number" id="accPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal" min="0">
+                    </div>
+                    <div class="input-row-2">
                         <div class="input-block">
-                            <label class="input-label">Tenaga Rujukan (Standard) - kWh</label>
-                            <input type="number" id="accReference" class="input-field" placeholder="Cth: 0.05" inputmode="decimal" step="any" min="0.000001">
+                            <label class="input-label">Pulse Constant STD (imp/kWh)</label>
+                            <input type="number" id="accPulseConst" class="input-field" placeholder="Cth: 100000" inputmode="decimal" min="0.000001">
+                        </div>
+                        <div class="input-block">
+                            <label class="input-label">Multiplier STD</label>
+                            <input type="number" id="accPulseMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
-
-                    <div id="accPulseSection" style="display:none;">
-                        <div class="input-block">
-                            <label class="input-label">Pulse Count dari Standard Meter</label>
-                            <input type="number" id="accPulseCount" class="input-field" placeholder="Cth: 5000" inputmode="decimal" min="0">
-                        </div>
-                        <div class="input-row-2">
-                            <div class="input-block">
-                                <label class="input-label">Pulse Constant STD (imp/kWh)</label>
-                                <input type="number" id="accPulseConst" class="input-field" placeholder="Cth: 100000" inputmode="decimal" min="0.000001">
-                            </div>
-                            <div class="input-block">
-                                <label class="input-label">Multiplier STD</label>
-                                <input type="number" id="accPulseMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
-                            </div>
-                        </div>
-                        <div class="input-block">
-                            <label class="input-label">Output Unit</label>
-                            <select id="accOutputUnit" class="input-field">
-                                <option value="kWh" selected>kWh (Kilowatt-hour)</option>
-                                <option value="Wh">Wh (Watt-hour)</option>
-                            </select>
-                        </div>
-                        <div class="live-ratio" id="accLiveEnergy" style="display:none;">
-                            <span>📐 Tenaga Rujukan</span>
-                            <strong id="accLiveEnergyValue">-</strong>
-                        </div>
+                    <div class="input-block">
+                        <label class="input-label">Output Unit</label>
+                        <select id="accOutputUnit" class="input-field">
+                            <option value="kWh" selected>kWh (Kilowatt-hour)</option>
+                            <option value="Wh">Wh (Watt-hour)</option>
+                        </select>
+                    </div>
+                    <div class="live-ratio" id="accLiveEnergy" style="display:none;">
+                        <span>📐 Tenaga Rujukan Dikira</span>
+                        <strong id="accLiveEnergyValue">-</strong>
                     </div>
 
                     <div class="input-block">
@@ -329,11 +314,9 @@
                             <input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001">
                         </div>
                     </div>
-
                     <button class="btn-calculate" onclick="Calculator.calculateDemand()">
                         <span>🕐 KIRA MD</span>
                     </button>
-
                     <div class="calc-result" id="demandResult" style="display:none;">
                         <div class="calc-result-label">Maximum Demand</div>
                         <div class="calc-result-value" id="demandResultValue">-</div>
@@ -366,36 +349,19 @@
                     <div class="ref-section">
                         <h3 class="ref-title">Standard CT Ratios</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">100/5A</span>
-                            <span class="ref-chip">200/5A</span>
-                            <span class="ref-chip">400/5A</span>
-                            <span class="ref-chip">600/5A</span>
-                            <span class="ref-chip">800/5A</span>
-                            <span class="ref-chip">1000/5A</span>
-                            <span class="ref-chip">1200/5A</span>
-                            <span class="ref-chip">1600/5A</span>
-                            <span class="ref-chip">2000/5A</span>
+                            <span class="ref-chip">100/5A</span><span class="ref-chip">200/5A</span><span class="ref-chip">400/5A</span><span class="ref-chip">600/5A</span><span class="ref-chip">800/5A</span><span class="ref-chip">1000/5A</span><span class="ref-chip">1200/5A</span><span class="ref-chip">1600/5A</span><span class="ref-chip">2000/5A</span>
                         </div>
                     </div>
                     <div class="ref-section">
                         <h3 class="ref-title">Standard VT Ratios</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">11kV/110V</span>
-                            <span class="ref-chip">22kV/110V</span>
-                            <span class="ref-chip">33kV/110V</span>
-                            <span class="ref-chip">66kV/110V</span>
+                            <span class="ref-chip">11kV/110V</span><span class="ref-chip">22kV/110V</span><span class="ref-chip">33kV/110V</span><span class="ref-chip">66kV/110V</span>
                         </div>
                     </div>
                     <div class="ref-section">
                         <h3 class="ref-title">Standard Meter Constants</h3>
                         <div class="ref-chips">
-                            <span class="ref-chip">1 imp/kWh</span>
-                            <span class="ref-chip">250 imp/kWh</span>
-                            <span class="ref-chip">500 imp/kWh</span>
-                            <span class="ref-chip">1000 imp/kWh</span>
-                            <span class="ref-chip">2000 imp/kWh</span>
-                            <span class="ref-chip">5000 imp/kWh</span>
-                            <span class="ref-chip">100000 imp/kWh</span>
+                            <span class="ref-chip">1 imp/kWh</span><span class="ref-chip">250 imp/kWh</span><span class="ref-chip">500 imp/kWh</span><span class="ref-chip">1000 imp/kWh</span><span class="ref-chip">2000 imp/kWh</span><span class="ref-chip">5000 imp/kWh</span><span class="ref-chip">100000 imp/kWh</span>
                         </div>
                     </div>
                     <div class="ref-section">
@@ -428,28 +394,22 @@
                             <tr><td>0.001 - 0.0099 kWh</td><td>5</td><td>0.00500 kWh</td></tr>
                             <tr><td>&lt; 0.001 kWh</td><td>6</td><td>0.000500 kWh</td></tr>
                         </table>
-                        <p style="font-size:0.7rem;color:var(--text2);margin-top:6px;">
-                            💡 <strong>Nota:</strong> Nilai dalam <strong>Wh</strong> darab 1000. Contoh: 0.05 kWh = 50 Wh.
-                        </p>
+                        <p style="font-size:0.7rem;color:var(--text2);margin-top:6px;">💡 <strong>Nota:</strong> Nilai dalam <strong>Wh</strong> darab 1000. Contoh: 0.05 kWh = 50 Wh.</p>
                     </div>
                 </div>
             </section>
 
         </main>
 
-        <!-- Toast -->
         <div id="toast" class="toast"></div>
     </div>
 
     <script src="js/calculator.js"></script>
     <script src="js/ui.js"></script>
     <script src="js/app.js"></script>
-
     <script>
         if ('serviceWorker' in navigator) {
-            window.addEventListener('load', () => {
-                navigator.serviceWorker.register('sw.js');
-            });
+            window.addEventListener('load', () => navigator.serviceWorker.register('sw.js'));
         }
     </script>
 </body>
