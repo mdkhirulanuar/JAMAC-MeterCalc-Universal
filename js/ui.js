@@ -1,13 +1,21 @@
 /**
  * MeterCalc Pro - UI Manager
- * Multi-language support (BM/EN), Copy to clipboard
- * V3 - Direct innerHTML rewrite for guaranteed language switch
+ * Multi-language (BM/EN) + Copy to Clipboard
+ * NO RELOAD - Direct DOM manipulation
  */
 
 const UIManager = {
     currentMainTab: 'calculatorPanel',
     currentEnergyMode: 'pulse-to-energy',
     currentLang: 'ms',
+
+    // ============ INIT ============
+    init() {
+        this.loadTheme();
+        this.loadLanguage();
+        this.switchCalcMode('direct');
+        this.switchMainTab('calculatorPanel');
+    },
 
     // ============ MAIN TAB SWITCHING ============
     switchMainTab(panelId) {
@@ -17,8 +25,8 @@ const UIManager = {
             tab.classList.toggle('active', tab.dataset.panel === panelId);
         });
 
-        const panels = ['calculatorPanel', 'calcResultsPanel', 'energyPanel', 'accuracyPanel', 'demandPanel', 'historyPanel', 'referencePanel'];
-        panels.forEach(id => {
+        const allPanels = ['calculatorPanel', 'calcResultsPanel', 'energyPanel', 'accuracyPanel', 'demandPanel', 'historyPanel', 'referencePanel'];
+        allPanels.forEach(id => {
             const el = document.getElementById(id);
             if (el) el.style.display = 'none';
         });
@@ -29,10 +37,6 @@ const UIManager = {
             targetPanel.scrollIntoView({ behavior: 'smooth', block: 'start' });
         }
 
-        if (panelId === 'calculatorPanel') {
-            const calcPanel = document.getElementById('calculatorPanel');
-            if (calcPanel) calcPanel.style.display = 'block';
-        }
         if (panelId === 'historyPanel') {
             Calculator.renderHistory();
         }
@@ -59,21 +63,16 @@ const UIManager = {
             if (el) el.style.display = 'none';
         });
 
-        switch (mode) {
-            case 'direct': break;
-            case 'ct':
-                if (ctDivider) ctDivider.style.display = 'flex';
-                if (ctInputs) ctInputs.style.display = 'grid';
-                if (ctLiveRatio) ctLiveRatio.style.display = 'flex';
-                break;
-            case 'ctvt':
-                if (ctDivider) ctDivider.style.display = 'flex';
-                if (ctInputs) ctInputs.style.display = 'grid';
-                if (ctLiveRatio) ctLiveRatio.style.display = 'flex';
-                if (vtDivider) vtDivider.style.display = 'flex';
-                if (vtInputs) vtInputs.style.display = 'grid';
-                if (vtLiveRatio) vtLiveRatio.style.display = 'flex';
-                break;
+        if (mode === 'ct' || mode === 'ctvt') {
+            if (ctDivider) ctDivider.style.display = 'flex';
+            if (ctInputs) ctInputs.style.display = 'grid';
+            if (ctLiveRatio) ctLiveRatio.style.display = 'flex';
+        }
+
+        if (mode === 'ctvt') {
+            if (vtDivider) vtDivider.style.display = 'flex';
+            if (vtInputs) vtInputs.style.display = 'grid';
+            if (vtLiveRatio) vtLiveRatio.style.display = 'flex';
         }
 
         const resultsPanel = document.getElementById('calcResultsPanel');
@@ -91,10 +90,8 @@ const UIManager = {
 
         document.getElementById('togglePulseToEnergy').classList.toggle('active', mode === 'pulse-to-energy');
         document.getElementById('toggleEnergyToPulse').classList.toggle('active', mode === 'energy-to-pulse');
-
         document.getElementById('energyPulseToEnergy').style.display = mode === 'pulse-to-energy' ? 'block' : 'none';
         document.getElementById('energyEnergyToPulse').style.display = mode === 'energy-to-pulse' ? 'block' : 'none';
-
         document.getElementById('energyResult').style.display = 'none';
 
         if (navigator.vibrate) navigator.vibrate(8);
@@ -114,7 +111,6 @@ const UIManager = {
         document.getElementById('ctSecondary').value = '5';
         document.getElementById('vtPrimary').value = '';
         document.getElementById('vtSecondary').value = '110';
-
         document.getElementById('energyPulseCount').value = '';
         document.getElementById('energyPulseConst').value = '';
         document.getElementById('energyMultiplier').value = '1';
@@ -122,17 +118,14 @@ const UIManager = {
         document.getElementById('energyPulseConst2').value = '';
         document.getElementById('energyMultiplier2').value = '1';
         document.getElementById('energyResult').style.display = 'none';
-
         document.getElementById('accReference').value = '';
         document.getElementById('accMeterReading').value = '';
         document.getElementById('accMeterClass').value = '1';
         document.getElementById('accuracyResult').style.display = 'none';
-
         document.getElementById('demandPulseCount').value = '';
         document.getElementById('demandPulseConst').value = '';
         document.getElementById('demandMultiplier').value = '1';
         document.getElementById('demandResult').style.display = 'none';
-
         document.getElementById('calcResultsPanel').style.display = 'none';
 
         Calculator.updateLiveRatios();
@@ -153,61 +146,41 @@ const UIManager = {
     // ============ COPY FUNCTIONS ============
     copyCalculatorResults() {
         const lastCalc = Calculator.history.find(h => h.type === 'calculator');
-        if (!lastCalc) {
-            this.showToast(Lang.get('toast-no-results'), 'error');
-            return;
-        }
+        if (!lastCalc) { this.showToast(Lang.get('toast-no-results'), 'error'); return; }
 
         const modeLabels = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT' };
-        let text = `📊 MeterCalc Pro\n`;
-        text += `⚡ ${modeLabels[lastCalc.mode]} | ${lastCalc.supply} | Cl.${lastCalc.meterClass}\n`;
-        text += `━━━━━━━━━━━━━━━━━━\n`;
-        text += `📏 Total Multiplier: ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n`;
-        if (lastCalc.mode !== 'direct') {
-            text += `🔧 CT Ratio: ${Calculator.formatNumber(lastCalc.ctRatio)} : 1\n`;
-        }
-        if (lastCalc.mode === 'ctvt') {
-            text += `⚡ VT Ratio: ${Calculator.formatNumber(lastCalc.vtRatio)} : 1\n`;
-        }
-        text += `━━━━━━━━━━━━━━━━━━\n`;
-        text += `🔌 Primary Active: ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n`;
+        let text = `📊 MeterCalc Pro\n⚡ ${modeLabels[lastCalc.mode]} | ${lastCalc.supply} | Cl.${lastCalc.meterClass}\n`;
+        text += `━━━━━━━━━━━━━━━━━━\n📏 Total Multiplier: ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n`;
+        if (lastCalc.mode !== 'direct') text += `🔧 CT Ratio: ${Calculator.formatNumber(lastCalc.ctRatio)} : 1\n`;
+        if (lastCalc.mode === 'ctvt') text += `⚡ VT Ratio: ${Calculator.formatNumber(lastCalc.vtRatio)} : 1\n`;
+        text += `━━━━━━━━━━━━━━━━━━\n🔌 Primary Active: ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n`;
         text += `🔌 Secondary Active: ${Calculator.formatNumber(lastCalc.secondaryActive)} imp/kWh\n`;
         if (lastCalc.primaryReactive > 0) {
             text += `🔌 Primary Reactive: ${Calculator.formatNumber(lastCalc.primaryReactive)} imp/kvarh\n`;
             text += `🔌 Secondary Reactive: ${Calculator.formatNumber(lastCalc.secondaryReactive)} imp/kvarh\n`;
         }
-
         this.copyToClipboard(text);
     },
 
     copySingleValue(elementId) {
         const el = document.getElementById(elementId);
         if (!el) return;
-        const text = el.textContent.trim();
-        this.copyToClipboard(text);
+        this.copyToClipboard(el.textContent.trim());
     },
 
     copyAccuracyResults() {
         const errorVal = document.getElementById('accuracyResultValue').textContent.trim();
         const statusVal = document.getElementById('accuracyStatus').textContent.trim();
-        const text = `📊 Accuracy Test\n% Error: ${errorVal}\nStatus: ${statusVal}`;
-        this.copyToClipboard(text);
+        this.copyToClipboard(`📊 Accuracy Test\n% Error: ${errorVal}\nStatus: ${statusVal}`);
     },
 
     copyFromCard(element) {
-        const value = element.dataset.value;
-        if (value) {
-            this.copyToClipboard(value);
-        }
+        if (element.dataset.value) this.copyToClipboard(element.dataset.value);
     },
 
     copyToClipboard(text) {
         if (navigator.clipboard && navigator.clipboard.writeText) {
-            navigator.clipboard.writeText(text).then(() => {
-                this.showToast(Lang.get('toast-copied'), 'success');
-            }).catch(() => {
-                this.fallbackCopy(text);
-            });
+            navigator.clipboard.writeText(text).then(() => this.showToast(Lang.get('toast-copied'), 'success')).catch(() => this.fallbackCopy(text));
         } else {
             this.fallbackCopy(text);
         }
@@ -220,338 +193,189 @@ const UIManager = {
         textarea.style.opacity = '0';
         document.body.appendChild(textarea);
         textarea.select();
-        try {
-            document.execCommand('copy');
-            this.showToast(Lang.get('toast-copied'), 'success');
-        } catch (e) {
-            this.showToast(Lang.get('toast-copy-failed'), 'error');
-        }
+        try { document.execCommand('copy'); this.showToast(Lang.get('toast-copied'), 'success'); } 
+        catch (e) { this.showToast(Lang.get('toast-copy-failed'), 'error'); }
         document.body.removeChild(textarea);
     },
 
-    // ============ LANGUAGE SWITCH (REWRITE APPROACH) ============
+    // ============ LANGUAGE SWITCH - NO RELOAD ============
     toggleLanguage() {
-        // Flip language
-        const newLang = this.currentLang === 'ms' ? 'en' : 'ms';
-        
-        // Save to localStorage
-        localStorage.setItem('metercalc_lang', newLang);
-        
-        // Reload to apply all changes
-        window.location.reload();
+        this.currentLang = this.currentLang === 'ms' ? 'en' : 'ms';
+        Lang.setLanguage(this.currentLang);
+        localStorage.setItem('metercalc_lang', this.currentLang);
+        document.getElementById('langIcon').textContent = this.currentLang === 'ms' ? '🇲🇾' : '🇬🇧';
+        this.rewriteAllText();
+        Calculator.renderHistory();
+        const lastCalc = Calculator.history.find(h => h.type === 'calculator');
+        if (lastCalc && document.getElementById('calcResultsPanel').style.display !== 'none') {
+            Calculator.displayCalcResults(lastCalc);
+        }
+        this.showToast(this.currentLang === 'ms' ? '🇲🇾 Bahasa Melayu' : '🇬🇧 English', 'success');
     },
 
     loadLanguage() {
         const saved = localStorage.getItem('metercalc_lang') || 'ms';
         this.currentLang = saved;
         Lang.setLanguage(saved);
-        
-        // Update lang icon
-        const langIcon = document.getElementById('langIcon');
-        if (langIcon) {
-            langIcon.textContent = saved === 'ms' ? '🇲🇾' : '🇬🇧';
-        }
-        
-        // CRITICAL: Rewrite ALL UI text directly
+        document.getElementById('langIcon').textContent = saved === 'ms' ? '🇲🇾' : '🇬🇧';
         this.rewriteAllText();
     },
 
+    // ============ REWRITE ALL TEXT ============
     rewriteAllText() {
-        const lang = this.currentLang;
-        const isMs = lang === 'ms';
+        const m = this.currentLang === 'ms';
+        
+        // TAB LABELS
+        const tabs = document.querySelectorAll('.main-tab-label');
+        const tabTexts = ['Kalkulator','Tenaga','Ketepatan','MD','Sejarah','Rujukan'];
+        const tabTextsEn = ['Calculator','Energy','Accuracy','MD','History','Reference'];
+        tabs.forEach((tab, i) => { if (i < tabTexts.length) tab.textContent = m ? tabTexts[i] : tabTextsEn[i]; });
 
-        // ===== MAIN TAB LABELS (DIRECT SPAN REWRITE) =====
-        const tabLabels = {
-            'Kalkulator': isMs ? 'Kalkulator' : 'Calculator',
-            'Tenaga': isMs ? 'Tenaga' : 'Energy',
-            'Ketepatan': isMs ? 'Ketepatan' : 'Accuracy',
-            'MD': 'MD',
-            'Sejarah': isMs ? 'Sejarah' : 'History',
-            'Rujukan': isMs ? 'Rujukan' : 'Reference'
-        };
-
-        document.querySelectorAll('.main-tab-label').forEach(span => {
-            const currentText = span.textContent.trim();
-            if (tabLabels[currentText] !== undefined) {
-                span.textContent = tabLabels[currentText];
-            }
+        // PANEL HEADERS
+        document.querySelectorAll('.panel-header h2').forEach(h2 => {
+            const t = h2.textContent.trim();
+            if (t.includes('Parameter Input')) h2.innerHTML = '📋 Parameter Input';
+            else if (t.includes('Keputusan') || t.includes('Calculation Results')) h2.innerHTML = m ? '📊 Keputusan Pengiraan' : '📊 Calculation Results';
+            else if (t.includes('Energy Registration')) h2.innerHTML = '🔢 Energy Registration Calculator';
+            else if (t.includes('Meter Accuracy')) h2.innerHTML = m ? '📊 Meter Accuracy Calculator' : '📊 Meter Accuracy Calculator';
+            else if (t.includes('Maximum Demand')) h2.innerHTML = m ? '🕐 Maximum Demand Calculator' : '🕐 Maximum Demand Calculator';
+            else if (t.includes('Sejarah') || t.includes('Calculation History')) h2.innerHTML = m ? '📋 Sejarah Pengiraan' : '📋 Calculation History';
+            else if (t.includes('Rujukan') || t.includes('Quick Reference')) h2.innerHTML = m ? '📚 Rujukan Pantas' : '📚 Quick Reference';
         });
 
-        // ===== PANEL HEADERS =====
-        const panelHeaders = document.querySelectorAll('.panel-header h2');
-        panelHeaders.forEach(h2 => {
-            const text = h2.innerHTML;
-            if (text.includes('Parameter Input')) {
-                h2.innerHTML = isMs ? '📋 Parameter Input' : '📋 Parameter Input';
-            } else if (text.includes('Keputusan Pengiraan') || text.includes('Calculation Results')) {
-                h2.innerHTML = isMs ? '📊 Keputusan Pengiraan' : '📊 Calculation Results';
-            } else if (text.includes('Energy Registration')) {
-                h2.innerHTML = isMs ? '🔢 Energy Registration Calculator' : '🔢 Energy Registration Calculator';
-            } else if (text.includes('Meter Accuracy')) {
-                h2.innerHTML = isMs ? '📊 Meter Accuracy Calculator' : '📊 Meter Accuracy Calculator';
-            } else if (text.includes('Maximum Demand')) {
-                h2.innerHTML = isMs ? '🕐 Maximum Demand Calculator' : '🕐 Maximum Demand Calculator';
-            } else if (text.includes('Sejarah') || text.includes('Calculation History')) {
-                h2.innerHTML = isMs ? '📋 Sejarah Pengiraan' : '📋 Calculation History';
-            } else if (text.includes('Rujukan') || text.includes('Quick Reference')) {
-                h2.innerHTML = isMs ? '📚 Rujukan Pantas' : '📚 Quick Reference';
-            }
-        });
-
-        // ===== INPUT LABELS =====
-        document.querySelectorAll('.input-label span:first-child').forEach(span => {
-            const text = span.textContent.trim();
-            const labelMap = {
+        // INPUT LABELS
+        document.querySelectorAll('.input-label').forEach(label => {
+            const span = label.querySelector('span:first-child');
+            if (!span) return;
+            const t = span.textContent.trim();
+            const map = {
                 'Meter Constant Active': 'Meter Constant Active',
                 'Meter Constant Reactive': 'Meter Constant Reactive',
-                'Jenis Supply': isMs ? 'Jenis Supply' : 'Supply Type',
-                'Supply Type': isMs ? 'Jenis Supply' : 'Supply Type',
-                'Class Meter': isMs ? 'Class Meter' : 'Meter Class',
-                'Meter Class': isMs ? 'Class Meter' : 'Meter Class',
+                'Jenis Supply': m ? 'Jenis Supply' : 'Supply Type',
+                'Supply Type': m ? 'Jenis Supply' : 'Supply Type',
+                'Class Meter': m ? 'Class Meter' : 'Meter Class',
+                'Meter Class': m ? 'Class Meter' : 'Meter Class',
                 'CT Primary (A)': 'CT Primary (A)',
                 'CT Secondary (A)': 'CT Secondary (A)',
                 'VT Primary (V)': 'VT Primary (V)',
                 'VT Secondary (V)': 'VT Secondary (V)',
-                'Jumlah Pulse Diterima': isMs ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
-                'Pulse Count Received': isMs ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
-                'Jumlah Pulse (dalam 30 minit)': isMs ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
-                'Pulse Count (in 30 minutes)': isMs ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
+                'Jumlah Pulse Diterima': m ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
+                'Pulse Count Received': m ? 'Jumlah Pulse Diterima' : 'Pulse Count Received',
                 'Pulse Constant (imp/kWh)': 'Pulse Constant (imp/kWh)',
                 'Multiplier (M)': 'Multiplier (M)',
-                'Tenaga Dikehendaki (kWh)': isMs ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
-                'Energy Required (kWh)': isMs ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
-                'Tenaga Rujukan (Standard)': isMs ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
-                'Reference Energy (Standard)': isMs ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
-                'Tenaga Meter Under Test': isMs ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy',
-                'Meter Under Test Energy': isMs ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy'
+                'Tenaga Dikehendaki (kWh)': m ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
+                'Energy Required (kWh)': m ? 'Tenaga Dikehendaki (kWh)' : 'Energy Required (kWh)',
+                'Tenaga Rujukan (Standard)': m ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
+                'Reference Energy (Standard)': m ? 'Tenaga Rujukan (Standard)' : 'Reference Energy (Standard)',
+                'Tenaga Meter Under Test': m ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy',
+                'Meter Under Test Energy': m ? 'Tenaga Meter Under Test' : 'Meter Under Test Energy',
+                'Jumlah Pulse (dalam 30 minit)': m ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)',
+                'Pulse Count (in 30 minutes)': m ? 'Jumlah Pulse (dalam 30 minit)' : 'Pulse Count (in 30 minutes)'
             };
-            if (labelMap[text] !== undefined) {
-                span.textContent = labelMap[text];
-            }
+            if (map[t] !== undefined) span.textContent = map[t];
         });
 
-        // ===== BUTTONS =====
+        // BUTTONS
         document.querySelectorAll('.btn-calculate span[data-lang]').forEach(span => {
-            const key = span.dataset.lang;
-            if (key === 'btn-calculate') {
-                span.textContent = isMs ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE';
-            } else if (key === 'btn-energy-calc') {
-                span.textContent = isMs ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY';
-            } else if (key === 'btn-accuracy-calc') {
-                span.textContent = isMs ? '📊 KIRA KETEPATAN' : '📊 CHECK ACCURACY';
-            } else if (key === 'btn-demand-calc') {
-                span.textContent = isMs ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
-            }
+            const k = span.dataset.lang;
+            if (k === 'btn-calculate') span.textContent = m ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE';
+            else if (k === 'btn-energy-calc') span.textContent = m ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY';
+            else if (k === 'btn-accuracy-calc') span.textContent = m ? '📊 KIRA KETEPATAN' : '📊 CHECK ACCURACY';
+            else if (k === 'btn-demand-calc') span.textContent = m ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
         });
 
-        // ===== TOGGLE BUTTONS =====
-        const togglePulse = document.getElementById('togglePulseToEnergy');
-        const toggleEnergy = document.getElementById('toggleEnergyToPulse');
-        if (togglePulse) {
-            const span = togglePulse.querySelector('span[data-lang]');
-            if (span) span.textContent = isMs ? 'Pulse → Tenaga' : 'Pulse → Energy';
-        }
-        if (toggleEnergy) {
-            const span = toggleEnergy.querySelector('span[data-lang]');
-            if (span) span.textContent = isMs ? 'Tenaga → Pulse' : 'Energy → Pulse';
-        }
+        // TOGGLE BUTTONS
+        const tp = document.querySelector('#togglePulseToEnergy span[data-lang]');
+        const te = document.querySelector('#toggleEnergyToPulse span[data-lang]');
+        if (tp) tp.textContent = m ? 'Pulse → Tenaga' : 'Pulse → Energy';
+        if (te) te.textContent = m ? 'Tenaga → Pulse' : 'Energy → Pulse';
 
-        // ===== COPY BUTTONS =====
-        document.querySelectorAll('.btn-copy-result span[data-lang]').forEach(span => {
-            span.textContent = isMs ? 'Salin' : 'Copy';
-        });
+        // COPY BUTTONS
+        document.querySelectorAll('.btn-copy-result span[data-lang]').forEach(s => s.textContent = m ? 'Salin' : 'Copy');
 
-        // ===== HISTORY CLEAR BUTTON =====
-        const btnClear = document.getElementById('btnClearHistory');
-        if (btnClear) {
-            btnClear.textContent = isMs ? 'Padam Semua' : 'Clear All';
-        }
+        // CLEAR HISTORY BUTTON
+        const bc = document.getElementById('btnClearHistory');
+        if (bc) bc.textContent = m ? 'Padam Semua' : 'Clear All';
 
-        // ===== HISTORY EMPTY STATE =====
-        const emptyState = document.querySelector('#historyList .empty-state p');
-        if (emptyState && emptyState.dataset.lang === 'history-empty') {
-            emptyState.textContent = isMs ? 'Tiada rekod pengiraan' : 'No calculation records';
-        }
+        // DEMAND DESC
+        const dd = document.querySelector('.panel-desc[data-lang="demand-desc"]');
+        if (dd) dd.textContent = m ? 'Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.' : 'Calculate Maximum Demand (MD) based on pulse readings over 30 minutes.';
 
-        // ===== PANEL DESC =====
-        const panelDesc = document.querySelector('.panel-desc[data-lang="demand-desc"]');
-        if (panelDesc) {
-            panelDesc.textContent = isMs 
-                ? 'Kira Maximum Demand (MD) berdasarkan bacaan pulse dalam tempoh 30 minit.'
-                : 'Calculate Maximum Demand (MD) based on pulse readings over 30 minutes.';
-        }
+        // EMPTY STATE
+        const ep = document.querySelector('#historyList .empty-state p[data-lang="history-empty"]');
+        if (ep) ep.textContent = m ? 'Tiada rekod pengiraan' : 'No calculation records';
 
-        // ===== REFERENCE TABLE =====
-        document.querySelectorAll('.ref-title').forEach(title => {
-            const text = title.textContent.trim();
-            const refMap = {
-                'Standard CT Ratios': 'Standard CT Ratios',
-                'Standard VT Ratios': 'Standard VT Ratios',
-                'Standard Meter Constants': 'Standard Meter Constants',
-                'Class Accuracy Limits': 'Class Accuracy Limits',
-                'Had Ralat': isMs ? 'Had Ralat' : 'Error Limit',
-                'Error Limit': isMs ? 'Had Ralat' : 'Error Limit',
-                'Kegunaan': isMs ? 'Kegunaan' : 'Usage',
-                'Usage': isMs ? 'Kegunaan' : 'Usage',
+        // REFERENCE TABLE
+        document.querySelectorAll('.ref-title').forEach(rt => {
+            const t = rt.textContent.trim();
+            const rm = {
+                'Standard CT Ratios': 'Standard CT Ratios', 'Standard VT Ratios': 'Standard VT Ratios',
+                'Standard Meter Constants': 'Standard Meter Constants', 'Class Accuracy Limits': 'Class Accuracy Limits',
+                'Had Ralat': m ? 'Had Ralat' : 'Error Limit', 'Error Limit': m ? 'Had Ralat' : 'Error Limit',
+                'Kegunaan': m ? 'Kegunaan' : 'Usage', 'Usage': m ? 'Kegunaan' : 'Usage',
                 'Wiring Configuration': 'Wiring Configuration',
-                'Jenis': isMs ? 'Jenis' : 'Type',
-                'Type': isMs ? 'Jenis' : 'Type',
-                'Precision metering': 'Precision metering',
-                'Large industrial': 'Large industrial',
-                'Industrial': 'Industrial',
-                'General / Commercial': 'General / Commercial',
-                'Domestic': 'Domestic',
-                'Domestik 1 fasa': isMs ? 'Domestik 1 fasa' : 'Domestic 1 phase',
-                'Domestic 1 phase': isMs ? 'Domestik 1 fasa' : 'Domestic 1 phase',
-                'Industri 3 fasa (delta)': isMs ? 'Industri 3 fasa (delta)' : 'Industrial 3 phase (delta)',
-                'Industrial 3 phase (delta)': isMs ? 'Industri 3 fasa (delta)' : 'Industrial 3 phase (delta)',
-                'Komersial/Industri (wye)': isMs ? 'Komersial/Industri (wye)' : 'Commercial/Industrial (wye)',
-                'Commercial/Industrial (wye)': isMs ? 'Komersial/Industri (wye)' : 'Commercial/Industrial (wye)'
+                'Jenis': m ? 'Jenis' : 'Type', 'Type': m ? 'Jenis' : 'Type'
             };
-            if (refMap[text] !== undefined) {
-                title.textContent = refMap[text];
-            }
+            if (rm[t] !== undefined) rt.textContent = rm[t];
         });
 
-        // ===== SPLASH SUBTITLE =====
-        const splashSub = document.querySelector('[data-lang="splash-subtitle"]');
-        if (splashSub) {
-            splashSub.textContent = isMs ? 'Universal Calculator' : 'Universal Calculator';
-        }
-
-        // ===== RESULT LABELS (DYNAMIC - update if results are visible) =====
-        this.updateResultLabels();
-    },
-
-    updateResultLabels() {
-        const lang = this.currentLang;
-        const isMs = lang === 'ms';
-
-        // Hero result label
-        const heroLabel = document.querySelector('.hero-label');
-        if (heroLabel) {
-            heroLabel.textContent = 'TOTAL MULTIPLIER';
-        }
-
-        // Result card labels
-        document.querySelectorAll('.result-card-label').forEach(label => {
-            const text = label.textContent.trim();
-            const labelMap = {
-                'CT Ratio': 'CT Ratio',
-                'VT Ratio': 'VT Ratio',
-                'Primary Active': 'Primary Active',
-                'Secondary Active': 'Secondary Active',
-                'Primary Reactive': 'Primary Reactive',
-                'Secondary Reactive': 'Secondary Reactive',
+        // RESULT LABELS (if visible)
+        document.querySelectorAll('.result-card-label').forEach(rl => {
+            const t = rl.textContent.trim();
+            const rlm = {
+                'CT Ratio': 'CT Ratio', 'VT Ratio': 'VT Ratio',
+                'Primary Active': 'Primary Active', 'Secondary Active': 'Secondary Active',
+                'Primary Reactive': 'Primary Reactive', 'Secondary Reactive': 'Secondary Reactive',
                 '% Error': '% Error',
-                'Hasil': isMs ? 'Hasil' : 'Result',
-                'Result': isMs ? 'Hasil' : 'Result',
+                'Hasil': m ? 'Hasil' : 'Result', 'Result': m ? 'Hasil' : 'Result',
                 'Maximum Demand': 'Maximum Demand'
             };
-            if (labelMap[text] !== undefined) {
-                label.textContent = labelMap[text];
-            }
+            if (rlm[t] !== undefined) rl.textContent = rlm[t];
         });
 
-        // Formula title
-        const formulaTitle = document.querySelector('.formula-title');
-        if (formulaTitle) {
-            formulaTitle.textContent = isMs ? '📐 Formula Digunakan' : '📐 Formula Used';
-        }
-
-        // Section dividers
-        document.querySelectorAll('.divider-text').forEach(div => {
-            if (div.textContent.trim() === 'PULSE CONSTANTS') {
-                div.textContent = 'PULSE CONSTANTS';
-            }
-        });
-
-        // Mode info in hero
-        const heroSub = document.querySelector('.hero-sub');
-        if (heroSub) {
-            const text = heroSub.textContent;
-            if (text.includes('Tiada CT/VT')) {
-                heroSub.textContent = text.replace('Tiada CT/VT', isMs ? 'Tiada CT/VT' : 'No CT/VT');
-            } else if (text.includes('No CT/VT')) {
-                heroSub.textContent = text.replace('No CT/VT', isMs ? 'Tiada CT/VT' : 'No CT/VT');
-            }
-            if (text.includes('CT Sahaja')) {
-                heroSub.textContent = text.replace('CT Sahaja', isMs ? 'CT Sahaja' : 'CT Only');
-            } else if (text.includes('CT Only')) {
-                heroSub.textContent = text.replace('CT Only', isMs ? 'CT Sahaja' : 'CT Only');
-            }
-            if (text.includes('High Voltage')) {
-                // Keep as is
-            }
-        });
+        const ft = document.querySelector('.formula-title');
+        if (ft) ft.textContent = m ? '📐 Formula Digunakan' : '📐 Formula Used';
     },
 
     // ============ TOAST ============
-    _toastTimeout: null,
-
     showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         toast.textContent = message;
         toast.className = `toast ${type} show`;
-
         clearTimeout(this._toastTimeout);
-        this._toastTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-            toast.className = 'toast';
-        }, 2000);
+        this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); toast.className = 'toast'; }, 2000);
     },
 
     // ============ THEME ============
     toggleTheme() {
-        const body = document.body;
-        body.classList.toggle('light-theme');
-        const isLight = body.classList.contains('light-theme');
+        document.body.classList.toggle('light-theme');
+        const isLight = document.body.classList.contains('light-theme');
         const icon = document.getElementById('themeIcon');
-
-        if (isLight) {
-            icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-        } else {
-            icon.innerHTML = '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-        }
-
+        icon.innerHTML = isLight ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
         localStorage.setItem('metercalc_theme', isLight ? 'light' : 'dark');
     },
 
     loadTheme() {
-        const saved = localStorage.getItem('metercalc_theme');
-        const icon = document.getElementById('themeIcon');
-
-        if (saved === 'light') {
+        if (localStorage.getItem('metercalc_theme') === 'light') {
             document.body.classList.add('light-theme');
-            if (icon) {
-                icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-            }
+            const icon = document.getElementById('themeIcon');
+            if (icon) icon.innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
         }
     },
 
-    // ============ SHARE ============
     shareCalculatorResult() {
         const lastCalc = Calculator.history.find(h => h.type === 'calculator');
-        if (!lastCalc) {
-            this.showToast(Lang.get('toast-no-results'), 'error');
-            return;
-        }
-
+        if (!lastCalc) { this.showToast(Lang.get('toast-no-results'), 'error'); return; }
         const modeLabels = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT' };
         const text = `📊 MeterCalc Pro\n⚡ ${modeLabels[lastCalc.mode]}\n📏 M = ${Calculator.formatNumber(lastCalc.totalMultiplier)}\n🔌 Primary Pulse = ${Calculator.formatNumber(lastCalc.primaryActive)} imp/kWh\n📋 ${lastCalc.supply} | Cl.${lastCalc.meterClass}`;
-
-        if (navigator.share) {
-            navigator.share({ title: 'MeterCalc Pro Result', text }).catch(() => {});
-        } else {
-            UIManager.copyToClipboard(text);
-        }
+        if (navigator.share) navigator.share({ title: 'MeterCalc Pro Result', text }).catch(() => {});
+        else this.copyToClipboard(text);
     }
 };
 
-// ============ LANGUAGE SYSTEM ============
+// ============ LANGUAGE DATA ============
 const Lang = {
     current: 'ms',
-
     data: {
         ms: {
             'toast-enter-constant': 'Sila masukkan Meter Constant Active!',
@@ -574,21 +398,7 @@ const Lang = {
             'toast-no-results': 'Tiada keputusan untuk disalin',
             'confirm-clear-history': 'Padam semua sejarah pengiraan?',
             'accuracy-pass': '✅ LULUS - Dalam had',
-            'accuracy-fail': '❌ GAGAL - Melebihi had',
-            'result-total-multiplier': 'TOTAL MULTIPLIER',
-            'result-direct-mode': 'DIRECT • Tiada CT/VT',
-            'result-ct-mode': 'CT Sahaja',
-            'result-ctvt-mode': 'CT + VT (High Voltage)',
-            'result-pulse-constants': 'PULSE CONSTANTS',
-            'result-primary-active': 'Primary Active',
-            'result-secondary-active': 'Secondary Active',
-            'result-primary-reactive': 'Primary Reactive',
-            'result-secondary-reactive': 'Secondary Reactive',
-            'result-formula': 'Formula Digunakan',
-            'live-enter-value': 'Masukkan nilai',
-            'history-empty': 'Tiada rekod pengiraan',
-            'result-hasil': 'Hasil',
-            'accuracy-error': '% Error'
+            'accuracy-fail': '❌ GAGAL - Melebihi had'
         },
         en: {
             'toast-enter-constant': 'Please enter Meter Constant Active!',
@@ -611,29 +421,9 @@ const Lang = {
             'toast-no-results': 'No results to copy',
             'confirm-clear-history': 'Delete all calculation history?',
             'accuracy-pass': '✅ PASS - Within',
-            'accuracy-fail': '❌ FAIL - Exceeds',
-            'result-total-multiplier': 'TOTAL MULTIPLIER',
-            'result-direct-mode': 'DIRECT • No CT/VT',
-            'result-ct-mode': 'CT Only',
-            'result-ctvt-mode': 'CT + VT (High Voltage)',
-            'result-pulse-constants': 'PULSE CONSTANTS',
-            'result-primary-active': 'Primary Active',
-            'result-secondary-active': 'Secondary Active',
-            'result-primary-reactive': 'Primary Reactive',
-            'result-secondary-reactive': 'Secondary Reactive',
-            'result-formula': 'Formula Used',
-            'live-enter-value': 'Enter value',
-            'history-empty': 'No calculation records',
-            'result-hasil': 'Result',
-            'accuracy-error': '% Error'
+            'accuracy-fail': '❌ FAIL - Exceeds'
         }
     },
-
-    setLanguage(lang) {
-        this.current = lang;
-    },
-
-    get(key) {
-        return this.data[this.current]?.[key] || this.data['ms']?.[key] || key;
-    }
+    setLanguage(lang) { this.current = lang; },
+    get(key) { return this.data[this.current]?.[key] || this.data['ms']?.[key] || key; }
 };
