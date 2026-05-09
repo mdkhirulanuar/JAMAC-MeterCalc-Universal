@@ -1,5 +1,6 @@
 /* ============================================
-   METERCALC UNIVERSAL - Mobile-First Design
+   METERCALC PRO - Complete Stylesheet
+   Mobile-First Design System
    ============================================ */
 
 :root {
@@ -18,6 +19,7 @@
     --green2: #1a8a38;
     --orange: #e6a820;
     --red: #e64545;
+    --purple: #8b5cf6;
     --radius: 14px;
     --radius-sm: 10px;
     --radius-xs: 6px;
@@ -180,15 +182,70 @@ body {
     background: var(--border);
 }
 
-/* ============ MODE TABS ============ */
-.mode-tabs {
+/* ============ MAIN TABS ============ */
+.main-tabs {
     display: flex;
-    gap: 6px;
-    padding: 10px 12px;
+    gap: 4px;
+    padding: 8px 8px;
     background: var(--bg);
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
     position: sticky;
     top: 60px;
     z-index: 99;
+}
+
+.main-tabs::-webkit-scrollbar {
+    display: none;
+}
+
+.main-tab {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    padding: 8px 12px;
+    background: var(--card);
+    border: 2px solid var(--border);
+    border-radius: var(--radius-sm);
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font);
+    min-width: 60px;
+}
+
+.main-tab:active {
+    transform: scale(0.95);
+}
+
+.main-tab.active {
+    border-color: var(--accent);
+    background: #1a2838;
+    box-shadow: 0 0 15px rgba(77, 166, 255, 0.15);
+}
+
+.main-tab-icon {
+    font-size: 1.2rem;
+}
+
+.main-tab-label {
+    font-size: 0.6rem;
+    font-weight: 700;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+}
+
+.main-tab.active .main-tab-label {
+    color: var(--accent);
+}
+
+/* ============ MODE TABS (Calculator Sub-tabs) ============ */
+.mode-tabs {
+    display: flex;
+    gap: 4px;
+    padding: 8px 12px;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
     scrollbar-width: none;
@@ -199,50 +256,27 @@ body {
 }
 
 .mode-tab {
-    flex: 1;
-    min-width: 100px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 2px;
-    padding: 12px 10px;
-    background: var(--card);
+    flex-shrink: 0;
+    padding: 8px 14px;
+    background: var(--card2);
     border: 2px solid var(--border);
-    border-radius: var(--radius-sm);
+    border-radius: 20px;
     cursor: pointer;
     transition: var(--transition);
-    white-space: nowrap;
     font-family: var(--font);
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: var(--text2);
 }
 
 .mode-tab:active {
-    transform: scale(0.96);
+    transform: scale(0.95);
 }
 
 .mode-tab.active {
-    border-color: var(--accent);
-    background: #1a2838;
-    box-shadow: 0 0 20px rgba(77, 166, 255, 0.15);
-}
-
-.mode-icon {
-    font-size: 1.5rem;
-}
-
-.mode-label {
-    font-size: 0.7rem;
-    font-weight: 800;
-    color: var(--text2);
-    letter-spacing: 1px;
-}
-
-.mode-tab.active .mode-label {
-    color: var(--accent);
-}
-
-.mode-desc {
-    font-size: 0.6rem;
-    color: var(--text3);
+    border-color: var(--purple);
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--purple);
 }
 
 /* ============ MAIN SCROLL ============ */
@@ -258,6 +292,12 @@ body {
     border-radius: var(--radius);
     margin-bottom: 12px;
     overflow: hidden;
+    animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
 }
 
 .panel-header {
@@ -276,6 +316,17 @@ body {
 
 .panel-body {
     padding: 16px;
+}
+
+.panel-desc {
+    font-size: 0.8rem;
+    color: var(--text2);
+    margin-bottom: 12px;
+    line-height: 1.5;
+}
+
+.results-header {
+    background: linear-gradient(135deg, #1a2838, #12161e);
 }
 
 /* ============ INPUT BLOCKS ============ */
@@ -471,11 +522,86 @@ select.input-field {
     margin-top: 12px;
 }
 
-/* ============ RESULTS ============ */
-.results-header {
-    background: linear-gradient(135deg, #1a2838, #12161e);
+/* ============ TOGGLE BUTTONS ============ */
+.calc-type-toggle {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 16px;
+    background: var(--bg2);
+    border-radius: 25px;
+    padding: 4px;
 }
 
+.toggle-btn {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    background: transparent;
+    color: var(--text2);
+    border-radius: 22px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    font-family: var(--font);
+    white-space: nowrap;
+}
+
+.toggle-btn.active {
+    background: var(--accent);
+    color: #fff;
+}
+
+.toggle-btn:active {
+    transform: scale(0.96);
+}
+
+/* ============ CALC RESULT ============ */
+.calc-result {
+    margin-top: 20px;
+    padding: 20px;
+    background: linear-gradient(135deg, #1a3040, #0d1a28);
+    border-radius: var(--radius-sm);
+    text-align: center;
+    border: 1px solid rgba(77, 166, 255, 0.2);
+}
+
+.calc-result-label {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text2);
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+}
+
+.calc-result-value {
+    font-size: 2.5rem;
+    font-weight: 900;
+    color: #fff;
+}
+
+.calc-result-status {
+    margin-top: 10px;
+    padding: 10px;
+    border-radius: var(--radius-xs);
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.calc-result-status.pass {
+    background: rgba(38, 184, 77, 0.2);
+    color: var(--green);
+    border: 1px solid var(--green);
+}
+
+.calc-result-status.fail {
+    background: rgba(230, 69, 69, 0.2);
+    color: var(--red);
+    border: 1px solid var(--red);
+}
+
+/* ============ HERO RESULT ============ */
 .hero-result {
     text-align: center;
     padding: 24px 16px;
@@ -508,7 +634,7 @@ select.input-field {
     font-weight: 500;
 }
 
-/* Result Grid */
+/* ============ RESULT GRID ============ */
 .result-grid-2 {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -550,7 +676,7 @@ select.input-field {
     color: var(--accent);
 }
 
-/* Formula Box */
+/* ============ FORMULA BOX ============ */
 .formula-box {
     background: var(--bg2);
     padding: 14px;
@@ -577,67 +703,57 @@ select.input-field {
     color: var(--accent);
 }
 
-/* ============ PRESET LIST ============ */
-.preset-list {
+/* ============ REFERENCE PANEL ============ */
+.ref-section {
+    margin-bottom: 20px;
+}
+
+.ref-title {
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 8px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.ref-chips {
     display: flex;
-    flex-direction: column;
+    flex-wrap: wrap;
     gap: 6px;
 }
 
-.preset-item {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    padding: 12px;
+.ref-chip {
+    padding: 6px 12px;
     background: var(--bg2);
     border: 1px solid var(--border);
-    border-radius: var(--radius-xs);
-    cursor: pointer;
-    transition: var(--transition);
-}
-
-.preset-item:active {
-    transform: scale(0.98);
-    background: var(--border);
-}
-
-.preset-icon {
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.2rem;
-    flex-shrink: 0;
-}
-
-.preset-icon.direct { background: #1a2e20; }
-.preset-icon.ct { background: #1a2535; }
-.preset-icon.ctvt { background: #2a1a20; }
-
-.preset-info {
-    flex: 1;
-    min-width: 0;
-}
-
-.preset-name {
-    font-size: 0.85rem;
-    font-weight: 600;
-    color: #fff;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-}
-
-.preset-detail {
+    border-radius: 15px;
     font-size: 0.7rem;
     color: var(--text2);
+    font-weight: 500;
+    font-family: 'SF Mono', 'Cascadia Code', monospace;
 }
 
-.preset-arrow {
-    color: var(--text3);
-    font-size: 0.8rem;
+.ref-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.75rem;
+}
+
+.ref-table th {
+    background: var(--bg2);
+    padding: 8px;
+    text-align: left;
+    color: var(--accent);
+    font-weight: 700;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+}
+
+.ref-table td {
+    padding: 8px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
 }
 
 /* ============ HISTORY ============ */
@@ -667,10 +783,12 @@ select.input-field {
     border-radius: var(--radius-xs);
     margin-bottom: 6px;
     cursor: pointer;
+    transition: var(--transition);
 }
 
 .history-item:active {
     background: var(--border);
+    transform: scale(0.98);
 }
 
 .history-left {
@@ -683,27 +801,43 @@ select.input-field {
     width: 10px;
     height: 10px;
     border-radius: 50%;
+    flex-shrink: 0;
 }
 
 .history-dot.direct { background: var(--green); }
 .history-dot.ct { background: var(--accent); }
 .history-dot.ctvt { background: var(--orange); }
+.history-dot.energy { background: var(--purple); }
+.history-dot.accuracy { background: var(--red); }
+.history-dot.demand { background: var(--orange); }
 
-.history-info .history-mode {
-    font-size: 0.7rem;
+.history-info .history-type {
+    font-size: 0.65rem;
     color: var(--text2);
-    font-weight: 600;
+    font-weight: 700;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-.history-info .history-value {
-    font-size: 0.85rem;
+.history-info .history-detail {
+    font-size: 0.8rem;
     color: #fff;
+    font-weight: 600;
+}
+
+.history-right {
+    text-align: right;
+    flex-shrink: 0;
+}
+
+.history-value {
+    font-size: 0.85rem;
     font-weight: 700;
+    color: var(--accent);
 }
 
 .history-time {
-    font-size: 0.65rem;
+    font-size: 0.6rem;
     color: var(--text3);
 }
 
@@ -722,7 +856,7 @@ select.input-field {
     z-index: 200;
     opacity: 0;
     transition: var(--transition);
-    box-shadow: 0 8px 30px rgba(0,0,0,0.5);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.5);
     border: 1px solid var(--border);
     pointer-events: none;
     white-space: nowrap;
@@ -736,49 +870,19 @@ select.input-field {
 .toast.success { border-color: var(--green); }
 .toast.error { border-color: var(--red); }
 
-/* ============ ANIMATIONS ============ */
-@keyframes fadeInUp {
-    from {
-        opacity: 0;
-        transform: translateY(12px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-.panel {
-    animation: fadeInUp 0.3s ease-out;
-}
-
 /* ============ SCROLLBAR ============ */
-::-webkit-scrollbar {
-    width: 3px;
-}
-::-webkit-scrollbar-track {
-    background: transparent;
-}
-::-webkit-scrollbar-thumb {
-    background: var(--border);
-    border-radius: 3px;
-}
+::-webkit-scrollbar { width: 3px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
 
 /* ============ RESPONSIVE ============ */
 @media (min-width: 520px) {
-    .mode-tabs {
-        justify-content: center;
-    }
-    .mode-tab {
-        max-width: 140px;
-    }
+    .main-tabs { justify-content: center; }
+    .main-tab { min-width: 70px; }
 }
 
 @media (max-width: 360px) {
-    .hero-value {
-        font-size: 2.2rem;
-    }
-    .input-row-2 {
-        grid-template-columns: 1fr;
-    }
+    .hero-value { font-size: 2.2rem; }
+    .calc-result-value { font-size: 2rem; }
+    .input-row-2 { grid-template-columns: 1fr; }
 }
