@@ -1,11 +1,10 @@
 /**
  * MeterCalc Pro - Core Calculation Engine
- * Features: Direct, CT, CT+VT, Energy, Accuracy (Manual & Pulse), Demand
+ * Features: Direct, CT, CT+VT, Energy (Pulse→Tenaga), Accuracy, Demand
  */
 
 const Calculator = {
     currentMode: 'direct',
-    currentEnergyMode: 'pulse-to-energy',
     currentAccuracyMode: 'manual',
     history: [],
 
@@ -18,8 +17,7 @@ const Calculator = {
     },
 
     attachInputValidators() {
-        const numberInputs = document.querySelectorAll('input[type="number"]');
-        numberInputs.forEach(input => {
+        document.querySelectorAll('input[type="number"]').forEach(input => {
             input.addEventListener('input', () => this.validateNumberInput(input));
             input.addEventListener('blur', () => this.validateNumberInput(input));
         });
@@ -31,13 +29,8 @@ const Calculator = {
         let num = parseFloat(val);
         if (isNaN(num)) { input.value = ''; return; }
         if (num < 0) {
-            num = Math.abs(num);
-            input.value = num;
+            input.value = Math.abs(num);
             UIManager.showToast('⚠️ Nilai negatif ditukar ke positif', 'error');
-        }
-        if (num === 0 && input.hasAttribute('data-required')) {
-            input.value = '';
-            UIManager.showToast('⚠️ Nilai tidak boleh 0', 'error');
         }
     },
 
@@ -45,8 +38,7 @@ const Calculator = {
         const el = document.getElementById(id);
         if (!el) return null;
         const val = parseFloat(el.value);
-        if (isNaN(val) || val < 0) return null;
-        return val;
+        return (isNaN(val) || val < 0) ? null : val;
     },
 
     getInputValues() {
@@ -120,41 +112,36 @@ const Calculator = {
     getFormulaText(result) {
         if (result.mode === 'direct') return `<code>M = 1 (Direct)</code><br><code>Primary Pulse = K<sub>m</sub> ÷ 1 = ${this.formatNumber(result.primaryActive)} imp/kWh</code>`;
         if (result.mode === 'ct') return `<code>M = ${this.formatNumber(result.ctPrimary)} ÷ ${this.formatNumber(result.ctSecondary)} = <strong>${this.formatNumber(result.totalMultiplier)}</strong></code><br><code>Primary Pulse = ${this.formatNumber(result.secondaryActive)} ÷ ${this.formatNumber(result.totalMultiplier)} = <strong>${this.formatNumber(result.primaryActive)} imp/kWh</strong></code>`;
-        return `<code>M = CT × VT = (${this.formatNumber(result.ctPrimary)} ÷ ${this.formatNumber(result.ctSecondary)}) × (${this.formatNumber(result.vtPrimary)} ÷ ${this.formatNumber(result.vtSecondary)})</code><br><code>M = ${this.formatNumber(result.ctRatio)} × ${this.formatNumber(result.vtRatio)} = <strong>${this.formatNumber(result.totalMultiplier)}</strong></code><br><code>Primary Pulse = ${this.formatNumber(result.secondaryActive)} ÷ ${this.formatNumber(result.totalMultiplier)} = <strong>${this.formatNumber(result.primaryActive)} imp/kWh</strong></code>`;
+        return `<code>M = CT × VT</code><br><code>M = ${this.formatNumber(result.ctRatio)} × ${this.formatNumber(result.vtRatio)} = <strong>${this.formatNumber(result.totalMultiplier)}</strong></code><br><code>Primary Pulse = ${this.formatNumber(result.secondaryActive)} ÷ ${this.formatNumber(result.totalMultiplier)} = <strong>${this.formatNumber(result.primaryActive)} imp/kWh</strong></code>`;
     },
 
-    // ============ ENERGY ============
+    // ============ ENERGY (PULSE → TENAGA SAHAJA) ============
     calculateEnergy() {
-        this.currentEnergyMode === 'pulse-to-energy' ? this.calculatePulseToEnergy() : this.calculateEnergyToPulse();
-    },
-
-    calculatePulseToEnergy() {
         const pc = parseFloat(document.getElementById('energyPulseCount').value);
         const pConst = parseFloat(document.getElementById('energyPulseConst').value);
         const mult = parseFloat(document.getElementById('energyMultiplier').value) || 1;
+
         if (!pc || pc <= 0) { UIManager.showToast('❌ Sila masukkan jumlah pulse!', 'error'); return; }
         if (!pConst || pConst <= 0) { UIManager.showToast('❌ Sila masukkan pulse constant!', 'error'); return; }
+
         const energy = (pc / pConst) * mult;
+
         document.getElementById('energyResult').style.display = 'block';
         document.getElementById('energyResultValue').textContent = this.formatEnergy(energy);
-        this.addToHistory({ type: 'energy', mode: 'pulse-to-energy', pulseCount: pc, pulseConst: pConst, multiplier: mult, result: energy, timestamp: new Date().toISOString() });
+
+        this.addToHistory({
+            type: 'energy',
+            pulseCount: pc,
+            pulseConst: pConst,
+            multiplier: mult,
+            result: energy,
+            timestamp: new Date().toISOString()
+        });
+
         UIManager.showToast('✅ Tenaga dikira!', 'success');
     },
 
-    calculateEnergyToPulse() {
-        const energy = parseFloat(document.getElementById('energyTarget').value);
-        const pConst = parseFloat(document.getElementById('energyPulseConst2').value);
-        const mult = parseFloat(document.getElementById('energyMultiplier2').value) || 1;
-        if (!energy || energy <= 0) { UIManager.showToast('❌ Sila masukkan tenaga!', 'error'); return; }
-        if (!pConst || pConst <= 0) { UIManager.showToast('❌ Sila masukkan pulse constant!', 'error'); return; }
-        const pulses = (energy * pConst) / mult;
-        document.getElementById('energyResult').style.display = 'block';
-        document.getElementById('energyResultValue').textContent = this.formatNumber(pulses) + ' pulses';
-        this.addToHistory({ type: 'energy', mode: 'energy-to-pulse', energy, pulseConst: pConst, multiplier: mult, result: pulses, timestamp: new Date().toISOString() });
-        UIManager.showToast('✅ Pulse dikira!', 'success');
-    },
-
-    // ============ ACCURACY (UPDATED) ============
+    // ============ ACCURACY ============
     attachAccPulseListeners() {
         const update = () => this.updateAccLiveEnergy();
         ['accPulseCount', 'accPulseConst', 'accPulseMultiplier', 'accOutputUnit'].forEach(id => {
@@ -174,11 +161,7 @@ const Calculator = {
         if (pc && pConst && pConst > 0 && pc >= 0) {
             let energyKWh = (pc / pConst) * mult;
             display.style.display = 'flex';
-            if (unit === 'Wh') {
-                value.textContent = (energyKWh * 1000).toFixed(1) + ' Wh';
-            } else {
-                value.textContent = this.formatEnergy(energyKWh);
-            }
+            value.textContent = unit === 'Wh' ? (energyKWh * 1000).toFixed(1) + ' Wh' : this.formatEnergy(energyKWh);
         } else {
             display.style.display = 'none';
         }
@@ -188,10 +171,7 @@ const Calculator = {
         let reference;
         if (this.currentAccuracyMode === 'manual') {
             reference = parseFloat(document.getElementById('accReference').value);
-            if (!reference || reference <= 0) {
-                UIManager.showToast('❌ Sila masukkan Tenaga Rujukan!', 'error');
-                return;
-            }
+            if (!reference || reference <= 0) { UIManager.showToast('❌ Sila masukkan Tenaga Rujukan!', 'error'); return; }
         } else {
             const pc = parseFloat(document.getElementById('accPulseCount').value);
             const pConst = parseFloat(document.getElementById('accPulseConst').value);
@@ -206,10 +186,7 @@ const Calculator = {
         const meterReading = parseFloat(document.getElementById('accMeterReading').value);
         const meterClass = document.getElementById('accMeterClass').value;
         const accSupply = document.getElementById('accSupplyType').value;
-        if (!meterReading || meterReading <= 0) {
-            UIManager.showToast('❌ Sila masukkan Tenaga MUT!', 'error');
-            return;
-        }
+        if (!meterReading || meterReading <= 0) { UIManager.showToast('❌ Sila masukkan Tenaga MUT!', 'error'); return; }
 
         const errorPercent = ((meterReading - reference) / reference) * 100;
         const absError = Math.abs(errorPercent);
@@ -221,21 +198,17 @@ const Calculator = {
         document.getElementById('accuracyResultValue').textContent = errorPercent.toFixed(4) + ' %';
         const statusEl = document.getElementById('accuracyStatus');
         if (passed) {
-            statusEl.textContent = `✅ LULUS - Dalam had Class ${meterClass} (±${limit}%) untuk ${accSupply}`;
+            statusEl.textContent = `✅ LULUS - Class ${meterClass} (±${limit}%) - ${accSupply}`;
             statusEl.className = 'calc-result-status pass';
         } else {
-            statusEl.textContent = `❌ GAGAL - Melebihi had Class ${meterClass} (±${limit}%) untuk ${accSupply}`;
+            statusEl.textContent = `❌ GAGAL - Class ${meterClass} (±${limit}%) - ${accSupply}`;
             statusEl.className = 'calc-result-status fail';
         }
-
         const noteEl = document.getElementById('accuracyNote');
-        if (noteEl) {
-            noteEl.innerHTML = `<small style="color:var(--text2);">📐 Rujukan: ${this.formatEnergy(reference)} | MUT: ${this.formatEnergy(meterReading)} | ${accSupply}</small>`;
-        }
+        if (noteEl) noteEl.innerHTML = `<small style="color:var(--text2);">📐 Rujukan: ${this.formatEnergy(reference)} | MUT: ${this.formatEnergy(meterReading)}</small>`;
 
         this.addToHistory({
-            type: 'accuracy',
-            reference, meterReading, meterClass, accSupply, errorPercent, passed,
+            type: 'accuracy', reference, meterReading, meterClass, accSupply, errorPercent, passed,
             accuracyMode: this.currentAccuracyMode,
             timestamp: new Date().toISOString()
         });
@@ -320,9 +293,9 @@ const Calculator = {
                 detail = `M = ${this.formatNumber(h.totalMultiplier)} | ${h.supply} Cl.${h.meterClass}`;
                 value = this.formatNumber(h.primaryActive) + ' imp/kWh';
             } else if (h.type === 'energy') {
-                label = h.mode === 'pulse-to-energy' ? '🔢 Pulse→Tenaga' : '🔢 Tenaga→Pulse'; dot = 'energy';
-                detail = h.mode === 'pulse-to-energy' ? `${this.formatNumber(h.pulseCount)} pulse ÷ ${this.formatNumber(h.pulseConst)} × ${this.formatNumber(h.multiplier)}` : `${this.formatNumber(h.energy)} kWh × ${this.formatNumber(h.pulseConst)} ÷ ${this.formatNumber(h.multiplier)}`;
-                value = h.mode === 'pulse-to-energy' ? this.formatEnergy(h.result) : this.formatNumber(h.result) + ' pulses';
+                label = '🔢 Pulse→Tenaga'; dot = 'energy';
+                detail = `${this.formatNumber(h.pulseCount)} pulse ÷ ${this.formatNumber(h.pulseConst)} × ${this.formatNumber(h.multiplier)}`;
+                value = this.formatEnergy(h.result);
             } else if (h.type === 'accuracy') {
                 label = '📊 ACCURACY'; dot = 'accuracy';
                 detail = `Ref: ${this.formatEnergy(h.reference)} | MUT: ${this.formatEnergy(h.meterReading)} | Cl.${h.meterClass}`;
@@ -343,7 +316,6 @@ const Calculator = {
         return parseFloat(num.toFixed(6)).toString();
     },
 
-    // Auto decimal formatting untuk tenaga
     formatEnergy(kWh) {
         if (kWh >= 1) return kWh.toFixed(2) + ' kWh';
         if (kWh >= 0.1) return kWh.toFixed(3) + ' kWh';
