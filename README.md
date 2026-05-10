@@ -177,8 +177,8 @@ Output: MD = 48 kW
 
 | Bahasa | Coverage |
 |--------|----------|
-| 🇲🇾 **Bahasa Melayu** | Semua label UI, toast, error, footer |
-| 🇬🇧 **English** | All UI labels, toast, errors, footer |
+| 🇲🇾 **Bahasa Melayu** | Semua label UI, toast, error, footer, rujukan |
+| 🇬🇧 **English** | All UI labels, toast, errors, footer, reference |
 
 Tekan butang **🇲🇾/🇬🇧** di topbar untuk tukar.
 
@@ -192,6 +192,27 @@ App ini dibina berdasarkan standard berikut:
 - **MS 62053-21:2009** — Static meters for active energy (Classes 1 and 2)
 - **MS 62053-22:2009** — Static meters for active energy (Classes 0.2S and 0.5S)
 - **MS 62053-23:2009** — Static meters for reactive energy (Classes 2 and 3)
+
+---
+
+## 📈 Sejarah Versi
+
+| Versi | Perubahan |
+|-------|-----------|
+| **v0.1** | Basic calculator — Direct, CT, CT+VT |
+| **v0.2** | Default values, Live CT/VT ratio display, Input validation |
+| **v0.3** | Energy Calculator — Pulse → Tenaga (kWh, kvarh, MWh) |
+| **v0.4** | Accuracy Test — Error (%), Error Pulse (%), Constant Check |
+| **v0.5** | Maximum Demand (MD) Calculator |
+| **v0.6** | Sejarah (History) + Rujukan (Reference) |
+| **v0.7** | Standardisasi label mengikut MS 62052/62053 |
+| **v0.8** | Dual Language (BM/EN), Dark/Light theme |
+| **v1.0** | PWA — Service Worker, Installable, Offline support |
+| **v1.5** | Label sumber — Nameplate, Reference Meter, Test Output MUT, Display MUT |
+| **v2.0** | Long-press delete history, Footer + Ownership, Version number |
+| **v2.1** | Multiplier Guide dalam tab Rujukan |
+| **v2.2** | Full dual language — Rujukan + Footer BM/EN |
+| **v3.0** | 🎉 **Current Release** — Production Ready |
 
 ---
 
@@ -209,3 +230,4 @@ Untuk **JAMAC Metering Sdn. Bhd.**
 ---
 
 **⚡ MeterCalc Pro v3.0 — Pantas, Tepat, Standard.**
+```
