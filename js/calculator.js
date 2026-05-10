@@ -1,8 +1,8 @@
+/**
+ * MeterCalc Pro - Core Calculation Engine v3.0
+ */
 const Calculator = {
-    currentMode: 'direct',
-    history: [],
-    longPressTimer: null,
-    longPressId: null,
+    currentMode: 'direct', history: [], longPressTimer: null, longPressId: null,
 
     init() { this.loadHistory(); this.renderHistory(); this.attachLiveListeners(); this.attachInputValidators(); },
 
@@ -11,122 +11,91 @@ const Calculator = {
             input.addEventListener('input', () => { let v = parseFloat(input.value.trim()); if (isNaN(v)) input.value = ''; if (v < 0) input.value = Math.abs(v); });
         });
     },
-
     getValidNumber(id) { const el = document.getElementById(id); if (!el) return null; const val = parseFloat(el.value); return (isNaN(val) || val < 0) ? null : val; },
 
-    // ============ LONG PRESS HANDLERS ============
     startLongPress(event, id) {
         this.longPressId = id;
         this.longPressTimer = setTimeout(() => {
             const item = document.getElementById('history-' + id);
             if (item) {
+                document.querySelectorAll('.history-item.show-delete').forEach(el => { if (el !== item) el.classList.remove('show-delete'); });
                 item.classList.add('show-delete');
                 if (navigator.vibrate) navigator.vibrate(15);
             }
         }, 600);
         event.preventDefault();
     },
-
-    cancelLongPress() {
-        clearTimeout(this.longPressTimer);
-        this.longPressTimer = null;
-    },
-
+    cancelLongPress() { clearTimeout(this.longPressTimer); this.longPressTimer = null; },
     handleHistoryClick(event, id) {
-        // Ignore if delete button was clicked
         if (event.target.closest('.history-delete-mobile')) return;
-        
-        // Hide all delete buttons
-        document.querySelectorAll('.history-item.show-delete').forEach(item => {
-            item.classList.remove('show-delete');
-        });
-        
-        this.longPressId = null;
-        clearTimeout(this.longPressTimer);
+        document.querySelectorAll('.history-item.show-delete').forEach(item => item.classList.remove('show-delete'));
+        this.longPressId = null; clearTimeout(this.longPressTimer);
     },
 
     calculate() {
-        const meterConstActive = this.getValidNumber('meterConstActive') || 0;
-        const meterConstReactive = this.getValidNumber('meterConstReactive') || 0;
-        const supply = document.getElementById('supplyType').value;
-        const meterClass = document.getElementById('meterClass').value;
-        if (!meterConstActive || meterConstActive <= 0) { UIManager.showToast(UIManager.t('errConstActive'), 'error'); return; }
-        let ctRatio = 1, vtRatio = 1;
+        const a = this.getValidNumber('meterConstActive') || 0, r = this.getValidNumber('meterConstReactive') || 0;
+        const s = document.getElementById('supplyType').value, c = document.getElementById('meterClass').value;
+        if (!a || a <= 0) { UIManager.showToast(UIManager.t('errConstActive'), 'error'); return; }
+        let ct = 1, vt = 1;
         if (this.currentMode === 'ct' || this.currentMode === 'ctvt') {
-            const ctP = this.getValidNumber('ctPrimary'), ctS = this.getValidNumber('ctSecondary');
-            if (!ctP || ctP <= 0) { UIManager.showToast(UIManager.t('errCTPrimary'), 'error'); return; }
-            if (!ctS || ctS <= 0) { UIManager.showToast(UIManager.t('errCTSecondary'), 'error'); return; }
-            if (ctS > ctP) UIManager.showToast(UIManager.t('warnCTSwap'), 'error');
-            ctRatio = ctP / ctS;
+            const p = this.getValidNumber('ctPrimary'), q = this.getValidNumber('ctSecondary');
+            if (!p || p <= 0) { UIManager.showToast(UIManager.t('errCTPrimary'), 'error'); return; }
+            if (!q || q <= 0) { UIManager.showToast(UIManager.t('errCTSecondary'), 'error'); return; }
+            if (q > p) UIManager.showToast(UIManager.t('warnCTSwap'), 'error');
+            ct = p / q;
         }
         if (this.currentMode === 'ctvt') {
-            const vtP = this.getValidNumber('vtPrimary'), vtS = this.getValidNumber('vtSecondary');
-            if (!vtP || vtP <= 0) { UIManager.showToast(UIManager.t('errVTPrimary'), 'error'); return; }
-            if (!vtS || vtS <= 0) { UIManager.showToast(UIManager.t('errVTSecondary'), 'error'); return; }
-            vtRatio = vtP / vtS;
+            const p = this.getValidNumber('vtPrimary'), q = this.getValidNumber('vtSecondary');
+            if (!p || p <= 0) { UIManager.showToast(UIManager.t('errVTPrimary'), 'error'); return; }
+            if (!q || q <= 0) { UIManager.showToast(UIManager.t('errVTSecondary'), 'error'); return; }
+            vt = p / q;
         }
-        const M = ctRatio * vtRatio;
-        const primaryActive = meterConstActive / M, secondaryActive = meterConstActive;
-        let primaryReactive = 0, secondaryReactive = 0;
-        if (meterConstReactive > 0) { primaryReactive = meterConstReactive / M; secondaryReactive = meterConstReactive; }
-        this.displayCalcResults({ type: 'calculator', mode: this.currentMode, supply, meterClass, meterConstActive, meterConstReactive, ctRatio, vtRatio, totalMultiplier: M, primaryActive, secondaryActive, primaryReactive, secondaryReactive, timestamp: new Date().toISOString() });
+        const M = ct * vt, pa = a / M, sa = a; let pr = 0, sr = 0;
+        if (r > 0) { pr = r / M; sr = r; }
+        this.displayCalcResults({ type: 'calculator', mode: this.currentMode, supply: s, meterClass: c, meterConstActive: a, meterConstReactive: r, ctRatio: ct, vtRatio: vt, totalMultiplier: M, primaryActive: pa, secondaryActive: sa, primaryReactive: pr, secondaryReactive: sr, timestamp: new Date().toISOString() });
         document.getElementById('calcResultsPanel').scrollIntoView({ behavior: 'smooth' });
         UIManager.showToast(UIManager.t('calcDone'), 'success');
         if (navigator.vibrate) navigator.vibrate([10, 20, 10]);
     },
 
-    displayCalcResults(result) {
-        const panel = document.getElementById('calcResultsPanel'), body = document.getElementById('calcResultsBody');
-        panel.style.display = 'block';
-        const labels = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT' };
-        let html = `<div class="hero-result"><div class="hero-label">TOTAL MULTIPLIER</div><div class="hero-value">${this.formatNumber(result.totalMultiplier)}</div><div class="hero-sub">${labels[result.mode]} • ${result.supply} • Cl.${result.meterClass}</div></div>`;
-        if (result.mode !== 'direct') {
-            html += `<div class="result-grid-2"><div class="result-card"><div class="result-card-label">CT Ratio</div><div class="result-card-value">${this.formatNumber(result.ctRatio)} : 1</div></div>`;
-            if (result.mode === 'ctvt') html += `<div class="result-card"><div class="result-card-label">VT Ratio</div><div class="result-card-value">${this.formatNumber(result.vtRatio)} : 1</div></div>`;
-            html += `</div>`;
-        }
-        html += `<div class="section-divider"><div class="divider-line"></div><span class="divider-text">PULSE CONSTANTS</span><div class="divider-line"></div></div><div class="result-grid-2"><div class="result-card pulse-card"><div class="result-card-label">Primary Active</div><div class="result-card-value">${result.primaryActive < 0.001 ? result.primaryActive.toExponential(4) : this.formatNumber(result.primaryActive)}</div><div class="result-card-unit">imp/kWh</div></div><div class="result-card pulse-card"><div class="result-card-label">Secondary Active</div><div class="result-card-value">${this.formatNumber(result.secondaryActive)}</div><div class="result-card-unit">imp/kWh</div></div></div>`;
-        if (result.primaryReactive > 0) html += `<div class="result-grid-2"><div class="result-card pulse-card"><div class="result-card-label">Primary Reactive</div><div class="result-card-value">${this.formatNumber(result.primaryReactive)}</div><div class="result-card-unit">imp/kvarh</div></div><div class="result-card pulse-card"><div class="result-card-label">Secondary Reactive</div><div class="result-card-value">${this.formatNumber(result.secondaryReactive)}</div><div class="result-card-unit">imp/kvarh</div></div></div>`;
-        html += `<div class="action-buttons"><button class="btn-action btn-share" onclick="UIManager.shareCalculatorResult()">📤 Kongsi</button></div>`;
-        body.innerHTML = html;
-        this.addToHistory(result);
+    displayCalcResults(r) {
+        const p = document.getElementById('calcResultsPanel'), b = document.getElementById('calcResultsBody');
+        p.style.display = 'block'; p.style.animation = 'none'; p.offsetHeight; p.style.animation = 'fadeInUp 0.3s ease-out';
+        const l = { direct: 'DIRECT', ct: 'CT', ctvt: 'CT+VT' };
+        let h = `<div class="hero-result"><div class="hero-label">TOTAL MULTIPLIER</div><div class="hero-value">${this.formatNumber(r.totalMultiplier)}</div><div class="hero-sub">${l[r.mode]} • ${r.supply} • Cl.${r.meterClass}</div></div>`;
+        if (r.mode !== 'direct') { h += `<div class="result-grid-2"><div class="result-card"><div class="result-card-label">CT Ratio</div><div class="result-card-value">${this.formatNumber(r.ctRatio)} : 1</div></div>`; if (r.mode === 'ctvt') h += `<div class="result-card"><div class="result-card-label">VT Ratio</div><div class="result-card-value">${this.formatNumber(r.vtRatio)} : 1</div></div>`; h += `</div>`; }
+        h += `<div class="section-divider"><div class="divider-line"></div><span class="divider-text">PULSE CONSTANTS</span><div class="divider-line"></div></div><div class="result-grid-2"><div class="result-card pulse-card"><div class="result-card-label">Primary Active</div><div class="result-card-value">${r.primaryActive < 0.001 ? r.primaryActive.toExponential(4) : this.formatNumber(r.primaryActive)}</div><div class="result-card-unit">imp/kWh</div></div><div class="result-card pulse-card"><div class="result-card-label">Secondary Active</div><div class="result-card-value">${this.formatNumber(r.secondaryActive)}</div><div class="result-card-unit">imp/kWh</div></div></div>`;
+        if (r.primaryReactive > 0) h += `<div class="result-grid-2"><div class="result-card pulse-card"><div class="result-card-label">Primary Reactive</div><div class="result-card-value">${this.formatNumber(r.primaryReactive)}</div><div class="result-card-unit">imp/kvarh</div></div><div class="result-card pulse-card"><div class="result-card-label">Secondary Reactive</div><div class="result-card-value">${this.formatNumber(r.secondaryReactive)}</div><div class="result-card-unit">imp/kvarh</div></div></div>`;
+        h += `<div class="action-buttons"><button class="btn-action btn-share" onclick="UIManager.shareCalculatorResult()">📤 Kongsi</button></div>`;
+        b.innerHTML = h; this.addToHistory(r);
     },
 
     calculateEnergy() {
         const pc = parseFloat(document.getElementById('energyPulseCount').value), pConst = parseFloat(document.getElementById('energyPulseConst').value), mult = parseFloat(document.getElementById('energyMultiplier').value) || 1, unit = document.getElementById('energyUnit').value;
         if (!pc || pc < 0) { UIManager.showToast(UIManager.t('errPulseCount'), 'error'); return; }
         if (!pConst || pConst <= 0) { UIManager.showToast(UIManager.t('errPulseConst'), 'error'); return; }
-        let energy = (pc / pConst) * mult; if (unit === 'MWh') energy /= 1000;
+        let e = (pc / pConst) * mult; if (unit === 'MWh') e /= 1000;
         document.getElementById('energyResult').style.display = 'block';
-        document.getElementById('energyResultValue').textContent = this.formatEnergy(energy, unit);
-        this.addToHistory({ type: 'energy', pulseCount: pc, pulseConst: pConst, multiplier: mult, unit, result: energy, timestamp: new Date().toISOString() });
+        document.getElementById('energyResultValue').textContent = this.formatEnergy(e, unit);
+        this.addToHistory({ type: 'energy', pulseCount: pc, pulseConst: pConst, multiplier: mult, unit, result: e, timestamp: new Date().toISOString() });
         UIManager.showToast(UIManager.t('energyDone'), 'success');
     },
 
     calculateDialTest() {
-        const unit = document.getElementById('dialUnit').value, meterClass = document.getElementById('dialClass').value, pConst = parseFloat(document.getElementById('dialPulseConst').value), mult = parseFloat(document.getElementById('dialMultiplier').value) || 1;
-        const pulseCount = parseFloat(document.getElementById('dialPulseCount').value), start = parseFloat(document.getElementById('dialStart').value), end = parseFloat(document.getElementById('dialEnd').value), realPulse = parseFloat(document.getElementById('dialRealPulse').value);
+        const unit = document.getElementById('dialUnit').value, mc = document.getElementById('dialClass').value, pConst = parseFloat(document.getElementById('dialPulseConst').value), mult = parseFloat(document.getElementById('dialMultiplier').value) || 1;
+        const pc = parseFloat(document.getElementById('dialPulseCount').value), start = parseFloat(document.getElementById('dialStart').value), end = parseFloat(document.getElementById('dialEnd').value), rp = parseFloat(document.getElementById('dialRealPulse').value);
         if (!pConst || pConst <= 0) { UIManager.showToast(UIManager.t('errPulseConst'), 'error'); return; }
-        if (!pulseCount || pulseCount < 0) { UIManager.showToast(UIManager.t('errPulseCountWS'), 'error'); return; }
+        if (!pc || pc < 0) { UIManager.showToast(UIManager.t('errPulseCountWS'), 'error'); return; }
         if (isNaN(start)) { UIManager.showToast(UIManager.t('errStart'), 'error'); return; }
         if (isNaN(end)) { UIManager.showToast(UIManager.t('errEnd'), 'error'); return; }
         if (end <= start) { UIManager.showToast(UIManager.t('errEndLess'), 'error'); return; }
-        if (!realPulse || realPulse < 0) { UIManager.showToast(UIManager.t('errRealPulse'), 'error'); return; }
-        const reference = (pulseCount / pConst) * mult, difference = end - start, calculatedPulse = difference * pConst;
-        const errorEnergy = ((difference - reference) / reference) * 100, errorPulse = ((realPulse - calculatedPulse) / calculatedPulse) * 100;
-        const limits = { '0.2S': 0.2, '0.5S': 0.5, '0.5': 0.5, '1': 1, '2': 2 }, limit = limits[meterClass] || 1, passed = Math.abs(errorEnergy) <= limit;
-        const constCheck = realPulse / difference;
+        if (!rp || rp < 0) { UIManager.showToast(UIManager.t('errRealPulse'), 'error'); return; }
+        const ref = (pc / pConst) * mult, diff = end - start, calcP = diff * pConst;
+        const errE = ((diff - ref) / ref) * 100, errP = ((rp - calcP) / calcP) * 100;
+        const limits = { '0.2S': 0.2, '0.5S': 0.5, '0.5': 0.5, '1': 1, '2': 2 }, limit = limits[mc] || 1, passed = Math.abs(errE) <= limit;
         document.getElementById('dialResult').style.display = 'block';
-        document.getElementById('dialResultContent').innerHTML = `
-            <div class="dial-results">
-                <div class="dial-row"><span>📐 Reference Energy</span><strong>${this.formatEnergy(reference, unit)}</strong></div>
-                <div class="dial-row"><span>📐 Difference</span><strong>${this.formatEnergy(difference, unit)}</strong></div>
-                <div class="dial-row"><span>📐 Calculated Pulse</span><strong>${this.formatNumber(calculatedPulse)}</strong></div>
-                <div class="dial-row"><span>📊 Error (%)</span><strong style="color:${passed?'var(--green)':'var(--red)'}">${errorEnergy.toFixed(4)}% ${passed?'✅':'❌'}</strong></div>
-                <div class="dial-row"><span>📊 Error Pulse (%)</span><strong style="color:${Math.abs(errorPulse)<=limit?'var(--green)':'var(--red)'}">${errorPulse.toFixed(4)}% ${Math.abs(errorPulse)<=limit?'✅':'❌'}</strong></div>
-                <div class="dial-row"><span>🔍 Constant Check</span><strong>${this.formatNumber(constCheck)} imp/${unit}</strong></div>
-            </div>`;
-        this.addToHistory({ type: 'accuracy', unit, meterClass, pConst, mult, pulseCount, start, end, realPulse, reference, difference, calculatedPulse, errorEnergy, errorPulse, passed, constCheck, timestamp: new Date().toISOString() });
+        document.getElementById('dialResultContent').innerHTML = `<div class="dial-results"><div class="dial-row"><span>📐 Reference Energy</span><strong>${this.formatEnergy(ref, unit)}</strong></div><div class="dial-row"><span>📐 Difference</span><strong>${this.formatEnergy(diff, unit)}</strong></div><div class="dial-row"><span>📐 Calculated Pulse</span><strong>${this.formatNumber(calcP)}</strong></div><div class="dial-row"><span>📊 Error (%)</span><strong style="color:${passed?'var(--green)':'var(--red)'}">${errE.toFixed(4)}% ${passed?'✅':'❌'}</strong></div><div class="dial-row"><span>📊 Error Pulse (%)</span><strong style="color:${Math.abs(errP)<=limit?'var(--green)':'var(--red)'}">${errP.toFixed(4)}% ${Math.abs(errP)<=limit?'✅':'❌'}</strong></div><div class="dial-row"><span>🔍 Constant Check</span><strong>${this.formatNumber(rp/diff)} imp/${unit}</strong></div></div>`;
+        this.addToHistory({ type: 'accuracy', unit, meterClass: mc, pConst, mult, pulseCount: pc, start, end, realPulse: rp, reference: ref, difference: diff, calculatedPulse: calcP, errorEnergy: errE, errorPulse: errP, passed, constCheck: rp/diff, timestamp: new Date().toISOString() });
         UIManager.showToast(passed ? UIManager.t('dialPass') : UIManager.t('dialFail'), passed ? 'success' : 'error');
     },
 
@@ -142,40 +111,38 @@ const Calculator = {
     },
 
     attachLiveListeners() {
-        const update = () => {
+        const u = () => {
             const ctP = parseFloat(document.getElementById('ctPrimary').value), ctS = parseFloat(document.getElementById('ctSecondary').value);
-            if (this.currentMode === 'ct' || this.currentMode === 'ctvt') {
-                document.getElementById('ctLiveRatio').style.display = 'flex';
-                document.getElementById('ctLiveRatioValue').textContent = (ctP && ctS && ctS > 0) ? (ctP/ctS).toFixed(2) + ' : 1' : '-';
-            } else document.getElementById('ctLiveRatio').style.display = 'none';
+            if (this.currentMode === 'ct' || this.currentMode === 'ctvt') { document.getElementById('ctLiveRatio').style.display = 'flex'; document.getElementById('ctLiveRatioValue').textContent = (ctP && ctS && ctS > 0) ? (ctP/ctS).toFixed(2)+' : 1' : '-'; }
+            else document.getElementById('ctLiveRatio').style.display = 'none';
             const vtP = parseFloat(document.getElementById('vtPrimary').value), vtS = parseFloat(document.getElementById('vtSecondary').value);
-            if (this.currentMode === 'ctvt') {
-                document.getElementById('vtLiveRatio').style.display = 'flex';
-                document.getElementById('vtLiveRatioValue').textContent = (vtP && vtS && vtS > 0) ? (vtP/vtS).toFixed(2) + ' : 1' : '-';
-            } else document.getElementById('vtLiveRatio').style.display = 'none';
+            if (this.currentMode === 'ctvt') { document.getElementById('vtLiveRatio').style.display = 'flex'; document.getElementById('vtLiveRatioValue').textContent = (vtP && vtS && vtS > 0) ? (vtP/vtS).toFixed(2)+' : 1' : '-'; }
+            else document.getElementById('vtLiveRatio').style.display = 'none';
         };
-        ['ctPrimary','ctSecondary','vtPrimary','vtSecondary'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', update); });
+        ['ctPrimary','ctSecondary','vtPrimary','vtSecondary'].forEach(id => { const el = document.getElementById(id); if(el) el.addEventListener('input', u); });
     },
     updateLiveRatios() {},
 
-    addToHistory(entry) { this.history.unshift({ id: Date.now(), ...entry }); if (this.history.length > 50) this.history.pop(); this.saveHistory(); this.renderHistory(); },
+    addToHistory(e) { this.history.unshift({ id: Date.now(), ...e }); if (this.history.length > 50) this.history.pop(); this.saveHistory(); this.renderHistory(); },
     saveHistory() { try { localStorage.setItem('metercalc_pro_history', JSON.stringify(this.history)); } catch(e){} },
     loadHistory() { try { const s = localStorage.getItem('metercalc_pro_history'); if(s) this.history = JSON.parse(s); } catch(e) { this.history = []; } },
-    deleteHistoryItem(id) { this.history = this.history.filter(h => h.id !== id); this.saveHistory(); this.renderHistory(); UIManager.showToast('🗑️ Rekod dipadam', 'success'); },
+    deleteHistoryItem(id) { this.history = this.history.filter(h => h.id !== id); this.saveHistory(); this.renderHistory(); UIManager.showToast('🗑️ ' + (UIManager.currentLang === 'bm' ? 'Rekod dipadam' : 'Record deleted'), 'success'); },
+
     renderHistory() {
-        const c = document.getElementById('historyList'), btn = document.getElementById('btnClearHistory');
-        if (!this.history.length) { c.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><p>Tiada rekod</p></div>'; btn.style.display = 'none'; return; }
+        const c = document.getElementById('historyList'), btn = document.getElementById('btnClearHistory'), lang = UIManager.currentLang;
+        if (!this.history.length) { c.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><p>' + (lang === 'bm' ? 'Tiada rekod' : 'No records') + '</p></div>'; btn.style.display = 'none'; return; }
         btn.style.display = 'inline-block';
         c.innerHTML = this.history.slice(0, 30).map(h => {
             const d = new Date(h.timestamp), ts = d.toLocaleDateString('ms-MY') + ' ' + d.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-            let typeLabel = '', dotClass = '', detail = '', value = '';
-            if (h.type === 'calculator') { typeLabel = '🔌 ' + (h.mode||'DIRECT').toUpperCase(); dotClass = h.mode||'direct'; detail = 'M=' + this.formatNumber(h.totalMultiplier) + ' | ' + h.supply + ' Cl.' + h.meterClass; value = this.formatNumber(h.primaryActive) + ' imp/kWh'; }
-            else if (h.type === 'energy') { typeLabel = '🔢 Tenaga'; dotClass = 'energy'; detail = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); value = this.formatEnergy(h.result, h.unit||'kWh'); }
-            else if (h.type === 'accuracy') { typeLabel = '📊 Accuracy Test'; dotClass = 'accuracy'; detail = 'Ref:' + this.formatEnergy(h.reference) + ' Diff:' + this.formatEnergy(h.difference); value = h.errorEnergy.toFixed(4) + '% ' + (h.passed?'✅':'❌'); }
-            else if (h.type === 'demand') { typeLabel = '🕐 MD'; dotClass = 'demand'; detail = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); value = this.formatNumber(h.result) + ' kW'; }
-            return `<div class="history-item" id="history-${h.id}" ontouchstart="Calculator.startLongPress(event, ${h.id})" ontouchend="Calculator.cancelLongPress()" ontouchmove="Calculator.cancelLongPress()" onmousedown="Calculator.startLongPress(event, ${h.id})" onmouseup="Calculator.cancelLongPress()" onmouseleave="Calculator.cancelLongPress()" onclick="Calculator.handleHistoryClick(event, ${h.id})"><div class="history-left"><div class="history-dot ${dotClass}"></div><div class="history-info"><div class="history-type">${typeLabel}</div><div class="history-detail">${detail}</div></div></div><div class="history-right"><div class="history-value">${value}</div><div class="history-time">${ts}</div></div><button class="history-delete-mobile" onclick="event.stopPropagation();Calculator.deleteHistoryItem(${h.id})">✕</button></div>`;
+            let tl = '', dc = '', dt = '', v = '';
+            if (h.type === 'calculator') { tl = '🔌 ' + (h.mode||'DIRECT').toUpperCase(); dc = h.mode||'direct'; dt = 'M=' + this.formatNumber(h.totalMultiplier) + ' | ' + h.supply + ' Cl.' + h.meterClass; v = this.formatNumber(h.primaryActive) + ' imp/kWh'; }
+            else if (h.type === 'energy') { tl = lang === 'bm' ? '🔢 Tenaga' : '🔢 Energy'; dc = 'energy'; dt = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); v = this.formatEnergy(h.result, h.unit||'kWh'); }
+            else if (h.type === 'accuracy') { tl = '📊 Accuracy Test'; dc = 'accuracy'; dt = 'Ref:' + this.formatEnergy(h.reference) + ' Diff:' + this.formatEnergy(h.difference); v = h.errorEnergy.toFixed(4) + '% ' + (h.passed?'✅':'❌'); }
+            else if (h.type === 'demand') { tl = '🕐 MD'; dc = 'demand'; dt = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); v = this.formatNumber(h.result) + ' kW'; }
+            return `<div class="history-item" id="history-${h.id}" ontouchstart="Calculator.startLongPress(event, ${h.id})" ontouchend="Calculator.cancelLongPress()" ontouchmove="Calculator.cancelLongPress()" onmousedown="Calculator.startLongPress(event, ${h.id})" onmouseup="Calculator.cancelLongPress()" onmouseleave="Calculator.cancelLongPress()" onclick="Calculator.handleHistoryClick(event, ${h.id})"><div class="history-left"><div class="history-dot ${dc}"></div><div class="history-info"><div class="history-type">${tl}</div><div class="history-detail">${dt}</div></div></div><div class="history-right"><div class="history-value">${v}</div><div class="history-time">${ts}</div></div><button class="history-delete-mobile" onclick="event.stopPropagation();Calculator.deleteHistoryItem(${h.id})">✕</button></div>`;
         }).join('');
     },
+
     exportHistoryCSV() {
         let csv = 'Type,Date,Detail,Value\n';
         this.history.forEach(h => {
@@ -188,6 +155,6 @@ const Calculator = {
         return csv;
     },
 
-    formatNumber(num) { if (num === undefined || num === null) return '-'; if (Number.isInteger(num)) return num.toLocaleString('ms-MY'); return parseFloat(num.toFixed(6)).toString(); },
+    formatNumber(n) { if (n === undefined || n === null) return '-'; if (Number.isInteger(n)) return n.toLocaleString('ms-MY'); return parseFloat(n.toFixed(6)).toString(); },
     formatEnergy(kWh, unit) { unit = unit || 'kWh'; if (unit === 'MWh') return kWh.toFixed(4) + ' MWh'; if (kWh >= 1) return kWh.toFixed(2) + ' ' + unit; if (kWh >= 0.1) return kWh.toFixed(3) + ' ' + unit; if (kWh >= 0.01) return kWh.toFixed(4) + ' ' + unit; if (kWh >= 0.001) return kWh.toFixed(5) + ' ' + unit; return kWh.toFixed(6) + ' ' + unit; }
 };
