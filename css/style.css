@@ -155,31 +155,3 @@ select.input-field { cursor:pointer; background-image:url("data:image/svg+xml,%3
 
 @media (min-width:520px) { .main-tabs { justify-content:center; } }
 @media (max-width:360px) { .hero-value { font-size:2.2rem; } .calc-result-value { font-size:2rem; } .input-row-2 { grid-template-columns:1fr; } }
-
-/* ============ WIRING DIAGRAMS ============ */
-.wiring-card {
-    background: var(--bg2);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-sm);
-    padding: 14px;
-    margin-bottom: 12px;
-}
-.wiring-title {
-    font-size: 0.8rem;
-    font-weight: 700;
-    color: var(--accent);
-    margin-bottom: 2px;
-}
-.wiring-desc {
-    font-size: 0.7rem;
-    color: var(--text2);
-    margin-bottom: 10px;
-}
-.wiring-svg {
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    background: #0d1117;
-    border-radius: 8px;
-    padding: 8px;
-}
