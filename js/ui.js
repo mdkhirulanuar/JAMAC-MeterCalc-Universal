@@ -107,14 +107,57 @@ const UIManager = {
             historyBtns[2].textContent = lang === 'bm' ? 'Padam Semua' : 'Clear All';
         }
 
-        // Reference titles
+        // Reference section titles
         const refTitles = document.querySelectorAll('#referencePanel .ref-title');
-        if (refTitles.length >= 5) {
+        if (refTitles.length >= 6) {
             refTitles[0].textContent = 'Standard CT Ratios';
             refTitles[1].textContent = 'Standard VT Ratios';
             refTitles[2].textContent = 'Standard Meter Constants';
             refTitles[3].textContent = 'Class Limits';
-            refTitles[4].textContent = lang === 'bm' ? '📏 Decimal Point Rules' : '📏 Decimal Point Rules';
+            refTitles[4].textContent = '📏 Decimal Point Rules';
+            refTitles[5].textContent = lang === 'bm' ? '📊 Contoh Nilai M (Multiplier)' : '📊 Multiplier (M) Examples';
+        }
+
+        // Reference tables
+        const refTables = document.querySelectorAll('#referencePanel .ref-table');
+        
+        // Class Limits table (index 0)
+        if (refTables[0]) {
+            const headers = refTables[0].querySelectorAll('th');
+            if (headers.length >= 2) {
+                headers[1].textContent = lang === 'bm' ? 'Had' : 'Limit';
+            }
+        }
+
+        // Decimal Point table (index 1)
+        if (refTables[1]) {
+            const headers = refTables[1].querySelectorAll('th');
+            if (headers.length >= 2) {
+                headers[0].textContent = lang === 'bm' ? 'Julat' : 'Range';
+            }
+        }
+
+        // Multiplier table (index 2)
+        if (refTables[2]) {
+            const headers = refTables[2].querySelectorAll('th');
+            if (headers.length >= 4) {
+                headers[0].textContent = lang === 'bm' ? 'Jenis Meter' : 'Meter Type';
+            }
+            refTables[2].querySelectorAll('td').forEach(td => {
+                if (td.textContent.trim() === 'Tiada' && lang === 'en') {
+                    td.textContent = 'None';
+                } else if (td.textContent.trim() === 'None' && lang === 'bm') {
+                    td.textContent = 'Tiada';
+                }
+            });
+        }
+
+        // Multiplier guide footer
+        const multiplierInfo = document.querySelector('#referencePanel .ref-section:last-child p:last-child');
+        if (multiplierInfo) {
+            multiplierInfo.innerHTML = lang === 'bm'
+                ? '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain'
+                : '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Use Calculator tab</strong> to calculate M for other CT/VT';
         }
 
         // Footer
