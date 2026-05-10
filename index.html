@@ -177,16 +177,31 @@
                     <div class="ref-section"><h3 class="ref-title">Standard Meter Constants</h3><div class="ref-chips"><span class="ref-chip">1</span><span class="ref-chip">250</span><span class="ref-chip">500</span><span class="ref-chip">1000</span><span class="ref-chip">2000</span><span class="ref-chip">5000</span><span class="ref-chip">100000</span></div></div>
                     <div class="ref-section"><h3 class="ref-title">Class Limits</h3><table class="ref-table"><tr><th>Class</th><th>Had</th></tr><tr><td>0.2S</td><td>±0.2%</td></tr><tr><td>0.5S</td><td>±0.5%</td></tr><tr><td>0.5</td><td>±0.5%</td></tr><tr><td>1</td><td>±1%</td></tr><tr><td>2</td><td>±2%</td></tr></table></div>
                     <div class="ref-section"><h3 class="ref-title">📏 Decimal Point Rules</h3><table class="ref-table"><tr><th>Julat</th><th>DP</th></tr><tr><td>≥1</td><td>2</td></tr><tr><td>0.1-0.999</td><td>3</td></tr><tr><td>0.01-0.099</td><td>4</td></tr><tr><td>0.001-0.0099</td><td>5</td></tr><tr><td>&lt;0.001</td><td>6</td></tr></table></div>
+                    <div class="ref-section">
+                        <h3 class="ref-title">📊 Contoh Nilai M (Multiplier)</h3>
+                        <table class="ref-table">
+                            <tr><th>Jenis Meter</th><th>CT</th><th>VT</th><th>M</th></tr>
+                            <tr><td>Domestik (direct)</td><td>Tiada</td><td>Tiada</td><td><strong>1</strong></td></tr>
+                            <tr><td>Kedai (CT)</td><td>200/5A</td><td>Tiada</td><td><strong>40</strong></td></tr>
+                            <tr><td>Kilang kecil (CT)</td><td>800/5A</td><td>Tiada</td><td><strong>160</strong></td></tr>
+                            <tr><td>Kilang besar (CT)</td><td>2000/5A</td><td>Tiada</td><td><strong>400</strong></td></tr>
+                            <tr><td>HV Consumer (CT+VT)</td><td>100/5A</td><td>11kV/110V</td><td><strong>2,000</strong></td></tr>
+                            <tr><td>Data Center (CT+VT)</td><td>50/5A</td><td>33kV/110V</td><td><strong>3,000</strong></td></tr>
+                        </table>
+                        <p style="font-size:0.7rem;color:var(--text2);margin-top:8px;">
+                            💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>
+                            💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain
+                        </p>
+                    </div>
                 </div>
             </section>
 
         </main>
 
         <!-- Footer -->
-        <<!-- Footer -->
-<footer class="app-footer">
-    <p data-lang="footerText">MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong></p>
-</footer>
+        <footer class="app-footer">
+            <p data-lang="footerText">MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong></p>
+        </footer>
 
         <div id="toast" class="toast"></div>
     </div>
