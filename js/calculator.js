@@ -1,6 +1,8 @@
 const Calculator = {
     currentMode: 'direct',
     history: [],
+    longPressTimer: null,
+    longPressId: null,
 
     init() { this.loadHistory(); this.renderHistory(); this.attachLiveListeners(); this.attachInputValidators(); },
 
@@ -11,6 +13,37 @@ const Calculator = {
     },
 
     getValidNumber(id) { const el = document.getElementById(id); if (!el) return null; const val = parseFloat(el.value); return (isNaN(val) || val < 0) ? null : val; },
+
+    // ============ LONG PRESS HANDLERS ============
+    startLongPress(event, id) {
+        this.longPressId = id;
+        this.longPressTimer = setTimeout(() => {
+            const item = document.getElementById('history-' + id);
+            if (item) {
+                item.classList.add('show-delete');
+                if (navigator.vibrate) navigator.vibrate(15);
+            }
+        }, 600);
+        event.preventDefault();
+    },
+
+    cancelLongPress() {
+        clearTimeout(this.longPressTimer);
+        this.longPressTimer = null;
+    },
+
+    handleHistoryClick(event, id) {
+        // Ignore if delete button was clicked
+        if (event.target.closest('.history-delete-mobile')) return;
+        
+        // Hide all delete buttons
+        document.querySelectorAll('.history-item.show-delete').forEach(item => {
+            item.classList.remove('show-delete');
+        });
+        
+        this.longPressId = null;
+        clearTimeout(this.longPressTimer);
+    },
 
     calculate() {
         const meterConstActive = this.getValidNumber('meterConstActive') || 0;
@@ -128,7 +161,7 @@ const Calculator = {
     addToHistory(entry) { this.history.unshift({ id: Date.now(), ...entry }); if (this.history.length > 50) this.history.pop(); this.saveHistory(); this.renderHistory(); },
     saveHistory() { try { localStorage.setItem('metercalc_pro_history', JSON.stringify(this.history)); } catch(e){} },
     loadHistory() { try { const s = localStorage.getItem('metercalc_pro_history'); if(s) this.history = JSON.parse(s); } catch(e) { this.history = []; } },
-    deleteHistoryItem(id) { this.history = this.history.filter(h => h.id !== id); this.saveHistory(); this.renderHistory(); },
+    deleteHistoryItem(id) { this.history = this.history.filter(h => h.id !== id); this.saveHistory(); this.renderHistory(); UIManager.showToast('🗑️ Rekod dipadam', 'success'); },
     renderHistory() {
         const c = document.getElementById('historyList'), btn = document.getElementById('btnClearHistory');
         if (!this.history.length) { c.innerHTML = '<div class="empty-state"><span class="empty-icon">📭</span><p>Tiada rekod</p></div>'; btn.style.display = 'none'; return; }
@@ -140,7 +173,7 @@ const Calculator = {
             else if (h.type === 'energy') { typeLabel = '🔢 Tenaga'; dotClass = 'energy'; detail = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); value = this.formatEnergy(h.result, h.unit||'kWh'); }
             else if (h.type === 'accuracy') { typeLabel = '📊 Accuracy Test'; dotClass = 'accuracy'; detail = 'Ref:' + this.formatEnergy(h.reference) + ' Diff:' + this.formatEnergy(h.difference); value = h.errorEnergy.toFixed(4) + '% ' + (h.passed?'✅':'❌'); }
             else if (h.type === 'demand') { typeLabel = '🕐 MD'; dotClass = 'demand'; detail = this.formatNumber(h.pulseCount) + ' ÷ ' + this.formatNumber(h.pulseConst) + ' × ' + this.formatNumber(h.multiplier); value = this.formatNumber(h.result) + ' kW'; }
-            return `<div class="history-item"><div class="history-left"><div class="history-dot ${dotClass}"></div><div class="history-info"><div class="history-type">${typeLabel}</div><div class="history-detail">${detail}</div></div></div><div class="history-right"><div class="history-value">${value}</div><div class="history-time">${ts}</div></div><button class="history-delete" onclick="event.stopPropagation();Calculator.deleteHistoryItem(${h.id})">✕</button></div>`;
+            return `<div class="history-item" id="history-${h.id}" ontouchstart="Calculator.startLongPress(event, ${h.id})" ontouchend="Calculator.cancelLongPress()" ontouchmove="Calculator.cancelLongPress()" onmousedown="Calculator.startLongPress(event, ${h.id})" onmouseup="Calculator.cancelLongPress()" onmouseleave="Calculator.cancelLongPress()" onclick="Calculator.handleHistoryClick(event, ${h.id})"><div class="history-left"><div class="history-dot ${dotClass}"></div><div class="history-info"><div class="history-type">${typeLabel}</div><div class="history-detail">${detail}</div></div></div><div class="history-right"><div class="history-value">${value}</div><div class="history-time">${ts}</div></div><button class="history-delete-mobile" onclick="event.stopPropagation();Calculator.deleteHistoryItem(${h.id})">✕</button></div>`;
         }).join('');
     },
     exportHistoryCSV() {
