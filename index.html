@@ -71,14 +71,14 @@
                 <div class="panel-header">
                     <h2>📋 Parameter Input</h2>
                     <div class="snap-btns">
-                        <button class="snap-btn" onclick="SnapManager.openCamera('calculator')" title="Snap Meter">📸</button>
+                        <button class="snap-btn" onclick="SnapManager.openCamera('calculator')" title="Snap">📸</button>
                         <button class="snap-btn" onclick="SnapManager.openGallery('calculator')" title="Gallery">🖼️</button>
                     </div>
                 </div>
                 <nav class="mode-tabs">
-                    <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchCalcMode('direct')"><span>DIRECT</span></button>
-                    <button class="mode-tab" data-mode="ct" onclick="UIManager.switchCalcMode('ct')"><span>CT</span></button>
-                    <button class="mode-tab" data-mode="ctvt" onclick="UIManager.switchCalcMode('ctvt')"><span>CT+VT</span></button>
+                    <button class="mode-tab active" data-mode="direct" onclick="UIManager.switchCalcMode('direct')"><span class="mode-label">DIRECT</span></button>
+                    <button class="mode-tab" data-mode="ct" onclick="UIManager.switchCalcMode('ct')"><span class="mode-label">CT</span></button>
+                    <button class="mode-tab" data-mode="ctvt" onclick="UIManager.switchCalcMode('ctvt')"><span class="mode-label">CT+VT</span></button>
                 </nav>
                 <div class="panel-body">
                     <div class="input-block">
@@ -91,7 +91,7 @@
                     </div>
                     <div class="input-row-2">
                         <div class="input-block"><label class="input-label">Jenis Supply</label><select id="supplyType" class="input-field"><option value="1P2W">1 Fasa (1P2W)</option><option value="3P3W">3 Fasa (3P3W)</option><option value="3P4W" selected>3 Fasa (3P4W)</option></select></div>
-                        <div class="input-block"><label class="input-label">Class Meter</label><select id="meterClass" class="input-field"><option value="0.2S">0.2S</option><option value="0.5S">0.5S</option><option value="0.5">0.5</option><option value="1" selected>1</option><option value="2">2</option></select></div>
+                        <div class="input-block"><label class="input-label">Class Meter</label><select id="meterClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select></div>
                     </div>
                     <div class="section-divider" id="ctSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">CURRENT TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="ctInputSection" style="display:none;">
@@ -115,7 +115,7 @@
                 <div class="panel-header">
                     <h2>🔢 Pulse → Tenaga</h2>
                     <div class="snap-btns">
-                        <button class="snap-btn" onclick="SnapManager.openCamera('energy')" title="Snap Meter">📸</button>
+                        <button class="snap-btn" onclick="SnapManager.openCamera('energy')" title="Snap">📸</button>
                         <button class="snap-btn" onclick="SnapManager.openGallery('energy')" title="Gallery">🖼️</button>
                     </div>
                 </div>
@@ -137,14 +137,14 @@
                 <div class="panel-header">
                     <h2>📊 Accuracy Test</h2>
                     <div class="snap-btns">
-                        <button class="snap-btn" onclick="SnapManager.openCamera('accuracy')" title="Snap Meter">📸</button>
+                        <button class="snap-btn" onclick="SnapManager.openCamera('accuracy')" title="Snap">📸</button>
                         <button class="snap-btn" onclick="SnapManager.openGallery('accuracy')" title="Gallery">🖼️</button>
                     </div>
                 </div>
                 <div class="panel-body">
                     <div class="input-row-2">
                         <div class="input-block"><label class="input-label">Unit</label><select id="dialUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option></select></div>
-                        <div class="input-block"><label class="input-label">Class</label><select id="dialClass" class="input-field"><option value="0.2S">0.2S</option><option value="0.5S">0.5S</option><option value="0.5">0.5</option><option value="1" selected>1</option><option value="2">2</option></select></div>
+                        <div class="input-block"><label class="input-label">Class</label><select id="dialClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select></div>
                     </div>
                     <div class="input-row-2">
                         <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="dialPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"></div>
@@ -167,7 +167,7 @@
                 <div class="panel-header">
                     <h2>🕐 Maximum Demand</h2>
                     <div class="snap-btns">
-                        <button class="snap-btn" onclick="SnapManager.openCamera('demand')" title="Snap Meter">📸</button>
+                        <button class="snap-btn" onclick="SnapManager.openCamera('demand')" title="Snap">📸</button>
                         <button class="snap-btn" onclick="SnapManager.openGallery('demand')" title="Gallery">🖼️</button>
                     </div>
                 </div>
@@ -200,9 +200,9 @@
             <section class="panel" id="referencePanel" style="display:none;">
                 <div class="panel-header"><h2>📚 Rujukan Pantas</h2></div>
                 <div class="panel-body">
-                    <div class="ref-section"><h3 class="ref-title">Standard CT Ratios</h3><div class="ref-chips"><span>100/5A</span><span>200/5A</span><span>400/5A</span><span>600/5A</span><span>800/5A</span><span>1000/5A</span><span>1200/5A</span><span>1600/5A</span><span>2000/5A</span></div></div>
-                    <div class="ref-section"><h3 class="ref-title">Standard VT Ratios</h3><div class="ref-chips"><span>11kV/110V</span><span>22kV/110V</span><span>33kV/110V</span><span>66kV/110V</span></div></div>
-                    <div class="ref-section"><h3 class="ref-title">Standard Meter Constants</h3><div class="ref-chips"><span>1</span><span>250</span><span>500</span><span>1000</span><span>2000</span><span>5000</span><span>100000</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title">Standard CT Ratios</h3><div class="ref-chips"><span class="ref-chip">100/5A</span><span class="ref-chip">200/5A</span><span class="ref-chip">400/5A</span><span class="ref-chip">600/5A</span><span class="ref-chip">800/5A</span><span class="ref-chip">1000/5A</span><span class="ref-chip">1200/5A</span><span class="ref-chip">1600/5A</span><span class="ref-chip">2000/5A</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title">Standard VT Ratios</h3><div class="ref-chips"><span class="ref-chip">11kV/110V</span><span class="ref-chip">22kV/110V</span><span class="ref-chip">33kV/110V</span><span class="ref-chip">66kV/110V</span></div></div>
+                    <div class="ref-section"><h3 class="ref-title">Standard Meter Constants</h3><div class="ref-chips"><span class="ref-chip">1</span><span class="ref-chip">250</span><span class="ref-chip">500</span><span class="ref-chip">1000</span><span class="ref-chip">2000</span><span class="ref-chip">5000</span><span class="ref-chip">100000</span></div></div>
                     <div class="ref-section"><h3 class="ref-title">Class Limits</h3><table class="ref-table"><tr><th>Class</th><th>Had</th></tr><tr><td>0.2S</td><td>±0.2%</td></tr><tr><td>0.5S</td><td>±0.5%</td></tr><tr><td>0.5</td><td>±0.5%</td></tr><tr><td>1</td><td>±1%</td></tr><tr><td>2</td><td>±2%</td></tr></table></div>
                     <div class="ref-section"><h3 class="ref-title">📏 Decimal Point Rules</h3><table class="ref-table"><tr><th>Julat</th><th>DP</th></tr><tr><td>≥1</td><td>2</td></tr><tr><td>0.1-0.999</td><td>3</td></tr><tr><td>0.01-0.099</td><td>4</td></tr><tr><td>0.001-0.0099</td><td>5</td></tr><tr><td>&lt;0.001</td><td>6</td></tr></table></div>
                     <div class="ref-section">
