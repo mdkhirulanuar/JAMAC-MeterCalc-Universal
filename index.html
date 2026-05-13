@@ -81,8 +81,14 @@
                         <div class="input-wrap"><input type="number" id="meterConstReactive" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0"><span class="input-suffix">imp/kvarh</span></div>
                     </div>
                     <div class="input-row-2">
-                        <div class="input-block"><label class="input-label">Jenis Supply</label><select id="supplyType" class="input-field"><option value="1P2W">1 Fasa (1P2W)</option><option value="3P3W">3 Fasa (3P3W)</option><option value="3P4W" selected>3 Fasa (3P4W)</option></select></div>
-                        <div class="input-block"><label class="input-label">Class Meter</label><select id="meterClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select></div>
+                        <div class="input-block">
+                            <label class="input-label"><span id="lblSupplyType">Jenis Supply</span></label>
+                            <select id="supplyType" class="input-field"><option value="1P2W">1 Fasa (1P2W)</option><option value="3P3W">3 Fasa (3P3W)</option><option value="3P4W" selected>3 Fasa (3P4W)</option></select>
+                        </div>
+                        <div class="input-block">
+                            <label class="input-label"><span id="lblMeterClass">Class Meter</span></label>
+                            <select id="meterClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select>
+                        </div>
                     </div>
                     <div class="section-divider" id="ctSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">CURRENT TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="ctInputSection" style="display:none;">
@@ -106,7 +112,10 @@
                 <div class="panel-header"><h2>🔢 Pulse → Tenaga</h2></div>
                 <div class="panel-body">
                     <p class="panel-desc">Kira tenaga berdasarkan jumlah pulse diterima.</p>
-                    <div class="input-block"><label class="input-label">Unit Tenaga</label><select id="energyUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option><option value="MWh">MWh</option></select></div>
+                    <div class="input-block">
+                        <label class="input-label"><span id="lblEnergyUnit">Unit Tenaga</span></label>
+                        <select id="energyUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option><option value="MWh">MWh</option></select>
+                    </div>
                     <div class="input-block"><label class="input-label"><span>Pulse Count</span><span class="label-src">Test Output MUT</span></label><input type="number" id="energyPulseCount" class="input-field" placeholder="5000" inputmode="decimal" value="5000" min="0"></div>
                     <div class="input-row-2">
                         <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"></div>
@@ -199,7 +208,6 @@
 
         </main>
 
-        <!-- Footer -->
         <footer class="app-footer">
             <p data-lang="footerText">MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong></p>
         </footer>
