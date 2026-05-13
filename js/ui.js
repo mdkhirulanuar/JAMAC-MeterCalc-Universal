@@ -7,7 +7,14 @@ const LANG_DATA = {
         errPulseCountWS: '❌ Pulse Count (Reference Meter) mesti ≥ 0', errStart: '❌ Sila masukkan Start Reading', errEnd: '❌ Sila masukkan End Reading',
         errEndLess: '❌ End Reading mesti > Start Reading', errRealPulse: '❌ Test Pulse mesti ≥ 0',
         resetDone: '🔄 Semua dikosongkan!', historyCleared: '🗑️ Sejarah dipadamkan!', copied: '📋 Disalin!', csvDone: '📥 CSV dimuat turun!',
-        noResult: 'Tiada keputusan', confirmClear: 'Padam semua sejarah?', recordDeleted: '🗑️ Rekod dipadam'
+        noResult: 'Tiada keputusan', confirmClear: 'Padam semua sejarah?', recordDeleted: '🗑️ Rekod dipadam',
+        // Labels
+        supplyType: 'Jenis Supply', meterClass: 'Class Meter', energyUnit: 'Unit Tenaga',
+        supply1P2W: '1 Fasa (1P2W)', supply3P3W: '3 Fasa (3P3W)', supply3P4W: '3 Fasa (3P4W)',
+        // Multiplier table
+        mDomestik: 'Domestik (direct)', mKedai: 'Kedai (CT)', mKilangKecil: 'Kilang kecil (CT)',
+        mKilangBesar: 'Kilang besar (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
+        mTiada: 'Tiada'
     },
     en: {
         calcDone: '✅ Calculation complete!', energyDone: '✅ Energy calculated!', dialPass: '✅ PASS!', dialFail: '❌ FAIL!', mdDone: '✅ MD calculated!',
@@ -17,7 +24,14 @@ const LANG_DATA = {
         errPulseCountWS: '❌ Pulse Count (Reference Meter) must be ≥ 0', errStart: '❌ Please enter Start Reading', errEnd: '❌ Please enter End Reading',
         errEndLess: '❌ End Reading must be > Start Reading', errRealPulse: '❌ Test Pulse must be ≥ 0',
         resetDone: '🔄 All cleared!', historyCleared: '🗑️ History deleted!', copied: '📋 Copied!', csvDone: '📥 CSV downloaded!',
-        noResult: 'No results', confirmClear: 'Delete all history?', recordDeleted: '🗑️ Record deleted'
+        noResult: 'No results', confirmClear: 'Delete all history?', recordDeleted: '🗑️ Record deleted',
+        // Labels
+        supplyType: 'Supply Type', meterClass: 'Meter Class', energyUnit: 'Energy Unit',
+        supply1P2W: '1 Phase (1P2W)', supply3P3W: '3 Phase (3P3W)', supply3P4W: '3 Phase (3P4W)',
+        // Multiplier table
+        mDomestik: 'Domestic (direct)', mKedai: 'Shop (CT)', mKilangKecil: 'Small Factory (CT)',
+        mKilangBesar: 'Large Factory (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
+        mTiada: 'None'
     }
 };
 
@@ -35,6 +49,7 @@ const UIManager = {
 
     updateAllLabels() {
         const lang = this.currentLang;
+        const t = LANG_DATA[lang];
 
         // Tab labels
         const tabLabels = {
@@ -51,7 +66,7 @@ const UIManager = {
             if (labelSpan && tabLabels[panelId]) labelSpan.textContent = tabLabels[panelId];
         });
 
-        // Panel titles
+        // Panel titles + descriptions
         const titles = {
             'calculatorPanel': '📋 Parameter Input',
             'energyPanel': lang === 'bm' ? '🔢 Pulse → Tenaga' : '🔢 Pulse → Energy',
@@ -75,8 +90,8 @@ const UIManager = {
         // Results title
         const resultsPanel = document.getElementById('calcResultsPanel');
         if (resultsPanel) {
-            const resultH2 = resultsPanel.querySelector('.panel-header h2');
-            if (resultH2) resultH2.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
+            const h2 = resultsPanel.querySelector('.panel-header h2');
+            if (h2) h2.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
         }
 
         // Buttons
@@ -90,12 +105,33 @@ const UIManager = {
         if (mdBtn) mdBtn.textContent = lang === 'bm' ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
 
         // Result labels
-        const energyResultLabel = document.querySelector('#energyResult .calc-result-label');
-        if (energyResultLabel) energyResultLabel.textContent = lang === 'bm' ? 'Tenaga' : 'Energy';
-        const dialResultLabel = document.querySelector('#dialResult .calc-result-label');
-        if (dialResultLabel) dialResultLabel.textContent = lang === 'bm' ? 'Keputusan' : 'Results';
-        const mdResultLabel = document.querySelector('#demandResult .calc-result-label');
-        if (mdResultLabel) mdResultLabel.textContent = 'Maximum Demand';
+        const energyLabel = document.querySelector('#energyResult .calc-result-label');
+        if (energyLabel) energyLabel.textContent = lang === 'bm' ? 'Tenaga' : 'Energy';
+        const dialLabel = document.querySelector('#dialResult .calc-result-label');
+        if (dialLabel) dialLabel.textContent = lang === 'bm' ? 'Keputusan' : 'Results';
+        const mdLabel = document.querySelector('#demandResult .calc-result-label');
+        if (mdLabel) mdLabel.textContent = 'Maximum Demand';
+
+        // ============ INPUT LABELS ============
+        // Supply Type label
+        const supplyLabel = document.querySelector('#supplyType').closest('.input-block').querySelector('.input-label');
+        if (supplyLabel) supplyLabel.childNodes[0].textContent = t.supplyType;
+
+        // Supply Type dropdown options
+        const supplySelect = document.getElementById('supplyType');
+        if (supplySelect) {
+            supplySelect.options[0].textContent = t.supply1P2W;
+            supplySelect.options[1].textContent = t.supply3P3W;
+            supplySelect.options[2].textContent = t.supply3P4W;
+        }
+
+        // Meter Class label
+        const classLabel = document.querySelector('#meterClass').closest('.input-block').querySelector('.input-label');
+        if (classLabel) classLabel.childNodes[0].textContent = t.meterClass;
+
+        // Energy Unit label
+        const energyUnitLabel = document.querySelector('#energyUnit').closest('.input-block').querySelector('.input-label');
+        if (energyUnitLabel) energyUnitLabel.childNodes[0].textContent = t.energyUnit;
 
         // History empty & buttons
         const emptyState = document.querySelector('#historyList .empty-state p');
@@ -107,7 +143,7 @@ const UIManager = {
             historyBtns[2].textContent = lang === 'bm' ? 'Padam Semua' : 'Clear All';
         }
 
-        // Reference section titles
+        // ============ REFERENCE PANEL ============
         const refTitles = document.querySelectorAll('#referencePanel .ref-title');
         if (refTitles.length >= 6) {
             refTitles[0].textContent = 'Standard CT Ratios';
@@ -118,20 +154,34 @@ const UIManager = {
             refTitles[5].textContent = lang === 'bm' ? '📊 Contoh Nilai M (Multiplier)' : '📊 Multiplier (M) Examples';
         }
 
-        // Reference tables
         const refTables = document.querySelectorAll('#referencePanel .ref-table');
         
+        // Class Limits table
         if (refTables[0]) {
-            const headers = refTables[0].querySelectorAll('th');
-            if (headers.length >= 2) headers[1].textContent = lang === 'bm' ? 'Had' : 'Limit';
+            const h = refTables[0].querySelectorAll('th');
+            if (h.length >= 2) h[1].textContent = lang === 'bm' ? 'Had' : 'Limit';
         }
+        // Decimal Point table
         if (refTables[1]) {
-            const headers = refTables[1].querySelectorAll('th');
-            if (headers.length >= 2) headers[0].textContent = lang === 'bm' ? 'Julat' : 'Range';
+            const h = refTables[1].querySelectorAll('th');
+            if (h.length >= 2) h[0].textContent = lang === 'bm' ? 'Julat' : 'Range';
         }
+        // Multiplier table
         if (refTables[2]) {
-            const headers = refTables[2].querySelectorAll('th');
-            if (headers.length >= 4) headers[0].textContent = lang === 'bm' ? 'Jenis Meter' : 'Meter Type';
+            const h = refTables[2].querySelectorAll('th');
+            if (h.length >= 4) h[0].textContent = lang === 'bm' ? 'Jenis Meter' : 'Meter Type';
+            
+            const rows = refTables[2].querySelectorAll('tr');
+            const mKeys = ['mDomestik', 'mKedai', 'mKilangKecil', 'mKilangBesar', 'mHV', 'mData'];
+            for (let i = 1; i <= 6; i++) {
+                if (rows[i]) {
+                    const firstCell = rows[i].querySelector('td');
+                    if (firstCell) {
+                        firstCell.innerHTML = '<strong>' + t[mKeys[i-1]] + '</strong>';
+                    }
+                }
+            }
+            // Update "Tiada" / "None"
             refTables[2].querySelectorAll('td').forEach(td => {
                 if (td.textContent.trim() === 'Tiada' && lang === 'en') td.textContent = 'None';
                 else if (td.textContent.trim() === 'None' && lang === 'bm') td.textContent = 'Tiada';
@@ -155,8 +205,8 @@ const UIManager = {
                 : `MeterCalc Pro v3.0 | © ${year} <strong>Khirul Anuar</strong> | For <strong>JAMAC Metering Sdn. Bhd.</strong>`;
         }
 
-        // Refresh history
-        if (this.currentMainTab === 'historyPanel') Calculator.renderHistory();
+        // Refresh history immediately
+        Calculator.renderHistory();
     },
 
     switchMainTab(panelId) {
@@ -217,9 +267,7 @@ const UIManager = {
         toast.offsetHeight;
         toast.classList.add('show');
         clearTimeout(this._toastTimeout);
-        this._toastTimeout = setTimeout(() => {
-            toast.classList.remove('show');
-        }, 2000);
+        this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2000);
     },
 
     toggleTheme() {
@@ -236,6 +284,7 @@ const UIManager = {
             document.body.classList.add('light-theme');
             document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
         }
+        this.updateAllLabels();
     },
 
     shareCalculatorResult() {
