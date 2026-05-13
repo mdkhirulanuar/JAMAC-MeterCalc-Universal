@@ -10,9 +10,14 @@ const LANG_DATA = {
         noResult: 'Tiada keputusan', confirmClear: 'Padam semua sejarah?', recordDeleted: '🗑️ Rekod dipadam',
         supplyType: 'Jenis Supply', meterClass: 'Class Meter', energyUnit: 'Unit Tenaga',
         supply1P2W: '1 Fasa (1P2W)', supply3P3W: '3 Fasa (3P3W)', supply3P4W: '3 Fasa (3P4W)',
+        btnCalc: '🔢 KIRA PARAMETER', btnEnergy: '🔢 KIRA TENAGA', btnDial: '📊 KIRA', btnMD: '🕐 KIRA MD',
+        energyResultLabel: 'Tenaga', dialResultLabel: 'Keputusan',
+        historyEmpty: 'Tiada rekod', historyCopy: '📋 Salin', historyClear: 'Padam Semua',
+        classLimitHeader: 'Had', decimalHeader: 'Julat', multiplierHeader: 'Jenis Meter',
         mDomestik: 'Domestik (direct)', mKedai: 'Kedai (CT)', mKilangKecil: 'Kilang kecil (CT)',
         mKilangBesar: 'Kilang besar (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
-        mTiada: 'Tiada'
+        mTiada: 'Tiada', multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain',
+        footerBM: 'MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong>'
     },
     en: {
         calcDone: '✅ Calculation complete!', energyDone: '✅ Energy calculated!', dialPass: '✅ PASS!', dialFail: '❌ FAIL!', mdDone: '✅ MD calculated!',
@@ -25,9 +30,14 @@ const LANG_DATA = {
         noResult: 'No results', confirmClear: 'Delete all history?', recordDeleted: '🗑️ Record deleted',
         supplyType: 'Supply Type', meterClass: 'Meter Class', energyUnit: 'Energy Unit',
         supply1P2W: '1 Phase (1P2W)', supply3P3W: '3 Phase (3P3W)', supply3P4W: '3 Phase (3P4W)',
+        btnCalc: '🔢 CALCULATE', btnEnergy: '🔢 CALCULATE ENERGY', btnDial: '📊 CALCULATE', btnMD: '🕐 CALCULATE MD',
+        energyResultLabel: 'Energy', dialResultLabel: 'Results',
+        historyEmpty: 'No records', historyCopy: '📋 Copy', historyClear: 'Clear All',
+        classLimitHeader: 'Limit', decimalHeader: 'Range', multiplierHeader: 'Meter Type',
         mDomestik: 'Domestic (direct)', mKedai: 'Shop (CT)', mKilangKecil: 'Small Factory (CT)',
         mKilangBesar: 'Large Factory (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
-        mTiada: 'None'
+        mTiada: 'None', multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Use Calculator tab</strong> to calculate M for other CT/VT',
+        footerEN: 'MeterCalc Pro v3.0 | Developed by <strong>Khirul Anuar</strong> | For <strong>JAMAC Metering Sdn. Bhd.</strong>'
     }
 };
 
@@ -46,8 +56,9 @@ const UIManager = {
     updateAllLabels() {
         const lang = this.currentLang;
         const t = LANG_DATA[lang];
+        const year = new Date().getFullYear();
 
-        // ============ TAB LABELS ============
+        // Tab labels
         const tabLabels = {
             'calculatorPanel': lang === 'bm' ? 'Kalkulator' : 'Calculator',
             'energyPanel': lang === 'bm' ? 'Tenaga' : 'Energy',
@@ -57,12 +68,11 @@ const UIManager = {
             'referencePanel': lang === 'bm' ? 'Rujukan' : 'Reference'
         };
         document.querySelectorAll('.main-tab').forEach(tab => {
-            const panelId = tab.dataset.panel;
-            const labelSpan = tab.querySelector('.main-tab-label');
-            if (labelSpan && tabLabels[panelId]) labelSpan.textContent = tabLabels[panelId];
+            const lbl = tab.querySelector('.main-tab-label');
+            if (lbl && tabLabels[tab.dataset.panel]) lbl.textContent = tabLabels[tab.dataset.panel];
         });
 
-        // ============ PANEL TITLES ============
+        // Panel titles
         const titles = {
             'calculatorPanel': '📋 Parameter Input',
             'energyPanel': lang === 'bm' ? '🔢 Pulse → Tenaga' : '🔢 Pulse → Energy',
@@ -71,67 +81,58 @@ const UIManager = {
             'historyPanel': lang === 'bm' ? '📋 Sejarah' : '📋 History',
             'referencePanel': lang === 'bm' ? '📚 Rujukan Pantas' : '📚 Quick Reference'
         };
-        Object.keys(titles).forEach(panelId => {
-            const panel = document.getElementById(panelId);
-            if (!panel) return;
-            const h2 = panel.querySelector('.panel-header h2');
-            if (h2 && titles[panelId]) h2.textContent = titles[panelId];
-            const desc = panel.querySelector('.panel-desc');
-            if (desc) {
-                if (panelId === 'energyPanel') desc.textContent = lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.';
-                if (panelId === 'demandPanel') desc.textContent = lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.';
+        Object.keys(titles).forEach(id => {
+            const p = document.getElementById(id); if (!p) return;
+            const h = p.querySelector('.panel-header h2');
+            if (h) h.textContent = titles[id];
+            const d = p.querySelector('.panel-desc');
+            if (d) {
+                if (id === 'energyPanel') d.textContent = lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.';
+                if (id === 'demandPanel') d.textContent = lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.';
             }
         });
 
         // Results title
-        const resultsH2 = document.querySelector('#calcResultsPanel .panel-header h2');
-        if (resultsH2) resultsH2.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
+        const rh = document.querySelector('#calcResultsPanel .panel-header h2');
+        if (rh) rh.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
 
-        // ============ BUTTONS ============
-        const calcBtn = document.querySelector('#calculatorPanel .btn-calculate span:first-child');
-        if (calcBtn) calcBtn.textContent = lang === 'bm' ? '🔢 KIRA PARAMETER' : '🔢 CALCULATE';
-        const energyBtn = document.querySelector('#energyPanel .btn-calculate span:first-child');
-        if (energyBtn) energyBtn.textContent = lang === 'bm' ? '🔢 KIRA TENAGA' : '🔢 CALCULATE ENERGY';
-        const mdBtn = document.querySelector('#demandPanel .btn-calculate span:first-child');
-        if (mdBtn) mdBtn.textContent = lang === 'bm' ? '🕐 KIRA MD' : '🕐 CALCULATE MD';
+        // BUTTONS
+        const btnCalc = document.querySelector('#calculatorPanel .btn-calculate span');
+        if (btnCalc) btnCalc.textContent = t.btnCalc;
+        const btnEnergy = document.querySelector('#energyPanel .btn-calculate span');
+        if (btnEnergy) btnEnergy.textContent = t.btnEnergy;
+        const btnDial = document.querySelector('#accuracyPanel .btn-calculate span');
+        if (btnDial) btnDial.textContent = t.btnDial;
+        const btnMD = document.querySelector('#demandPanel .btn-calculate span');
+        if (btnMD) btnMD.textContent = t.btnMD;
 
-        // Result labels
-        const energyResLabel = document.querySelector('#energyResult .calc-result-label');
-        if (energyResLabel) energyResLabel.textContent = lang === 'bm' ? 'Tenaga' : 'Energy';
-        const dialResLabel = document.querySelector('#dialResult .calc-result-label');
-        if (dialResLabel) dialResLabel.textContent = lang === 'bm' ? 'Keputusan' : 'Results';
+        // RESULT LABELS
+        const erl = document.querySelector('#energyResult .calc-result-label');
+        if (erl) erl.textContent = t.energyResultLabel;
+        const drl = document.querySelector('#dialResult .calc-result-label');
+        if (drl) drl.textContent = t.dialResultLabel;
 
-        // ============ INPUT LABELS (cari guna parent structure) ============
+        // INPUT LABELS
         document.querySelectorAll('.input-label').forEach(label => {
-            const span = label.querySelector('span:first-child');
-            if (!span) return;
-            const text = span.textContent.trim();
-            // Kalkulator labels
-            if (text === 'Jenis Supply' || text === 'Supply Type') span.textContent = t.supplyType;
-            if (text === 'Class Meter' || text === 'Meter Class') span.textContent = t.meterClass;
-            // Tenaga labels
-            if (text === 'Unit Tenaga' || text === 'Energy Unit') span.textContent = t.energyUnit;
+            const s = label.querySelector('span:first-child');
+            if (!s) return;
+            const txt = s.textContent.trim();
+            if (txt.includes('Jenis Supply') || txt.includes('Supply Type')) s.textContent = t.supplyType;
+            if (txt.includes('Class Meter') || txt.includes('Meter Class')) s.textContent = t.meterClass;
+            if (txt.includes('Unit Tenaga') || txt.includes('Energy Unit')) s.textContent = t.energyUnit;
         });
 
-        // ============ DROPDOWN OPTIONS ============
-        const supplySelect = document.getElementById('supplyType');
-        if (supplySelect) {
-            supplySelect.options[0].textContent = t.supply1P2W;
-            supplySelect.options[1].textContent = t.supply3P3W;
-            supplySelect.options[2].textContent = t.supply3P4W;
-        }
+        // DROPDOWN OPTIONS
+        const ss = document.getElementById('supplyType');
+        if (ss) { ss.options[0].textContent = t.supply1P2W; ss.options[1].textContent = t.supply3P3W; ss.options[2].textContent = t.supply3P4W; }
 
-        // ============ HISTORY ============
-        const emptyState = document.querySelector('#historyList .empty-state p');
-        if (emptyState) emptyState.textContent = lang === 'bm' ? 'Tiada rekod' : 'No records';
-        const historyBtns = document.querySelectorAll('#historyPanel .btn-text');
-        if (historyBtns.length >= 3) {
-            historyBtns[0].textContent = lang === 'bm' ? '📋 Salin' : '📋 Copy';
-            historyBtns[2].textContent = lang === 'bm' ? 'Padam Semua' : 'Clear All';
-        }
+        // HISTORY
+        const empty = document.querySelector('#historyList .empty-state p');
+        if (empty) empty.textContent = t.historyEmpty;
+        const hb = document.querySelectorAll('#historyPanel .btn-text');
+        if (hb.length >= 3) { hb[0].textContent = t.historyCopy; hb[2].textContent = t.historyClear; }
 
-        // ============ REFERENCE PANEL ============
-        // Section titles
+        // REFERENCE PANEL
         const refTitles = document.querySelectorAll('#referencePanel .ref-title');
         if (refTitles.length >= 6) {
             refTitles[0].textContent = 'Standard CT Ratios';
@@ -142,67 +143,31 @@ const UIManager = {
             refTitles[5].textContent = lang === 'bm' ? '📊 Contoh Nilai M (Multiplier)' : '📊 Multiplier (M) Examples';
         }
 
-        // Reference tables
         const refTables = document.querySelectorAll('#referencePanel .ref-table');
-        
-        // Class Limits table (index 0)
-        if (refTables[0]) {
-            const h = refTables[0].querySelectorAll('th');
-            if (h.length >= 2) h[1].textContent = lang === 'bm' ? 'Had' : 'Limit';
-        }
-        // Decimal Point table (index 1)
-        if (refTables[1]) {
-            const h = refTables[1].querySelectorAll('th');
-            if (h.length >= 2) h[0].textContent = lang === 'bm' ? 'Julat' : 'Range';
-        }
-        // Multiplier table (index 2)
+        if (refTables[0]) { const h = refTables[0].querySelectorAll('th'); if (h.length >= 2) h[1].textContent = t.classLimitHeader; }
+        if (refTables[1]) { const h = refTables[1].querySelectorAll('th'); if (h.length >= 2) h[0].textContent = t.decimalHeader; }
         if (refTables[2]) {
-            const h = refTables[2].querySelectorAll('th');
-            if (h.length >= 4) h[0].textContent = lang === 'bm' ? 'Jenis Meter' : 'Meter Type';
-            
+            const h = refTables[2].querySelectorAll('th'); if (h.length >= 4) h[0].textContent = t.multiplierHeader;
             const rows = refTables[2].querySelectorAll('tr');
-            const mKeys = ['mDomestik', 'mKedai', 'mKilangKecil', 'mKilangBesar', 'mHV', 'mData'];
-            for (let i = 1; i <= 6; i++) {
-                if (rows[i]) {
-                    const firstCell = rows[i].querySelector('td');
-                    if (firstCell) firstCell.innerHTML = '<strong>' + t[mKeys[i-1]] + '</strong>';
-                }
-            }
-            // Update "Tiada" cells
-            refTables[2].querySelectorAll('td').forEach(td => {
-                const txt = td.textContent.trim();
-                if (txt === 'Tiada' && lang === 'en') td.textContent = 'None';
-                else if (txt === 'None' && lang === 'bm') td.textContent = 'Tiada';
-            });
+            const keys = ['mDomestik','mKedai','mKilangKecil','mKilangBesar','mHV','mData'];
+            for (let i = 1; i <= 6; i++) { if (rows[i]) { const c = rows[i].querySelector('td'); if (c) c.innerHTML = '<strong>' + t[keys[i-1]] + '</strong>'; } }
+            refTables[2].querySelectorAll('td').forEach(td => { if (td.textContent.trim() === 'Tiada' && lang === 'en') td.textContent = 'None'; else if (td.textContent.trim() === 'None' && lang === 'bm') td.textContent = 'Tiada'; });
         }
 
-        // Multiplier guide footer
-        const refSections = document.querySelectorAll('#referencePanel .ref-section');
-        if (refSections.length >= 6) {
-            const lastP = refSections[5].querySelector('p:last-child');
-            if (lastP) {
-                lastP.innerHTML = lang === 'bm'
-                    ? '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain'
-                    : '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Use Calculator tab</strong> to calculate M for other CT/VT';
-            }
-        }
+        const refSec = document.querySelectorAll('#referencePanel .ref-section');
+        if (refSec.length >= 6) { const lp = refSec[5].querySelector('p:last-child'); if (lp) lp.innerHTML = t.multiplierFooter; }
 
-        // ============ FOOTER ============
-        const footerEl = document.querySelector('[data-lang="footerText"]');
-        if (footerEl) {
-            const year = new Date().getFullYear();
-            footerEl.innerHTML = lang === 'bm'
-                ? `MeterCalc Pro v3.0 | © ${year} <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong>`
-                : `MeterCalc Pro v3.0 | © ${year} <strong>Khirul Anuar</strong> | For <strong>JAMAC Metering Sdn. Bhd.</strong>`;
-        }
+        // FOOTER
+        const footer = document.querySelector('[data-lang="footerText"]');
+        if (footer) footer.innerHTML = lang === 'bm' ? t.footerBM.replace('2025', year) : t.footerEN.replace('2025', year);
 
-        // ============ RENDER HISTORY ============
+        // HISTORY RENDER
         Calculator.renderHistory();
     },
 
     switchMainTab(panelId) {
         this.currentMainTab = panelId;
-        document.querySelectorAll('.main-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.panel === panelId));
+        document.querySelectorAll('.main-tab').forEach(t => t.classList.toggle('active', t.dataset.panel === panelId));
         ['calculatorPanel','calcResultsPanel','energyPanel','accuracyPanel','demandPanel','historyPanel','referencePanel'].forEach(id => {
             const el = document.getElementById(id); if (el) el.style.display = 'none';
         });
@@ -210,12 +175,11 @@ const UIManager = {
         if (target) { target.style.display = 'block'; target.scrollIntoView({ behavior: 'smooth' }); }
         if (panelId === 'calculatorPanel') document.getElementById('calculatorPanel').style.display = 'block';
         if (panelId === 'historyPanel') Calculator.renderHistory();
-        if (navigator.vibrate) navigator.vibrate(8);
     },
 
     switchCalcMode(mode) {
         Calculator.currentMode = mode;
-        document.querySelectorAll('#calculatorPanel .mode-tab').forEach(tab => tab.classList.toggle('active', tab.dataset.mode === mode));
+        document.querySelectorAll('#calculatorPanel .mode-tab').forEach(t => t.classList.toggle('active', t.dataset.mode === mode));
         ['ctSectionDivider','ctInputSection','ctLiveRatio','vtSectionDivider','vtInputSection','vtLiveRatio'].forEach(id => {
             const el = document.getElementById(id); if (el) el.style.display = 'none';
         });
@@ -230,59 +194,17 @@ const UIManager = {
             document.getElementById('vtLiveRatio').style.display = 'flex';
         }
         document.getElementById('calcResultsPanel').style.display = 'none';
-        if (navigator.vibrate) navigator.vibrate(8);
     },
 
-    resetAll() {
-        Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel');
-        document.getElementById('calcResultsPanel').style.display = 'none';
-        document.getElementById('energyResult').style.display = 'none';
-        document.getElementById('dialResult').style.display = 'none';
-        document.getElementById('demandResult').style.display = 'none';
-        this.showToast(this.t('resetDone'), 'success');
-    },
-
+    resetAll() { Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel'); ['calcResultsPanel','energyResult','dialResult','demandResult'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; }); this.showToast(this.t('resetDone'), 'success'); },
     clearHistory() { if (confirm(this.t('confirmClear'))) { Calculator.history = []; Calculator.saveHistory(); Calculator.renderHistory(); this.showToast(this.t('historyCleared'), 'success'); } },
     copyAllHistory() { navigator.clipboard.writeText(Calculator.exportHistoryCSV()).then(() => this.showToast(this.t('copied'), 'success')); },
-    exportCSV() {
-        const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' });
-        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click();
-        URL.revokeObjectURL(url); this.showToast(this.t('csvDone'), 'success');
-    },
+    exportCSV() { const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click(); URL.revokeObjectURL(url); this.showToast(this.t('csvDone'), 'success'); },
 
     _toastTimeout: null,
-    showToast(message, type = 'success') {
-        const toast = document.getElementById('toast');
-        toast.textContent = message;
-        toast.className = `toast ${type}`;
-        toast.offsetHeight;
-        toast.classList.add('show');
-        clearTimeout(this._toastTimeout);
-        this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2000);
-    },
+    showToast(msg, type = 'success') { const toast = document.getElementById('toast'); toast.textContent = msg; toast.className = `toast ${type}`; toast.offsetHeight; toast.classList.add('show'); clearTimeout(this._toastTimeout); this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2000); },
 
-    toggleTheme() {
-        document.body.classList.toggle('light-theme');
-        const icon = document.getElementById('themeIcon');
-        icon.innerHTML = document.body.classList.contains('light-theme')
-            ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
-            : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
-        localStorage.setItem('metercalc_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
-    },
-
-    loadTheme() {
-        if (localStorage.getItem('metercalc_theme') === 'light') {
-            document.body.classList.add('light-theme');
-            document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
-        }
-        this.updateAllLabels();
-    },
-
-    shareCalculatorResult() {
-        const last = Calculator.history.find(h => h.type === 'calculator');
-        if (!last) { this.showToast(this.t('noResult'), 'error'); return; }
-        const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`;
-        if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {});
-        else navigator.clipboard.writeText(text).then(() => this.showToast(this.t('copied'), 'success'));
-    }
+    toggleTheme() { document.body.classList.toggle('light-theme'); const icon = document.getElementById('themeIcon'); icon.innerHTML = document.body.classList.contains('light-theme') ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'; localStorage.setItem('metercalc_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); },
+    loadTheme() { if (localStorage.getItem('metercalc_theme') === 'light') { document.body.classList.add('light-theme'); document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; } this.updateAllLabels(); },
+    shareCalculatorResult() { const last = Calculator.history.find(h => h.type === 'calculator'); if (!last) { this.showToast(this.t('noResult'), 'error'); return; } const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`; if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {}); else navigator.clipboard.writeText(text).then(() => this.showToast(this.t('copied'), 'success')); }
 };
