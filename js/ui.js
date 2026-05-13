@@ -16,8 +16,9 @@ const LANG_DATA = {
         classLimitHeader: 'Had', decimalHeader: 'Julat', multiplierHeader: 'Jenis Meter',
         mDomestik: 'Domestik (direct)', mKedai: 'Kedai (CT)', mKilangKecil: 'Kilang kecil (CT)',
         mKilangBesar: 'Kilang besar (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
-        mTiada: 'Tiada', multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain',
-        footerBM: 'MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong>'
+        mTiada: 'Tiada', 
+        multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain',
+        footerText: 'MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong>'
     },
     en: {
         calcDone: '✅ Calculation complete!', energyDone: '✅ Energy calculated!', dialPass: '✅ PASS!', dialFail: '❌ FAIL!', mdDone: '✅ MD calculated!',
@@ -36,8 +37,9 @@ const LANG_DATA = {
         classLimitHeader: 'Limit', decimalHeader: 'Range', multiplierHeader: 'Meter Type',
         mDomestik: 'Domestic (direct)', mKedai: 'Shop (CT)', mKilangKecil: 'Small Factory (CT)',
         mKilangBesar: 'Large Factory (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
-        mTiada: 'None', multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Use Calculator tab</strong> to calculate M for other CT/VT',
-        footerEN: 'MeterCalc Pro v3.0 | Developed by <strong>Khirul Anuar</strong> | For <strong>JAMAC Metering Sdn. Bhd.</strong>'
+        mTiada: 'None',
+        multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Use Calculator tab</strong> to calculate M for other CT/VT',
+        footerText: 'MeterCalc Pro v3.0 | Developed by <strong>Khirul Anuar</strong> | For <strong>JAMAC Metering Sdn. Bhd.</strong>'
     }
 };
 
@@ -159,7 +161,7 @@ const UIManager = {
 
         // FOOTER
         const footer = document.querySelector('[data-lang="footerText"]');
-        if (footer) footer.innerHTML = lang === 'bm' ? t.footerBM.replace('2025', year) : t.footerEN.replace('2025', year);
+        if (footer) footer.innerHTML = t.footerText.replace('2025', year);
 
         // HISTORY RENDER
         Calculator.renderHistory();
@@ -196,15 +198,53 @@ const UIManager = {
         document.getElementById('calcResultsPanel').style.display = 'none';
     },
 
-    resetAll() { Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel'); ['calcResultsPanel','energyResult','dialResult','demandResult'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; }); this.showToast(this.t('resetDone'), 'success'); },
+    resetAll() {
+        Calculator.currentMode = 'direct'; this.switchCalcMode('direct'); this.switchMainTab('calculatorPanel');
+        ['calcResultsPanel','energyResult','dialResult','demandResult'].forEach(id => { const el = document.getElementById(id); if (el) el.style.display = 'none'; });
+        this.showToast(this.t('resetDone'), 'success');
+    },
+
     clearHistory() { if (confirm(this.t('confirmClear'))) { Calculator.history = []; Calculator.saveHistory(); Calculator.renderHistory(); this.showToast(this.t('historyCleared'), 'success'); } },
     copyAllHistory() { navigator.clipboard.writeText(Calculator.exportHistoryCSV()).then(() => this.showToast(this.t('copied'), 'success')); },
-    exportCSV() { const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' }); const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click(); URL.revokeObjectURL(url); this.showToast(this.t('csvDone'), 'success'); },
+    exportCSV() {
+        const blob = new Blob([Calculator.exportHistoryCSV()], { type: 'text/csv' });
+        const url = URL.createObjectURL(blob); const a = document.createElement('a'); a.href = url; a.download = 'metercalc_history.csv'; a.click();
+        URL.revokeObjectURL(url); this.showToast(this.t('csvDone'), 'success');
+    },
 
     _toastTimeout: null,
-    showToast(msg, type = 'success') { const toast = document.getElementById('toast'); toast.textContent = msg; toast.className = `toast ${type}`; toast.offsetHeight; toast.classList.add('show'); clearTimeout(this._toastTimeout); this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2000); },
+    showToast(msg, type = 'success') {
+        const toast = document.getElementById('toast');
+        toast.textContent = msg;
+        toast.className = `toast ${type}`;
+        toast.offsetHeight;
+        toast.classList.add('show');
+        clearTimeout(this._toastTimeout);
+        this._toastTimeout = setTimeout(() => { toast.classList.remove('show'); }, 2000);
+    },
 
-    toggleTheme() { document.body.classList.toggle('light-theme'); const icon = document.getElementById('themeIcon'); icon.innerHTML = document.body.classList.contains('light-theme') ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>' : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>'; localStorage.setItem('metercalc_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark'); },
-    loadTheme() { if (localStorage.getItem('metercalc_theme') === 'light') { document.body.classList.add('light-theme'); document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'; } this.updateAllLabels(); },
-    shareCalculatorResult() { const last = Calculator.history.find(h => h.type === 'calculator'); if (!last) { this.showToast(this.t('noResult'), 'error'); return; } const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`; if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {}); else navigator.clipboard.writeText(text).then(() => this.showToast(this.t('copied'), 'success')); }
+    toggleTheme() {
+        document.body.classList.toggle('light-theme');
+        const icon = document.getElementById('themeIcon');
+        icon.innerHTML = document.body.classList.contains('light-theme')
+            ? '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>'
+            : '<path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>';
+        localStorage.setItem('metercalc_theme', document.body.classList.contains('light-theme') ? 'light' : 'dark');
+    },
+
+    loadTheme() {
+        if (localStorage.getItem('metercalc_theme') === 'light') {
+            document.body.classList.add('light-theme');
+            document.getElementById('themeIcon').innerHTML = '<circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/>';
+        }
+        this.updateAllLabels();
+    },
+
+    shareCalculatorResult() {
+        const last = Calculator.history.find(h => h.type === 'calculator');
+        if (!last) { this.showToast(this.t('noResult'), 'error'); return; }
+        const text = `📊 MeterCalc Pro\n⚡ ${last.mode.toUpperCase()}\n📏 M = ${Calculator.formatNumber(last.totalMultiplier)}\n🔌 Primary = ${Calculator.formatNumber(last.primaryActive)} imp/kWh\n📋 ${last.supply} | Cl.${last.meterClass}`;
+        if (navigator.share) navigator.share({ title: 'MeterCalc Pro', text }).catch(() => {});
+        else navigator.clipboard.writeText(text).then(() => this.showToast(this.t('copied'), 'success'));
+    }
 };
