@@ -77,22 +77,23 @@ const UIManager = {
         setTitle('historyPanel', '📋 Sejarah', '📋 History');
         setTitle('referencePanel', '📚 Rujukan Pantas', '📚 Quick Reference');
 
-        // Panel descriptions
         const energyDesc = document.querySelector('#energyPanel .panel-desc');
         if (energyDesc) energyDesc.textContent = lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.';
         const mdDesc = document.querySelector('#demandPanel .panel-desc');
         if (mdDesc) mdDesc.textContent = lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.';
 
-        // Results title
         const rh = document.querySelector('#calcResultsPanel .panel-header h2');
         if (rh) rh.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
 
         // ============ BUTTONS ============
-        const setBtn = (selector, key) => { const el = document.querySelector(selector); if (el) el.textContent = t[key]; };
-        setBtn('#calculatorPanel .btn-calculate span', 'btnCalc');
-        setBtn('#energyPanel .btn-calculate span', 'btnEnergy');
-        setBtn('#accuracyPanel .btn-calculate span', 'btnDial');
-        setBtn('#demandPanel .btn-calculate span', 'btnMD');
+        const btnCalc = document.querySelector('#calculatorPanel .btn-calculate span');
+        if (btnCalc) btnCalc.textContent = t.btnCalc;
+        const btnEnergy = document.querySelector('#energyPanel .btn-calculate span');
+        if (btnEnergy) btnEnergy.textContent = t.btnEnergy;
+        const btnDial = document.querySelector('#accuracyPanel .btn-calculate span');
+        if (btnDial) btnDial.textContent = t.btnDial;
+        const btnMD = document.querySelector('#demandPanel .btn-calculate span');
+        if (btnMD) btnMD.textContent = t.btnMD;
 
         // ============ RESULT LABELS ============
         const erl = document.querySelector('#energyResult .calc-result-label');
@@ -100,26 +101,17 @@ const UIManager = {
         const drl = document.querySelector('#dialResult .calc-result-label');
         if (drl) drl.textContent = t.dialResultLabel;
 
-        // ============ INPUT LABELS - guna parent ID ============
-        const labelMap = {
-            'supplyType': 'supplyType',
-            'meterClass': 'meterClass',
-            'energyUnit': 'energyUnit'
-        };
-        Object.keys(labelMap).forEach(inputId => {
-            const input = document.getElementById(inputId);
-            if (!input) return;
-            const block = input.closest('.input-block');
-            if (!block) return;
-            const labelSpan = block.querySelector('.input-label span:first-child');
-            if (labelSpan) labelSpan.textContent = t[labelMap[inputId]];
-        });
+        // ============ INPUT LABELS - DIRECT ID ============
+        const setLabel = (id, key) => { const el = document.getElementById(id); if (el) el.textContent = t[key]; };
+        setLabel('lblSupplyType', 'supplyType');
+        setLabel('lblMeterClass', 'meterClass');
+        setLabel('lblEnergyUnit', 'energyUnit');
 
         // ============ DROPDOWN OPTIONS ============
         const ss = document.getElementById('supplyType');
         if (ss) { ss.options[0].textContent = t.supply1P2W; ss.options[1].textContent = t.supply3P3W; ss.options[2].textContent = t.supply3P4W; }
 
-        // ============ HISTORY ============
+        // ============ HISTORY BUTTONS ============
         const hb = document.querySelectorAll('#historyPanel .btn-text');
         if (hb.length >= 3) { hb[0].textContent = t.historyCopy; hb[2].textContent = t.historyClear; }
 
