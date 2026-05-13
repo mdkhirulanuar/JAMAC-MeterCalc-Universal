@@ -83,11 +83,11 @@
                 <div class="panel-body">
                     <div class="input-block">
                         <label class="input-label"><span>Meter Constant Active (kWh)</span><span class="label-src">Nameplate</span></label>
-                        <div class="input-wrap"><input type="number" id="meterConstActive" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"><span class="input-suffix">imp/kWh</span></div>
+                        <div class="input-wrap"><input type="number" id="meterConstActive" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001"><span class="input-suffix">imp/kWh</span></div>
                     </div>
                     <div class="input-block">
                         <label class="input-label"><span>Meter Constant Reactive (kvarh)</span><span class="label-src">Nameplate</span></label>
-                        <div class="input-wrap"><input type="number" id="meterConstReactive" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0"><span class="input-suffix">imp/kvarh</span></div>
+                        <div class="input-wrap"><input type="number" id="meterConstReactive" class="input-field" placeholder="1000" inputmode="decimal" min="0"><span class="input-suffix">imp/kvarh</span></div>
                     </div>
                     <div class="input-row-2">
                         <div class="input-block"><label class="input-label">Jenis Supply</label><select id="supplyType" class="input-field"><option value="1P2W">1 Fasa (1P2W)</option><option value="3P3W">3 Fasa (3P3W)</option><option value="3P4W" selected>3 Fasa (3P4W)</option></select></div>
@@ -96,13 +96,13 @@
                     <div class="section-divider" id="ctSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">CURRENT TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="ctInputSection" style="display:none;">
                         <div class="input-block"><label class="input-label"><span>CT Primary (A)</span><span class="label-src">Nameplate</span></label><input type="number" id="ctPrimary" class="input-field" placeholder="800" inputmode="decimal" min="0"></div>
-                        <div class="input-block"><label class="input-label"><span>CT Secondary (A)</span><span class="label-src">Nameplate</span></label><input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" value="5" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span>CT Secondary (A)</span><span class="label-src">Nameplate</span></label><input type="number" id="ctSecondary" class="input-field" placeholder="5" inputmode="decimal" min="0.000001"></div>
                     </div>
                     <div class="live-ratio" id="ctLiveRatio" style="display:none;"><span>CT Ratio</span><strong id="ctLiveRatioValue">-</strong></div>
                     <div class="section-divider" id="vtSectionDivider" style="display:none;"><div class="divider-line"></div><span class="divider-text">VOLTAGE TRANSFORMER</span><div class="divider-line"></div></div>
                     <div class="input-row-2" id="vtInputSection" style="display:none;">
                         <div class="input-block"><label class="input-label"><span>VT Primary (V)</span><span class="label-src">Nameplate</span></label><input type="number" id="vtPrimary" class="input-field" placeholder="11000" inputmode="decimal" min="0"></div>
-                        <div class="input-block"><label class="input-label"><span>VT Secondary (V)</span><span class="label-src">Nameplate</span></label><input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" value="110" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span>VT Secondary (V)</span><span class="label-src">Nameplate</span></label><input type="number" id="vtSecondary" class="input-field" placeholder="110" inputmode="decimal" min="0.000001"></div>
                     </div>
                     <div class="live-ratio" id="vtLiveRatio" style="display:none;"><span>VT Ratio</span><strong id="vtLiveRatioValue">-</strong></div>
                     <button class="btn-calculate" onclick="Calculator.calculate()"><span>🔢 KIRA PARAMETER</span><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg></button>
@@ -122,10 +122,10 @@
                 <div class="panel-body">
                     <p class="panel-desc">Kira tenaga berdasarkan jumlah pulse diterima.</p>
                     <div class="input-block"><label class="input-label">Unit Tenaga</label><select id="energyUnit" class="input-field"><option value="kWh" selected>kWh</option><option value="kvarh">kvarh</option><option value="MWh">MWh</option></select></div>
-                    <div class="input-block"><label class="input-label"><span>Pulse Count</span><span class="label-src">Test Output MUT</span></label><input type="number" id="energyPulseCount" class="input-field" placeholder="5000" inputmode="decimal" value="5000" min="0"></div>
+                    <div class="input-block"><label class="input-label"><span>Pulse Count</span><span class="label-src">Test Output MUT</span></label><input type="number" id="energyPulseCount" class="input-field" placeholder="5000" inputmode="decimal" min="0"></div>
                     <div class="input-row-2">
-                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"></div>
-                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="energyPulseConst" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="energyMultiplier" class="input-field" placeholder="1" inputmode="decimal" min="0.000001"></div>
                     </div>
                     <button class="btn-calculate" onclick="Calculator.calculateEnergy()"><span>🔢 KIRA TENAGA</span></button>
                     <div class="calc-result" id="energyResult" style="display:none;"><div class="calc-result-label">Tenaga</div><div class="calc-result-value" id="energyResultValue">-</div></div>
@@ -147,16 +147,16 @@
                         <div class="input-block"><label class="input-label">Class</label><select id="dialClass" class="input-field"><option value="0.2S">Class 0.2S</option><option value="0.5S">Class 0.5S</option><option value="0.5">Class 0.5</option><option value="1" selected>Class 1</option><option value="2">Class 2</option></select></div>
                     </div>
                     <div class="input-row-2">
-                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="dialPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"></div>
-                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="dialMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="dialPulseConst" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="dialMultiplier" class="input-field" placeholder="1" inputmode="decimal" min="0.000001"></div>
                     </div>
                     <div class="section-divider"><div class="divider-line"></div><span class="divider-text">INPUT</span><div class="divider-line"></div></div>
-                    <div class="input-block"><label class="input-label"><span>Pulse Count</span><span class="label-src">Reference Meter</span></label><input type="number" id="dialPulseCount" class="input-field" placeholder="1740" inputmode="decimal" value="1740" min="0"></div>
+                    <div class="input-block"><label class="input-label"><span>Pulse Count</span><span class="label-src">Reference Meter</span></label><input type="number" id="dialPulseCount" class="input-field" placeholder="1740" inputmode="decimal" min="0"></div>
                     <div class="input-row-2">
-                        <div class="input-block"><label class="input-label"><span>Start Reading</span><span class="label-src">Display MUT</span></label><input type="number" id="dialStart" class="input-field" placeholder="100.0000" inputmode="decimal" step="any" value="100.0000" min="0"></div>
-                        <div class="input-block"><label class="input-label"><span>End Reading</span><span class="label-src">Display MUT</span></label><input type="number" id="dialEnd" class="input-field" placeholder="101.7400" inputmode="decimal" step="any" value="101.7400" min="0"></div>
+                        <div class="input-block"><label class="input-label"><span>Start Reading</span><span class="label-src">Display MUT</span></label><input type="number" id="dialStart" class="input-field" placeholder="100.0000" inputmode="decimal" step="any" min="0"></div>
+                        <div class="input-block"><label class="input-label"><span>End Reading</span><span class="label-src">Display MUT</span></label><input type="number" id="dialEnd" class="input-field" placeholder="101.7400" inputmode="decimal" step="any" min="0"></div>
                     </div>
-                    <div class="input-block"><label class="input-label"><span>Test Pulse</span><span class="label-src">Test Output MUT</span></label><input type="number" id="dialRealPulse" class="input-field" placeholder="1745" inputmode="decimal" value="1745" min="0"></div>
+                    <div class="input-block"><label class="input-label"><span>Test Pulse</span><span class="label-src">Test Output MUT</span></label><input type="number" id="dialRealPulse" class="input-field" placeholder="1745" inputmode="decimal" min="0"></div>
                     <button class="btn-calculate" onclick="Calculator.calculateDialTest()"><span>📊 KIRA</span></button>
                     <div class="calc-result" id="dialResult" style="display:none;"><div class="calc-result-label">Keputusan</div><div id="dialResultContent"></div></div>
                 </div>
@@ -173,10 +173,10 @@
                 </div>
                 <div class="panel-body">
                     <p class="panel-desc">Kira MD berdasarkan bacaan pulse dalam 30 minit.</p>
-                    <div class="input-block"><label class="input-label"><span>Pulse Count (30 min)</span><span class="label-src">Test Output MUT</span></label><input type="number" id="demandPulseCount" class="input-field" placeholder="150" inputmode="decimal" value="150" min="0"></div>
+                    <div class="input-block"><label class="input-label"><span>Pulse Count (30 min)</span><span class="label-src">Test Output MUT</span></label><input type="number" id="demandPulseCount" class="input-field" placeholder="150" inputmode="decimal" min="0"></div>
                     <div class="input-row-2">
-                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="demandPulseConst" class="input-field" placeholder="1000" inputmode="decimal" value="1000" min="0.000001"></div>
-                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" value="1" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label"><span>Meter Constant</span><span class="label-src">Nameplate</span></label><input type="number" id="demandPulseConst" class="input-field" placeholder="1000" inputmode="decimal" min="0.000001"></div>
+                        <div class="input-block"><label class="input-label">Multiplier (M)</label><input type="number" id="demandMultiplier" class="input-field" placeholder="1" inputmode="decimal" min="0.000001"></div>
                     </div>
                     <button class="btn-calculate" onclick="Calculator.calculateDemand()"><span>🕐 KIRA MD</span></button>
                     <div class="calc-result" id="demandResult" style="display:none;"><div class="calc-result-label">Maximum Demand</div><div class="calc-result-value" id="demandResultValue">-</div></div>
