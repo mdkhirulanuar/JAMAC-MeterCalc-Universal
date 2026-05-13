@@ -16,7 +16,7 @@ const LANG_DATA = {
         classLimitHeader: 'Had', decimalHeader: 'Julat', multiplierHeader: 'Jenis Meter',
         mDomestik: 'Domestik (direct)', mKedai: 'Kedai (CT)', mKilangKecil: 'Kilang kecil (CT)',
         mKilangBesar: 'Kilang besar (CT)', mHV: 'HV Consumer (CT+VT)', mData: 'Data Center (CT+VT)',
-        mTiada: 'Tiada', 
+        mTiada: 'Tiada',
         multiplierFooter: '💡 <strong>Formula:</strong> M = (CT Primary ÷ CT Secondary) × (VT Primary ÷ VT Secondary)<br>💡 <strong>Guna tab Kalkulator</strong> untuk kira M bagi CT/VT lain',
         footerText: 'MeterCalc Pro v3.0 | Dibangunkan oleh <strong>Khirul Anuar</strong> | Untuk <strong>JAMAC Metering Sdn. Bhd.</strong>'
     },
@@ -60,81 +60,70 @@ const UIManager = {
         const t = LANG_DATA[lang];
         const year = new Date().getFullYear();
 
-        // Tab labels
-        const tabLabels = {
-            'calculatorPanel': lang === 'bm' ? 'Kalkulator' : 'Calculator',
-            'energyPanel': lang === 'bm' ? 'Tenaga' : 'Energy',
-            'accuracyPanel': 'Accuracy Test',
-            'demandPanel': 'MD',
-            'historyPanel': lang === 'bm' ? 'Sejarah' : 'History',
-            'referencePanel': lang === 'bm' ? 'Rujukan' : 'Reference'
-        };
+        // ============ TAB LABELS ============
         document.querySelectorAll('.main-tab').forEach(tab => {
             const lbl = tab.querySelector('.main-tab-label');
-            if (lbl && tabLabels[tab.dataset.panel]) lbl.textContent = tabLabels[tab.dataset.panel];
+            if (!lbl) return;
+            const map = { calculatorPanel: lang === 'bm' ? 'Kalkulator' : 'Calculator', energyPanel: lang === 'bm' ? 'Tenaga' : 'Energy', accuracyPanel: 'Accuracy Test', demandPanel: 'MD', historyPanel: lang === 'bm' ? 'Sejarah' : 'History', referencePanel: lang === 'bm' ? 'Rujukan' : 'Reference' };
+            if (map[tab.dataset.panel]) lbl.textContent = map[tab.dataset.panel];
         });
 
-        // Panel titles
-        const titles = {
-            'calculatorPanel': '📋 Parameter Input',
-            'energyPanel': lang === 'bm' ? '🔢 Pulse → Tenaga' : '🔢 Pulse → Energy',
-            'accuracyPanel': '📊 Accuracy Test',
-            'demandPanel': '🕐 Maximum Demand',
-            'historyPanel': lang === 'bm' ? '📋 Sejarah' : '📋 History',
-            'referencePanel': lang === 'bm' ? '📚 Rujukan Pantas' : '📚 Quick Reference'
-        };
-        Object.keys(titles).forEach(id => {
-            const p = document.getElementById(id); if (!p) return;
-            const h = p.querySelector('.panel-header h2');
-            if (h) h.textContent = titles[id];
-            const d = p.querySelector('.panel-desc');
-            if (d) {
-                if (id === 'energyPanel') d.textContent = lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.';
-                if (id === 'demandPanel') d.textContent = lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.';
-            }
-        });
+        // ============ PANEL TITLES ============
+        const setTitle = (id, bm, en) => { const p = document.getElementById(id); if (p) { const h = p.querySelector('.panel-header h2'); if (h) h.textContent = lang === 'bm' ? bm : en; } };
+        setTitle('calculatorPanel', '📋 Parameter Input', '📋 Parameter Input');
+        setTitle('energyPanel', '🔢 Pulse → Tenaga', '🔢 Pulse → Energy');
+        setTitle('accuracyPanel', '📊 Accuracy Test', '📊 Accuracy Test');
+        setTitle('demandPanel', '🕐 Maximum Demand', '🕐 Maximum Demand');
+        setTitle('historyPanel', '📋 Sejarah', '📋 History');
+        setTitle('referencePanel', '📚 Rujukan Pantas', '📚 Quick Reference');
+
+        // Panel descriptions
+        const energyDesc = document.querySelector('#energyPanel .panel-desc');
+        if (energyDesc) energyDesc.textContent = lang === 'bm' ? 'Kira tenaga berdasarkan jumlah pulse diterima.' : 'Calculate energy from received pulses.';
+        const mdDesc = document.querySelector('#demandPanel .panel-desc');
+        if (mdDesc) mdDesc.textContent = lang === 'bm' ? 'Kira MD berdasarkan bacaan pulse dalam 30 minit.' : 'Calculate MD from 30-minute pulse reading.';
 
         // Results title
         const rh = document.querySelector('#calcResultsPanel .panel-header h2');
         if (rh) rh.textContent = lang === 'bm' ? '📊 Keputusan' : '📊 Results';
 
-        // BUTTONS
-        const btnCalc = document.querySelector('#calculatorPanel .btn-calculate span');
-        if (btnCalc) btnCalc.textContent = t.btnCalc;
-        const btnEnergy = document.querySelector('#energyPanel .btn-calculate span');
-        if (btnEnergy) btnEnergy.textContent = t.btnEnergy;
-        const btnDial = document.querySelector('#accuracyPanel .btn-calculate span');
-        if (btnDial) btnDial.textContent = t.btnDial;
-        const btnMD = document.querySelector('#demandPanel .btn-calculate span');
-        if (btnMD) btnMD.textContent = t.btnMD;
+        // ============ BUTTONS ============
+        const setBtn = (selector, key) => { const el = document.querySelector(selector); if (el) el.textContent = t[key]; };
+        setBtn('#calculatorPanel .btn-calculate span', 'btnCalc');
+        setBtn('#energyPanel .btn-calculate span', 'btnEnergy');
+        setBtn('#accuracyPanel .btn-calculate span', 'btnDial');
+        setBtn('#demandPanel .btn-calculate span', 'btnMD');
 
-        // RESULT LABELS
+        // ============ RESULT LABELS ============
         const erl = document.querySelector('#energyResult .calc-result-label');
         if (erl) erl.textContent = t.energyResultLabel;
         const drl = document.querySelector('#dialResult .calc-result-label');
         if (drl) drl.textContent = t.dialResultLabel;
 
-        // INPUT LABELS
-        document.querySelectorAll('.input-label').forEach(label => {
-            const s = label.querySelector('span:first-child');
-            if (!s) return;
-            const txt = s.textContent.trim();
-            if (txt.includes('Jenis Supply') || txt.includes('Supply Type')) s.textContent = t.supplyType;
-            if (txt.includes('Class Meter') || txt.includes('Meter Class')) s.textContent = t.meterClass;
-            if (txt.includes('Unit Tenaga') || txt.includes('Energy Unit')) s.textContent = t.energyUnit;
+        // ============ INPUT LABELS - guna parent ID ============
+        const labelMap = {
+            'supplyType': 'supplyType',
+            'meterClass': 'meterClass',
+            'energyUnit': 'energyUnit'
+        };
+        Object.keys(labelMap).forEach(inputId => {
+            const input = document.getElementById(inputId);
+            if (!input) return;
+            const block = input.closest('.input-block');
+            if (!block) return;
+            const labelSpan = block.querySelector('.input-label span:first-child');
+            if (labelSpan) labelSpan.textContent = t[labelMap[inputId]];
         });
 
-        // DROPDOWN OPTIONS
+        // ============ DROPDOWN OPTIONS ============
         const ss = document.getElementById('supplyType');
         if (ss) { ss.options[0].textContent = t.supply1P2W; ss.options[1].textContent = t.supply3P3W; ss.options[2].textContent = t.supply3P4W; }
 
-        // HISTORY
-        const empty = document.querySelector('#historyList .empty-state p');
-        if (empty) empty.textContent = t.historyEmpty;
+        // ============ HISTORY ============
         const hb = document.querySelectorAll('#historyPanel .btn-text');
         if (hb.length >= 3) { hb[0].textContent = t.historyCopy; hb[2].textContent = t.historyClear; }
 
-        // REFERENCE PANEL
+        // ============ REFERENCE PANEL ============
         const refTitles = document.querySelectorAll('#referencePanel .ref-title');
         if (refTitles.length >= 6) {
             refTitles[0].textContent = 'Standard CT Ratios';
@@ -159,11 +148,11 @@ const UIManager = {
         const refSec = document.querySelectorAll('#referencePanel .ref-section');
         if (refSec.length >= 6) { const lp = refSec[5].querySelector('p:last-child'); if (lp) lp.innerHTML = t.multiplierFooter; }
 
-        // FOOTER
+        // ============ FOOTER ============
         const footer = document.querySelector('[data-lang="footerText"]');
         if (footer) footer.innerHTML = t.footerText.replace('2025', year);
 
-        // HISTORY RENDER
+        // ============ HISTORY RENDER ============
         Calculator.renderHistory();
     },
 
