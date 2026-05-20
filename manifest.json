@@ -1,17 +1,19 @@
 {
-    "name": "MeterCalc Pro Universal",
+    "name": "MeterCalc Pro",
     "short_name": "MeterCalc",
-    "description": "Universal Meter Parameter Calculator for direct, CT and CT+VT metering.",
+    "description": "Universal Meter Calculator - SAMM 654 Accredited",
     "start_url": "./",
     "scope": "./",
     "display": "standalone",
     "orientation": "portrait",
     "theme_color": "#0a0e14",
     "background_color": "#0a0e14",
-    "icons": [{
-        "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>",
-        "sizes": "100x100",
-        "type": "image/svg+xml",
-        "purpose": "any maskable"
-    }]
+    "icons": [
+        {
+            "src": "data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>",
+            "sizes": "100x100",
+            "type": "image/svg+xml",
+            "purpose": "any maskable"
+        }
+    ]
 }
