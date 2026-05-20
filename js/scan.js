@@ -118,4 +118,64 @@ const Scanner = {
         const currentMatch = normalized.match(/(\d+)\(\d+\)a/);
         if (currentMatch) detected.ctSecondary = currentMatch[1];
         
-        return detected
+        return detected;
+    },
+
+    renderDetected() {
+        if (!this.detected) return;
+        
+        const d = this.detected;
+        const content = document.getElementById('scanDetectedContent');
+        
+        let html = `<div class="scan-detected-grid">`;
+        html += `<div class="scan-detected-row"><span>Active Constant:</span><strong>${d.constActive || 'Not found'} imp/kWh</strong></div>`;
+        html += `<div class="scan-detected-row"><span>Reactive Constant:</span><strong>${d.constReactive || 'Not found'} imp/kvarh</strong></div>`;
+        html += `<div class="scan-detected-row"><span>CT Secondary (suggested):</span><strong>${d.ctSecondary ? d.ctSecondary + 'A' : 'Not found'}</strong></div>`;
+        html += `<div class="scan-detected-row"><span>Supply Type:</span><strong>${d.supply || 'Not found'}</strong></div>`;
+        html += `<div class="scan-detected-row"><span>Meter Class:</span><strong>${d.meterClass || 'Not found'}</strong></div>`;
+        html += `</div>`;
+        
+        content.innerHTML = html;
+        document.getElementById('scanResult').style.display = 'block';
+        document.getElementById('scanApplyWrap').style.display = 'grid';
+    },
+
+    applyDetectedValues() {
+        if (!this.detected) return;
+        const d = this.detected;
+        
+        if (d.constActive) document.getElementById('meterConstActive').value = d.constActive;
+        if (d.constReactive) document.getElementById('meterConstReactive').value = d.constReactive;
+        if (d.supply) document.getElementById('supplyType').value = d.supply;
+        if (d.meterClass) {
+            const classOptions = ['0.2S', '0.5S', '0.5', '1', '2', '2_reactive', '3_reactive'];
+            if (classOptions.includes(d.meterClass)) {
+                document.getElementById('meterClass').value = d.meterClass;
+            }
+        }
+        if (d.ctSecondary) {
+            document.getElementById('ctSecondary').value = d.ctSecondary;
+            UIManager.switchCalcMode('ct');
+        }
+        
+        UIManager.switchMainTab('calculatorPanel');
+        UIManager.showToast('Safe values applied to calculator', 'success');
+    },
+
+    clearScan() {
+        this.file = null;
+        this.rawText = '';
+        this.detected = null;
+        if (this.imageUrl) URL.revokeObjectURL(this.imageUrl);
+        this.imageUrl = null;
+        
+        document.getElementById('scanCameraInput').value = '';
+        document.getElementById('scanUploadInput').value = '';
+        document.getElementById('scanPreviewWrap').style.display = 'none';
+        document.getElementById('scanResult').style.display = 'none';
+        document.getElementById('scanApplyWrap').style.display = 'none';
+        document.getElementById('btnRunOCR').disabled = true;
+        
+        UIManager.showToast('Scan cleared', 'success');
+    }
+};
