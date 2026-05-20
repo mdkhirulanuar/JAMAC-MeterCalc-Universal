@@ -266,4 +266,29 @@ const Calculator = {
                 return '';
             }
 
-            return `<div class="history-item"><div class="history-left"><div class="history-dot ${dotClass}"></div><div class="history-info"><div class="history-type">${typeLabel}</div><div class="history-detail">${detail}</div></div></div><div class="history-right"><div class="history-value">${value}</div><div class="history-time">${
+            return `<div class="history-item"><div class="history-left"><div class="history-dot ${dotClass}"></div><div class="history-info"><div class="history-type">${typeLabel}</div><div class="history-detail">${detail}</div></div></div><div class="history-right"><div class="history-value">${value}</div><div class="history-time">${timestamp}</div></div><button class="history-delete" onclick="event.stopPropagation();Calculator.deleteHistoryItem(${h.id})">✕</button></div>`;
+        }).join('');
+    },
+
+    formatNumber(num) {
+        if (num === undefined || !Number.isFinite(Number(num))) return '-';
+        const value = Number(num);
+        if (Number.isInteger(value)) return value.toLocaleString('ms-MY');
+        return parseFloat(value.toFixed(6)).toLocaleString('ms-MY');
+    },
+
+    formatPulseConstant(value) {
+        if (!Number.isFinite(Number(value))) return '-';
+        return Math.abs(value) < 0.001 ? Number(value).toExponential(4) : this.formatNumber(value);
+    },
+
+    formatEnergy(value, unit = 'kWh') {
+        if (!Number.isFinite(Number(value))) return '-';
+        const energy = Number(value);
+        if (unit === 'MWh') return `${energy.toFixed(4)} MWh`;
+        if (energy >= 1) return `${energy.toFixed(2)} ${unit}`;
+        if (energy >= 0.1) return `${energy.toFixed(3)} ${unit}`;
+        if (energy >= 0.01) return `${energy.toFixed(4)} ${unit}`;
+        return `${energy.toFixed(6)} ${unit}`;
+    }
+};
