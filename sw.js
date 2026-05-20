@@ -1,20 +1,24 @@
-const CACHE = 'metercalc-v3.2.0';
+const CACHE = 'metercalc-v3.3.0';
 const ASSETS = [
     './',
     './index.html',
     './css/style.css',
+    './css/desktop.css',
+    './js/app.js',
     './js/calculator.js',
     './js/ui.js',
     './js/scan.js',
-    './js/app.js',
+    './js/accuracy.js',
+    './js/batch-test.js',
+    './js/site-manager.js',
+    './js/pdf-report.js',
+    './js/keyboard.js',
     './manifest.json'
 ];
 
 self.addEventListener('install', event => {
     self.skipWaiting();
-    event.waitUntil(
-        caches.open(CACHE).then(cache => cache.addAll(ASSETS))
-    );
+    event.waitUntil(caches.open(CACHE).then(cache => cache.addAll(ASSETS)));
 });
 
 self.addEventListener('activate', event => {
