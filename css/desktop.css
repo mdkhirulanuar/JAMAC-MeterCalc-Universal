@@ -1,0 +1,154 @@
+/* Desktop Styles - for screens 1024px and above */
+@media (min-width: 1024px) {
+    .app {
+        max-width: 1400px;
+        padding: 20px;
+    }
+    
+    .topbar {
+        position: static;
+        border-radius: 16px;
+        margin-bottom: 20px;
+    }
+    
+    .main-tabs {
+        position: static;
+        justify-content: center;
+        margin-bottom: 20px;
+        border-radius: 40px;
+    }
+    
+    .main-scroll {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+        gap: 20px;
+        padding: 0;
+    }
+    
+    .panel {
+        break-inside: avoid;
+        margin-bottom: 0;
+    }
+    
+    /* Calculator + Results side by side */
+    #calculatorPanel,
+    #calcResultsPanel {
+        display: block !important;
+    }
+    
+    /* Hover effects for desktop */
+    .main-tab:hover,
+    .mode-tab:hover,
+    .btn-calculate:hover {
+        transform: translateY(-2px);
+        filter: brightness(1.05);
+    }
+    
+    .test-point-row:hover {
+        background: var(--border);
+    }
+    
+    /* Fixed width for some panels */
+    #calculatorPanel,
+    #calcResultsPanel {
+        grid-column: span 1;
+    }
+    
+    /* Sticky results panel */
+    #calcResultsPanel {
+        position: sticky;
+        top: 20px;
+        height: fit-content;
+    }
+    
+    /* Better form layout */
+    .input-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+    
+    .preset-row {
+        gap: 15px;
+    }
+    
+    /* Keyboard shortcut hint */
+    .topbar-btn[title] {
+        position: relative;
+    }
+    
+    .topbar-btn[title]:hover::after {
+        content: attr(title);
+        position: absolute;
+        bottom: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: var(--card);
+        padding: 4px 8px;
+        border-radius: 8px;
+        font-size: 0.7rem;
+        white-space: nowrap;
+        z-index: 100;
+        border: 1px solid var(--border);
+    }
+}
+
+/* Tablet Styles */
+@media (min-width: 768px) and (max-width: 1023px) {
+    .main-scroll {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 15px;
+    }
+    
+    .panel {
+        margin-bottom: 0;
+    }
+    
+    .input-row-2 {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+/* Print Styles for Report */
+@media print {
+    .topbar,
+    .main-tabs,
+    .btn-calculate,
+    .topbar-btn,
+    .action-buttons,
+    .history-actions,
+    .scan-actions,
+    .app-footer {
+        display: none !important;
+    }
+    
+    .app {
+        max-width: 100%;
+        padding: 0;
+        margin: 0;
+    }
+    
+    .panel {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        border: none;
+        background: white;
+        color: black;
+    }
+    
+    .panel-header {
+        background: #f0f0f0;
+        color: black;
+    }
+    
+    .calc-result,
+    .hero-result {
+        background: #f5f5f5;
+        color: black;
+        border: 1px solid #ccc;
+    }
+    
+    .calc-result-value,
+    .hero-value {
+        color: black;
+    }
+}
