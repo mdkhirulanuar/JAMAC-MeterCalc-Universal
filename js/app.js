@@ -1,11 +1,24 @@
+// App Entry Point - MeterCalc Pro v3.3
+
 document.addEventListener('DOMContentLoaded', () => {
-    setTimeout(() => {
-        document.getElementById('splash').classList.add('hide');
-        document.getElementById('app').style.display = 'block';
-    }, 1000);
-    UIManager.loadTheme();
+    // Initialize all modules
     Calculator.init();
-    UIManager.updateEnergyMode();
+    UIManager.loadTheme();
+    SiteManager.init();
+    KeyboardShortcuts.init();
+    Scanner.init();
+    
+    // Set default active tab
     UIManager.switchMainTab('calculatorPanel');
-    console.log('✅ MeterCalc Pro v3.0 initialized');
+    UIManager.updateEnergyMode();
+    
+    // Hide splash screen after delay
+    setTimeout(() => {
+        const splash = document.getElementById('splash');
+        const app = document.getElementById('app');
+        if (splash) splash.classList.add('hide');
+        if (app) app.style.display = 'block';
+    }, 800);
+    
+    console.log('✅ MeterCalc Pro v3.3 initialized - SAMM 654 Compliant');
 });
